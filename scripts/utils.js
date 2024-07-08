@@ -29,6 +29,26 @@ export const [setLibs, getLibs] = (() => {
   ];
 })();
 
+export function loadLink(href, { as, callback, crossorigin, rel, fetchpriority } = {}) {
+  let link = document.head.querySelector(`link[href="${href}"]`);
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', rel);
+    if (as) link.setAttribute('as', as);
+    if (crossorigin) link.setAttribute('crossorigin', crossorigin);
+    if (fetchpriority) link.setAttribute('fetchpriority', fetchpriority);
+    link.setAttribute('href', href);
+    if (callback) {
+      link.onload = (e) => callback(e.type);
+      link.onerror = (e) => callback(e.type);
+    }
+    document.head.appendChild(link);
+  } else if (callback) {
+    callback('noop');
+  }
+  return link;
+}
+
 /*
  * ------------------------------------------------------------
  * Edit above at your own risk.
@@ -40,3 +60,26 @@ export const [setLibs, getLibs] = (() => {
 export async function useMiloSample() {
   const { createTag } = await import(`${getLibs()}/utils/utils.js`);
 }
+
+function loadStyle(href, callback) {
+  return loadLink(href, { rel: 'stylesheet', callback });
+}
+
+export async function bootstrapBlock(miloConfigs, blockConfig) {
+  const { miloLibs } = miloConfigs;
+  const { setConfig, createTag } = await import(`${miloLibs}/utils/utils.js`);
+  setConfig({ ...miloConfigs });
+  loadStyle(`${miloLibs}/blocks/${blockConfig.name}/${blockConfig.name}.css`);
+  loadStyle(`${miloLibs}/styles/styles.css`); //TODO: remove when css gets updated in core milo
+
+  const { default: initBlock } = await import(`${miloLibs}/blocks/${blockConfig.name}/${blockConfig.name}.js`);
+  const meta = createTag('meta', { name: blockConfig.metaName, content: miloConfigs.url });
+  document.head.append(meta);
+
+  if (!document.querySelector(blockConfig.targetEl)) {
+    const block = createTag(blockConfig.targetEl, { class: blockConfig.name});
+    document.body.appendChild(block)
+  }
+  initBlock(document.querySelector(blockConfig.targetEl));
+}
+
