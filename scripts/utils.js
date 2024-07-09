@@ -63,7 +63,7 @@ function loadStyle(href, callback) {
 
 export async function bootstrapBlock(miloConfigs, blockConfig) {
   if (!miloConfigs.url) {
-    console.log(`${blockConfig.type} url not found!`);
+    console.log(`${blockConfig.label} url not found!`);
     return;
   }
   const { miloLibs } = miloConfigs;
