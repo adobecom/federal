@@ -57,15 +57,15 @@ export function loadLink(href, { as, callback, crossorigin, rel, fetchpriority }
  * ------------------------------------------------------------
  */
 
-export async function useMiloSample() {
-  const { createTag } = await import(`${getLibs()}/utils/utils.js`);
-}
-
 function loadStyle(href, callback) {
   return loadLink(href, { rel: 'stylesheet', callback });
 }
 
 export async function bootstrapBlock(miloConfigs, blockConfig) {
+  if (!miloConfigs.url) {
+    console.log(`${blockConfig.type} url not found!`);
+    return;
+  }
   const { miloLibs } = miloConfigs;
   const { setConfig, createTag } = await import(`${miloLibs}/utils/utils.js`);
   setConfig({ ...miloConfigs });
