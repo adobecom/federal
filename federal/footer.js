@@ -19,6 +19,7 @@ async function loadBlock() {
     miloLibs: `${miloLibs}/libs`,
     pathname: `/${fedsGlobalConfig.locale}`,
     locales: fedsGlobalConfig.locales || locales,
+    url: fedsGlobalConfig.footerUrl,
   }
 
   bootstrapBlock(clientConfig, blockConfig);
