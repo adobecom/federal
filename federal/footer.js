@@ -1,8 +1,6 @@
 const blockConfig = {
   name: 'global-footer',
   targetEl: 'footer',
-  metaName: 'footer-source',
-  label: 'Footer',
   appendType: 'appendChild'
 }
 
@@ -17,11 +15,10 @@ async function loadBlock() {
   const { locales } = await import(`${federalRepo}/constants/constants.js`);
   const clientConfig = {
     origin: federalRepo,
-    contentRoot: fedsGlobalConfig.contentRoot || '/federal/globalNav',
+    contentRoot: fedsGlobalConfig.contentRoot,
     miloLibs: `${miloLibs}/libs`,
     pathname: `/${fedsGlobalConfig.locale || ''}`,
     locales: fedsGlobalConfig.locales || locales,
-    url: fedsGlobalConfig.footerUrl,
   }
 
   bootstrapBlock(clientConfig, blockConfig);

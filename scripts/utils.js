@@ -29,26 +29,6 @@ export const [setLibs, getLibs] = (() => {
   ];
 })();
 
-export function loadLink(href, { as, callback, crossorigin, rel, fetchpriority } = {}) {
-  let link = document.head.querySelector(`link[href="${href}"]`);
-  if (!link) {
-    link = document.createElement('link');
-    link.setAttribute('rel', rel);
-    if (as) link.setAttribute('as', as);
-    if (crossorigin) link.setAttribute('crossorigin', crossorigin);
-    if (fetchpriority) link.setAttribute('fetchpriority', fetchpriority);
-    link.setAttribute('href', href);
-    if (callback) {
-      link.onload = (e) => callback(e.type);
-      link.onerror = (e) => callback(e.type);
-    }
-    document.head.appendChild(link);
-  } else if (callback) {
-    callback('noop');
-  }
-  return link;
-}
-
 /*
  * ------------------------------------------------------------
  * Edit above at your own risk.
@@ -58,10 +38,6 @@ export function loadLink(href, { as, callback, crossorigin, rel, fetchpriority }
  */
 
 export async function bootstrapBlock(miloConfigs, blockConfig) {
-  if (!miloConfigs.url) {
-    console.log(`${blockConfig.label} url not found!`);
-    return;
-  }
   const { miloLibs } = miloConfigs;
   const { setConfig, createTag, loadLink } = await import(`${miloLibs}/utils/utils.js`);
   setConfig({ ...miloConfigs });
