@@ -57,28 +57,22 @@ export function loadLink(href, { as, callback, crossorigin, rel, fetchpriority }
  * ------------------------------------------------------------
  */
 
-function loadStyle(href, callback) {
-  return loadLink(href, { rel: 'stylesheet', callback });
-}
-
 export async function bootstrapBlock(miloConfigs, blockConfig) {
   if (!miloConfigs.url) {
     console.log(`${blockConfig.label} url not found!`);
     return;
   }
   const { miloLibs } = miloConfigs;
-  const { setConfig, createTag } = await import(`${miloLibs}/utils/utils.js`);
+  const { setConfig, createTag, loadLink } = await import(`${miloLibs}/utils/utils.js`);
   setConfig({ ...miloConfigs });
-  loadStyle(`${miloLibs}/blocks/${blockConfig.name}/${blockConfig.name}.css`);
-  loadStyle(`${miloLibs}/styles/styles.css`); //TODO: remove when css gets updated in core milo
+  loadLink(`${miloLibs}/blocks/${blockConfig.name}/${blockConfig.name}.css`, { rel: 'stylesheet' });
+  loadLink(`${miloLibs}/styles/styles.css`, { rel: 'stylesheet' });//TODO: remove when css gets updated in core milo
 
   const { default: initBlock } = await import(`${miloLibs}/blocks/${blockConfig.name}/${blockConfig.name}.js`);
-  const meta = createTag('meta', { name: blockConfig.metaName, content: miloConfigs.url });
-  document.head.append(meta);
 
   if (!document.querySelector(blockConfig.targetEl)) {
     const block = createTag(blockConfig.targetEl, { class: blockConfig.name});
-    document.body.appendChild(block)
+    document.body[blockConfig.appendType](block)
   }
   initBlock(document.querySelector(blockConfig.targetEl));
 }
