@@ -39,17 +39,17 @@ export const [setLibs, getLibs] = (() => {
 
 export async function bootstrapBlock(miloConfigs, blockConfig) {
   const { miloLibs } = miloConfigs;
+  const { name, targetEl } = blockConfig;
   const { setConfig, createTag, loadLink } = await import(`${miloLibs}/utils/utils.js`);
   setConfig({ ...miloConfigs });
-  loadLink(`${miloLibs}/blocks/${blockConfig.name}/${blockConfig.name}.css`, { rel: 'stylesheet' });
-  loadLink(`${miloLibs}/styles/styles.css`, { rel: 'stylesheet' });//TODO: remove when css gets updated in core milo
+  const styles = [ `${miloLibs}/blocks/${name}/${name}.css`, `${miloConfigs.origin}/styles/styles.css` ];
+  styles.forEach((url) => loadLink(url, { rel: 'stylesheet' }));
+  const { default: initBlock } = await import(`${miloLibs}/blocks/${name}/${name}.js`);
 
-  const { default: initBlock } = await import(`${miloLibs}/blocks/${blockConfig.name}/${blockConfig.name}.js`);
-
-  if (!document.querySelector(blockConfig.targetEl)) {
-    const block = createTag(blockConfig.targetEl, { class: blockConfig.name});
+  if (!document.querySelector(targetEl)) {
+    const block = createTag(targetEl, { class: name });
     document.body[blockConfig.appendType](block)
   }
-  initBlock(document.querySelector(blockConfig.targetEl));
+  initBlock(document.querySelector(targetEl));
 }
 
