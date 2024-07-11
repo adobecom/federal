@@ -8,9 +8,19 @@
 
 .global-footer a, .dialog-modal a {
   text-decoration: none;
+  color: #035fe6;
 }
 
 .global-footer img {
   max-width: 100%;
   height: auto;
+}
+
+.global-footer .feds-navLink {
+  color: #2c2c2c;
+}
+
+.global-footer .feds-regionPicker,
+.global-footer .feds-footer-privacyLink {
+  color: var(--feds-color-link--light);
 }
