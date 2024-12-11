@@ -1,4 +1,6 @@
 {
+  "previewHost": "main--federal--adobecom.aem.page",
+  "liveHost": "main--federal--adobecom.aem.live",
   "plugins": [
     {
       "id": "library",
@@ -37,7 +39,7 @@
       "id": "localize-2",
       "title": "Localize (V2)",
       "environments": [ "edit" ],
-      "url": "https://main--federal--adobecom.hlx.page/tools/loc?milolibs=locui",
+      "url": "https://main--federal--adobecom.aem.page/tools/loc?milolibs=locui",
       "passReferrer": true,
       "passConfig": true,
       "includePaths": [ "**.xlsx**" ]
