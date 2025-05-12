@@ -2,6 +2,7 @@
   "previewHost": "main--federal--adobecom.aem.page",
   "liveHost": "main--federal--adobecom.aem.live",
   "project": "Federal",
+  "trustedHosts": ["milo.adobe.com", "*--*--adobecom.aem.page", "*--*--adobecom.aem.live", "*--*--adobecom.hlx.page", "*--*--adobecom.hlx.live"],
   "plugins": [
     {
       "id": "library",
