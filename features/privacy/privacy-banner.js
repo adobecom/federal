@@ -1,13 +1,8 @@
-// privacy-banner.js
-
 import privacyState from './privacy-state.js';
 import getUserLocation from './utilities/helpers/getUserLocation.js';
+import getPropertySafely from './utilities/lang/getPropertySafely.js';
 import isInSensitiveGroup from './utilities/helpers/isInSensitiveGroup.js';
 import isGPCEnabled from './utilities/helpers/isGPCEnabled.js';
-import { setLibs, getLibs } from '../../scripts/utils.js';
-
-setLibs('/libs'); // <-- This is critical!
-const miloLibs = getLibs();
 
 // Helper: fetch OneTrust config
 async function getOneTrustConfig(otDomainId) {
@@ -25,15 +20,22 @@ function isGdprEnforcedCountry(location, config) {
   if (!location?.country || !config?.RuleSet) return true;
   const country = location.country.toLowerCase();
   const rules = config.RuleSet.filter((rule) =>
-    Array.isArray(rule.Countries) && rule.Countries.includes(country) && !rule.Global);
+    Array.isArray(rule.Countries) && rule.Countries.includes(country) && !rule.Global
+  );
   return !!rules.length;
 }
 
 async function getInitialConsent({ isGdpr, userProfileTags = [] }) {
+  // Always enable strictly necessary cookies
   if (isGdpr) return ['C0001'];
-  if (isGPCEnabled()) return ['C0001', 'C0002', 'C0003'];
+
+  // For non-GDPR regions:
+  if (isGPCEnabled()) return ['C0001', 'C0002', 'C0003']; // Exclude advertising if GPC is enabled
+
   const [isSensitive] = isInSensitiveGroup(userProfileTags);
-  if (isSensitive) return ['C0001', 'C0002', 'C0003'];
+  if (isSensitive) return ['C0001', 'C0002', 'C0003']; // Exclude advertising for sensitive groups
+
+  // Otherwise, enable all
   return ['C0001', 'C0002', 'C0003', 'C0004'];
 }
 
@@ -48,6 +50,7 @@ async function fetchBannerData(config) {
       if (json?.data?.[0]) return json.data[0];
     }
   } catch {}
+  // Fallback
   return {
     title: 'DefaultTitle',
     description: 'DefaultDescription',
@@ -55,15 +58,18 @@ async function fetchBannerData(config) {
 }
 
 // ---- MAIN EXPORT ----
-export default async function loadPrivacyModal() {
-  console.log(miloLibs);
-  const { getConfig, loadStyle, createTag } = await import(`${miloLibs}/utils/utils.js`);
-  const config = getConfig();
+export default async function loadPrivacyBanner(config, createTag, getMetadata, loadStyle) {
+  // Support custom location for local/dev testing
+  const urlParams = new URLSearchParams(window.location.search);
+  const customLocation = urlParams.get('customPrivacyLocation');
+  if (customLocation) {
+    const locationData = JSON.stringify({ country: customLocation.toUpperCase() });
+    window.sessionStorage.setItem(config.location, locationData);
+  }
 
-  // Use local CSS, not miloLibs
-  loadStyle('./privacy-banner.css');
-
+  // Don't double-load banner or if consent exists
   if (document.querySelector('.privacy-banner')) return;
+  loadStyle('./privacy-banner.css');
   if (privacyState.hasExistingConsent()) return;
 
   // GEO/CONFIG/PROFILE/GPC LOGIC
@@ -74,17 +80,23 @@ export default async function loadPrivacyModal() {
 
   // Fetch user tags/profile as needed
   const userProfileTags = [];
+  // If you have a function to get user profile, do it here and set userProfileTags
+
   const initialConsent = await getInitialConsent({ isGdpr, userProfileTags });
 
+  // Set implicit consent for non-GDPR
   if (!isGdpr && !privacyState.hasExistingConsent()) {
     privacyState.setImplicitConsent();
   }
+
+  // Show banner only if GDPR consent is required
   const showBanner = isGdpr;
   if (!showBanner) {
-    privacyState.setImplicitConsent();
+    privacyState.setImplicitConsent(); // For non-GDPR
     return;
   }
 
+  // Set default consent if not already set (usually C0001)
   if (!privacyState.hasExistingConsent()) {
     privacyState.setConsent(['C0001']);
   }

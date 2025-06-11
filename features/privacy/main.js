@@ -1,7 +1,33 @@
-import loadPrivacyBanner from './privacy-banner.js';
-import loadPrivacyModal from './privacy-modal.js';
+// import loadPrivacyBanner from './privacy-banner.js';
+// import loadPrivacyModal from './privacy-modal.js';
 
-document.getElementById('show-privacy-banner').onclick = loadPrivacyBanner;
-document.getElementById('show-privacy-modal').onclick = loadPrivacyModal;
+// document.getElementById('show-privacy-banner').onclick = loadPrivacyBanner;
+// document.getElementById('show-privacy-modal').onclick = loadPrivacyModal;
 
-document.addEventListener('adobePrivacy:OpenModal', loadPrivacyModal);
+// document.addEventListener('adobePrivacy:OpenModal', loadPrivacyModal);
+
+import { initPrivacy } from './privacy-standalone.js';
+import { setLibs, getLibs } from '../../scripts/utils.js';
+import privacyState from './privacy-state.js';
+
+window.adobePrivacy = {
+    setConsent: (groups) => privacyState.setConsent(groups),
+    hasExistingConsent: () => privacyState.hasExistingConsent(),
+    activeCookieGroups: () => privacyState.activeCookieGroups(),
+    setImplicitConsent: () => privacyState.setImplicitConsent(),
+  };
+
+//const miloLibs = '/libs';
+setLibs('/libs'); // <-- This is critical!
+const miloLibs = getLibs();
+
+const utilsModule = await import(`${miloLibs}/utils/utils.js`);
+const { getConfig, createTag, getMetadata, loadBlock, loadStyle } = utilsModule;
+
+const config = getConfig ? getConfig() : {
+    privacyId: '7a5eb705-95ed-4cc4-a11d-0cc5760e93db', // or your test domain's OneTrust ID
+    codeRoot: '/libs',
+    miloLibs
+  };
+// Start privacy flow automatically!
+initPrivacy(config, createTag, getMetadata, loadBlock, loadStyle);
