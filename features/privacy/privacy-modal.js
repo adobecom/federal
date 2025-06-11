@@ -184,9 +184,8 @@ export default async function loadPrivacyModal() {
 
   if (document.querySelector('.privacy-modal-backdrop')) return;
   await loadStyles('./privacy-modal.css');
-  //loadStyle('./privacy-modal.css');
-  // If you need modal code, import or use your own here
-  // const { getModal } = await import('./modal.js'); // Adjust path if needed
+  
+  const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`); // Adjust path if needed
 
   let privacyJson;
   try {
@@ -195,13 +194,18 @@ export default async function loadPrivacyModal() {
 
   const content = buildModalContent(privacyJson, createTag);
 
-  // --- For demo: just append to DOM (replace with real modal logic in production)
-  const modalWrap = createTag('div', { class: 'privacy-modal-backdrop' });
-  modalWrap.append(content);
-  document.body.append(modalWrap);
+  getModal(null, {
+    class: 'privacy-modal-v2',
+    id: 'privacy-modal-v2',
+    content,
+    closeEvent: 'closePrivacyModal',
+  });
 
-  // --- Close on background click for demo
-  modalWrap.onclick = (e) => {
-    if (e.target === modalWrap) modalWrap.remove();
-  };
+  content.querySelectorAll('.privacy-modal-action:not([data-action="confirm"])').forEach((btn) => {
+    btn.onclick = () => {
+      document.querySelector('#privacy-modal-v2')?.remove();
+      document.querySelector('.modal-curtain')?.remove();
+      document.body.classList.remove('disable-scroll');
+    };
+  });
 }
