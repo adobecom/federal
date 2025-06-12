@@ -69,7 +69,10 @@ export default async function loadPrivacyBanner(config, createTag, getMetadata, 
 
   // Don't double-load banner or if consent exists
   if (document.querySelector('.privacy-banner')) return;
-  loadStyle('./privacy-banner.css');
+  //loadStyle('./privacy-banner.css');
+  const cssUrl = new URL('./privacy-banner.css', import.meta.url).href;
+
+  await loadStyle(cssUrl);
   if (privacyState.hasExistingConsent()) return;
 
   // GEO/CONFIG/PROFILE/GPC LOGIC

@@ -174,16 +174,19 @@ async function fetchPrivacyJson(config, getFederatedContentRoot) {
 }
 
 // ----------- MAIN EXPORT FUNCTION --------------
-export default async function loadPrivacyModal() {
+export default async function loadPrivacyModal(config, createTag, getMetadata, loadStyle) {
   // Dynamically get milo config/util
   const utilsModule = await import('../../scripts/utils.js');
   const getLibs = utilsModule.getLibs;
   const miloLibs = getLibs('/libs');
-  const { getConfig, loadStyle, createTag, getFederatedContentRoot } = await import(`${miloLibs}/utils/utils.js`);
-  const config = getConfig();
+  const { getFederatedContentRoot } = await import(`${miloLibs}/utils/utils.js`);
+  //config = getConfig();
 
   if (document.querySelector('.privacy-modal-backdrop')) return;
-  await loadStyles('./privacy-modal.css');
+  //await loadStyles('./privacy-modal.css');
+  const cssUrl = new URL('./privacy-modal.css', import.meta.url).href;
+
+  await loadStyle(cssUrl);
   
   const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`); // Adjust path if needed
 
