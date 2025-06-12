@@ -38,14 +38,14 @@ function createEnableInfo({ data = [] }, createTag) {
   const infoWrap = createTag('div', { class: 'privacy-modal-enableinfo' });
   const ei = data[0];
   if (!ei) return infoWrap;
-  const makeList = (bullets) => (bullets ? bullets.split('\n').map((b) => createTag('li', null, b)) : [createTag('li', null, 'No bullets found!')]);
+  const makeList = (bullets) => (bullets ? bullets.split('\n').map((b) => createTag('li', {}, b)) : [createTag('li', {}, 'No bullets found!')]);
   const enabled = createTag('div', { class: 'privacy-modal-enabled' }, [
-    createTag('h4', null, ei.enabled_heading),
-    createTag('ul', null, fragment(makeList(ei.enabled_bullets))),
+    createTag('h4', {}, ei.enabled_heading),
+    createTag('ul', {}, fragment(makeList(ei.enabled_bullets))),
   ]);
   const disabled = createTag('div', { class: 'privacy-modal-disabled' }, [
-    createTag('h4', null, ei.disabled_heading),
-    createTag('ul', null, fragment(makeList(ei.disabled_bullets))),
+    createTag('h4', {}, ei.disabled_heading),
+    createTag('ul', {}, fragment(makeList(ei.disabled_bullets))),
   ]);
   infoWrap.append(enabled, disabled);
   return infoWrap;
