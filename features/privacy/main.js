@@ -2,12 +2,12 @@ import { initPrivacy } from './privacy-standalone.js';
 import { setLibs, getLibs } from '../../scripts/utils.js';
 import privacyState from './privacy-state.js';
 
-window.adobePrivacy = {
-    setConsent: (groups) => privacyState.setConsent(groups),
-    hasExistingConsent: () => privacyState.hasExistingConsent(),
-    activeCookieGroups: () => privacyState.activeCookieGroups(),
-    setImplicitConsent: () => privacyState.setImplicitConsent(),
-  };
+// window.adobePrivacy = {
+//     setConsent: (groups) => privacyState.setConsent(groups),
+//     hasExistingConsent: () => privacyState.hasExistingConsent(),
+//     activeCookieGroups: () => privacyState.activeCookieGroups(),
+//     setImplicitConsent: () => privacyState.setImplicitConsent(),
+//   };
 
 //const miloLibs = '/libs';
 setLibs('/libs'); // <-- This is critical!

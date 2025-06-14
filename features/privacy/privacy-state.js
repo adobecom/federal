@@ -107,17 +107,16 @@ function setImplicitConsent() {
   setConsent(CATEGORIES_ALL);
 }
 
-// Listen/subscribe API
 function on(event, cb) {
   window.addEventListener(`adobePrivacy:${event}`, cb);
 }
 
-// Export the API
+
 const privacyState = {
   // eslint-disable-next-line max-len
   getConsent, setConsent, hasExistingConsent, hasFullConsent, hasCustomConsent, setImplicitConsent, on,
 };
 
 privacyState.activeCookieGroups = () => privacyState.getConsent()[0];
-
+window.adobePrivacy = privacyState;
 export default privacyState;
