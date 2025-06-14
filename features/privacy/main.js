@@ -14,7 +14,7 @@ setLibs('/libs'); // <-- This is critical!
 const miloLibs = getLibs();
 
 const utilsModule = await import(`${miloLibs}/utils/utils.js`);
-const { getConfig, createTag, getMetadata, loadBlock } = utilsModule;
+const { getConfig, getMetadata, loadBlock } = utilsModule;
 
 const config = getConfig ? getConfig() : {
     privacyId: '7a5eb705-95ed-4cc4-a11d-0cc5760e93db', // or your test domain's OneTrust ID
@@ -22,4 +22,4 @@ const config = getConfig ? getConfig() : {
     miloLibs
   };
 // Start privacy flow automatically!
-initPrivacy(config, createTag, getMetadata, loadBlock);
+initPrivacy(config, getMetadata, loadBlock);

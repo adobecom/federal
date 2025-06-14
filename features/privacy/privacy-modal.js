@@ -1,8 +1,9 @@
 import privacyState from './privacy-state.js';
 import { setLibs, getLibs } from '../../scripts/utils.js';
-import { loadStyle } from './utilities/loadStyle.js';
+import { loadStyle } from './utilities/utilities.js';
+import { createTag } from './utilities/utilities.js';
 
-setLibs('/libs'); // <-- This is critical!
+setLibs('/libs'); 
 const miloLibs = getLibs();
 
 function fragment(children) {
@@ -166,23 +167,21 @@ async function fetchPrivacyJson(config, getFederatedContentRoot) {
   const root = config.contentRoot ?? getFederatedContentRoot();
   const url1 = `${root}/privacy/privacy.json`;
   const url2 = 'https://stage--federal--adobecom.aem.page/federal/dev/snehal/privacy/privacy-modal.json';
-  let resp = await fetch(url1, { cache: 'no-cache' });
+  let resp = await fetch(url2, { cache: 'no-cache' });
   if (resp.ok) return resp.json();
-  resp = await fetch(url2, { cache: 'no-cache' });
+  resp = await fetch(url1, { cache: 'no-cache' });
   if (resp.ok) return resp.json();
   throw new Error('Privacy JSON not found');
 }
 
-// ----------- MAIN EXPORT FUNCTION --------------
-export default async function loadPrivacyModal(config, createTag, getMetadata) {
-  // Dynamically get milo config/util
+export default async function loadPrivacyModal(config, getMetadata) {
   const utilsModule = await import('../../scripts/utils.js');
   const getLibs = utilsModule.getLibs;
   const miloLibs = getLibs('/libs');
   const { getFederatedContentRoot } = await import(`${miloLibs}/utils/utils.js`);
 
   if (document.querySelector('.privacy-modal-backdrop')) return;
-  const cssUrl = new URL('./privacy-banner.css', import.meta.url).href;
+  const cssUrl = new URL('./privacy-modal.css', import.meta.url).href;
   loadStyle(cssUrl);
   
   const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`); // Adjust path if needed

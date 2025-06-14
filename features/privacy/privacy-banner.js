@@ -3,7 +3,8 @@ import getUserLocation from './utilities/helpers/getUserLocation.js';
 import getPropertySafely from './utilities/lang/getPropertySafely.js';
 import isInSensitiveGroup from './utilities/helpers/isInSensitiveGroup.js';
 import isGPCEnabled from './utilities/helpers/isGPCEnabled.js';
-import { loadStyle } from './utilities/loadStyle.js';
+import { loadStyle } from './utilities/utilities.js';
+import { createTag } from './utilities/utilities.js';
 
 // Helper: fetch OneTrust config
 async function getOneTrustConfig(otDomainId) {
@@ -44,8 +45,8 @@ async function fetchBannerData(config) {
   const url1 = `${config.contentRoot ?? ''}/privacy/privacy-banner.json`;
   const url2 = 'https://stage--federal--adobecom.aem.page/federal/dev/snehal/privacy/privacy-banner.json';
   try {
-    let resp = await fetch(url1, { cache: 'no-cache' });
-    if (!resp.ok) resp = await fetch(url2, { cache: 'no-cache' });
+    let resp = await fetch(url2, { cache: 'no-cache' });
+    if (!resp.ok) resp = await fetch(url1, { cache: 'no-cache' });
     if (resp.ok) {
       const json = await resp.json();
       if (json?.data?.[0]) return json.data[0];
@@ -58,8 +59,7 @@ async function fetchBannerData(config) {
   };
 }
 
-// ---- MAIN EXPORT ----
-export default async function loadPrivacyBanner(config, createTag, getMetadata) {
+export default async function loadPrivacyBanner(config, getMetadata) {
   // Support custom location for local/dev testing
   const urlParams = new URLSearchParams(window.location.search);
   const customLocation = urlParams.get('customPrivacyLocation');
@@ -68,7 +68,6 @@ export default async function loadPrivacyBanner(config, createTag, getMetadata) 
     window.sessionStorage.setItem(config.location, locationData);
   }
 
-  // Don't double-load banner or if consent exists
   if (document.querySelector('.privacy-banner')) return;
   const cssUrl = new URL('./privacy-banner.css', import.meta.url).href;
   loadStyle(cssUrl);
@@ -80,9 +79,7 @@ export default async function loadPrivacyBanner(config, createTag, getMetadata) 
   const otConfig = await getOneTrustConfig(otDomainId);
   const isGdpr = isGdprEnforcedCountry(location, otConfig);
 
-  // Fetch user tags/profile as needed
   const userProfileTags = [];
-  // If you have a function to get user profile, do it here and set userProfileTags
 
   const initialConsent = await getInitialConsent({ isGdpr, userProfileTags });
 
@@ -105,7 +102,6 @@ export default async function loadPrivacyBanner(config, createTag, getMetadata) 
 
   const bannerData = await fetchBannerData(config);
 
-  // --- Banner UI ---
   const banner = createTag('div', { class: 'privacy-banner', role: 'region', 'aria-label': 'Cookie banner' });
   const wrap = createTag('div', { class: 'privacy-banner-wrap' });
 
