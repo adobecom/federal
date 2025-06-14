@@ -1,4 +1,4 @@
-export function loadStyles(url) {
+export function loadStyle(url) {
     return new Promise((resolve, reject) => {
       if ([...document.styleSheets].some(s => s.href && s.href.endsWith(url))) return resolve();
       const link = document.createElement('link');

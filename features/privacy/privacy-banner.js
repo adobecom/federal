@@ -3,6 +3,7 @@ import getUserLocation from './utilities/helpers/getUserLocation.js';
 import getPropertySafely from './utilities/lang/getPropertySafely.js';
 import isInSensitiveGroup from './utilities/helpers/isInSensitiveGroup.js';
 import isGPCEnabled from './utilities/helpers/isGPCEnabled.js';
+import { loadStyle } from './utilities/loadStyle.js';
 
 // Helper: fetch OneTrust config
 async function getOneTrustConfig(otDomainId) {
@@ -58,7 +59,7 @@ async function fetchBannerData(config) {
 }
 
 // ---- MAIN EXPORT ----
-export default async function loadPrivacyBanner(config, createTag, getMetadata, loadStyle) {
+export default async function loadPrivacyBanner(config, createTag, getMetadata) {
   // Support custom location for local/dev testing
   const urlParams = new URLSearchParams(window.location.search);
   const customLocation = urlParams.get('customPrivacyLocation');
