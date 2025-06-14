@@ -3,7 +3,7 @@ import { setLibs, getLibs } from '../../scripts/utils.js';
 import { loadStyle } from './utilities/utilities.js';
 import { createTag } from './utilities/utilities.js';
 
-
+setLibs('/libs');
 const miloLibs = getLibs();
 
 function fragment(children) {
