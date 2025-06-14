@@ -182,7 +182,8 @@ export default async function loadPrivacyModal(config, createTag, getMetadata) {
   const { getFederatedContentRoot } = await import(`${miloLibs}/utils/utils.js`);
 
   if (document.querySelector('.privacy-modal-backdrop')) return;
-  loadStyle('./privacy-modal.css');
+  const cssUrl = new URL('./privacy-banner.css', import.meta.url).href;
+  loadStyle(cssUrl);
   
   const { getModal } = await import(`${miloLibs}/blocks/modal/modal.js`); // Adjust path if needed
 
