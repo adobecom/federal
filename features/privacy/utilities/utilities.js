@@ -14,9 +14,11 @@ export function createTag(tag, attributes, html, options = {}) {
       }
     }
     if (attributes) {
-      Object.entries(attributes).forEach(([key, val]) => {
-        el.setAttribute(key, val);
-      });
+        Object.entries(attributes).forEach(([key, val]) => {
+            if (val !== undefined && val !== null) {
+              el.setAttribute(key, val);
+            }
+          });
     }
     if (options.parent) options.parent.append(el);
     return el;

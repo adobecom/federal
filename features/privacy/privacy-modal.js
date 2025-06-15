@@ -111,7 +111,6 @@ function buildModalContent(json, createTag) {
     createCookieGroups(cookiegroups, createTag),
   );
 
-  // Actions will be prepended after modal is added to DOM (see below)
   return wrap;
 }
 
@@ -124,7 +123,6 @@ function showModal(content, {
   document.getElementById(id)?.remove();
   document.querySelector('.modal-curtain')?.remove();
 
-  // Modal
   const modal = document.createElement('div');
   modal.id = id;
   modal.className = `${className} dialog-modal`;
@@ -133,11 +131,9 @@ function showModal(content, {
   modal.tabIndex = -1;
   modal.append(content);
 
-  // Curtain
   const curtain = document.createElement('div');
   curtain.className = 'modal-curtain is-open';
 
-  // Central close function
   function closeModal() {
     modal.remove();
     curtain.remove();
@@ -147,82 +143,19 @@ function showModal(content, {
 
   curtain.onclick = (e) => { if (e.target === curtain) closeModal(); };
 
-  // Close button
   const closeBtn = document.createElement('button');
   closeBtn.className = 'dialog-close';
   closeBtn.setAttribute('aria-label', 'Close');
   closeBtn.innerHTML = '&times;';
   closeBtn.onclick = () => closeModal();
   modal.prepend(closeBtn);
-
-  // Add to DOM
   document.body.appendChild(modal);
   modal.insertAdjacentElement('afterend', curtain);
-
-  // Accessibility
   modal.focus();
   modal.onkeydown = (e) => { if (e.key === 'Escape') closeModal(); };
   document.body.classList.add('disable-scroll');
 
   return closeModal;
-}
-
-export default async function loadPrivacyModal(config, getMetadata) {
-  const utilsModule = await import('../../scripts/utils.js');
-  const getLibs = utilsModule.getLibs;
-  const miloLibs = getLibs('/libs');
-  const { getFederatedContentRoot } = await import(`${miloLibs}/utils/utils.js`);
-
-  if (document.querySelector('.privacy-modal-backdrop')) return;
-  const cssUrl = new URL('./privacy-modal.css', import.meta.url).href;
-  loadStyle(cssUrl);
-
-  let privacyJson;
-  try {
-    privacyJson = await fetchPrivacyJson(config, getFederatedContentRoot);
-  } catch (e) { return; }
-
-  // Build modal content (without actions yet)
-  const content = buildModalContent(privacyJson, createTag);
-
-  // Show modal and get working closeModal callback
-  const closeModal = showModal(content, {
-    className: 'privacy-modal-v2',
-    id: 'privacy-modal-v2',
-    closeEvent: 'closePrivacyModal',
-  });
-
-  // Now create actions and wire up (has access to closeModal)
-  const actionsDiv = createActions(privacyJson.actions, content, privacyJson.cookiegroups, createTag);
-  content.prepend(actionsDiv);
-
-  // Button wiring
-  content.querySelectorAll('.privacy-modal-action').forEach((btn) => {
-    btn.onclick = () => {
-      if (btn.dataset.action === "accept") {
-        const allCats = privacyJson.cookiegroups.data.map((g, i) => g.category || `C000${i+1}`);
-        privacyState.setConsent(allCats);
-      } else if (btn.dataset.action === "reject") {
-        privacyState.setConsent(['C0001']);
-      } else if (btn.dataset.action === "confirm") {
-        const checkedCats = collectConsentFromModal(content);
-        privacyState.setConsent(checkedCats);
-      }
-      showPrivacyToaster();
-      closeModal();
-    };
-  });
-}
-
-async function fetchPrivacyJson(config, getFederatedContentRoot) {
-  const root = config.contentRoot ?? getFederatedContentRoot();
-  const url1 = `${root}/privacy/privacy.json`;
-  const url2 = 'https://stage--federal--adobecom.aem.page/federal/dev/snehal/privacy/privacy-modal.json';
-  let resp = await fetch(url2, { cache: 'no-cache' });
-  if (resp.ok) return resp.json();
-  resp = await fetch(url1, { cache: 'no-cache' });
-  if (resp.ok) return resp.json();
-  throw new Error('Privacy JSON not found');
 }
 
 function createActions(actions, modalContent, cookiegroups, createTag) {
@@ -252,3 +185,73 @@ function createActions(actions, modalContent, cookiegroups, createTag) {
   }
   return actionsDiv;
 }
+
+async function fetchPrivacyJson(config, getFederatedContentRoot) {
+  const root = config.contentRoot ?? getFederatedContentRoot();
+  const url1 = `${root}/privacy/privacy.json`;
+  const url2 = 'https://stage--federal--adobecom.aem.page/federal/dev/snehal/privacy/privacy-modal.json';
+  let resp = await fetch(url2, { cache: 'no-cache' });
+  if (resp.ok) return resp.json();
+  resp = await fetch(url1, { cache: 'no-cache' });
+  if (resp.ok) return resp.json();
+  throw new Error('Privacy JSON not found');
+}
+
+export default async function loadPrivacyModal(config, getMetadata) {
+  const utilsModule = await import('../../scripts/utils.js');
+  const getLibs = utilsModule.getLibs;
+  const miloLibs = getLibs('/libs');
+  const { getFederatedContentRoot } = await import(`${miloLibs}/utils/utils.js`);
+
+  if (document.querySelector('.privacy-modal-backdrop')) return;
+  const cssUrl = new URL('./privacy-modal.css', import.meta.url).href;
+  loadStyle(cssUrl);
+
+  let privacyJson;
+  try {
+    privacyJson = await fetchPrivacyJson(config, getFederatedContentRoot);
+  } catch (e) { return; }
+
+  // Build modal content (without actions yet)
+  const content = buildModalContent(privacyJson, createTag);
+
+  // Show modal and get working closeModal callback
+  const closeModal = showModal(content, {
+    className: 'privacy-modal-v2',
+    id: 'privacy-modal-v2',
+    closeEvent: 'closePrivacyModal',
+  });
+
+  const actionsDiv = createActions(privacyJson.actions, content, privacyJson.cookiegroups, createTag);
+  content.prepend(actionsDiv);
+
+  // Button wiring
+  actionsDiv.querySelectorAll('.privacy-modal-action').forEach((btn) => {
+    btn.onclick = () => {
+      if (btn.dataset.action === "accept") {
+        content.querySelectorAll('.privacy-modal-cookiegroup input[type="checkbox"]:not(:disabled)').forEach(cb => {
+          cb.checked = true;
+        });
+        const allCats = Array.from(
+          content.querySelectorAll('.privacy-modal-cookiegroup')
+        ).map(groupDiv => groupDiv.dataset.cat);
+        privacyState.setConsent(allCats);
+  
+      } else if (btn.dataset.action === "reject") {
+        // Disable all except strictly necessary: uncheck all, check only C0001 in UI and consent
+        content.querySelectorAll('.privacy-modal-cookiegroup input[type="checkbox"]:not(:disabled)').forEach(cb => {
+          cb.checked = cb.closest('.privacy-modal-cookiegroup').dataset.cat === 'C0001';
+        });
+        privacyState.setConsent(['C0001']);
+  
+      } else if (btn.dataset.action === "confirm") {
+        const checkedCats = collectConsentFromModal(content);
+        privacyState.setConsent(checkedCats);
+      }
+      showPrivacyToaster();
+      closeModal();
+    };
+  });
+}
+
+
