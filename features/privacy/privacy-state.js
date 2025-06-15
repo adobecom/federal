@@ -92,29 +92,92 @@ function fireConsentEvent() {
   }
 }
 
+function updateOneTrustRuntime(groups = []) {
+  const formatted = `,${groups.join(',')},`;
+
+  function write(val) {
+    window.OptanonActiveGroups  = val;
+    window.OneTrustActiveGroups = val;
+  }
+
+  write(formatted);                         
+  window._desiredOTGroups = formatted;
+
+  if (!window._otPatchApplied) {
+    window._otPatchApplied = true;
+
+    ['OptanonActiveGroups', 'OneTrustActiveGroups'].forEach((prop) => {
+      let internal = window[prop]; 
+
+      Object.defineProperty(window, prop, {
+        configurable: true,
+        enumerable: true,
+        get()  { return internal; },
+        set(v) {
+          internal = window._desiredOTGroups || v;
+        }
+      });
+    });
+  }
+  if (window.OneTrust) {
+    window.OneTrust.activeGroups = groups;
+  }
+}
+
+function attachOneTrustSyncHook() {
+  if (
+    window.OneTrust &&
+    typeof window.OneTrust.OnConsentChanged === 'function' &&
+    !window._otSyncHookAdded
+  ) {
+    window._otSyncHookAdded = true;
+    window.OneTrust.OnConsentChanged(() => {
+      try {
+        const [active] = getConsent();        // read fresh from cookie
+        updateOneTrustRuntime(active);
+      } catch (e) {
+        console.warn('[Privacy] Sync-hook failed:', e);
+      }
+    });
+  }
+}
+
 function setConsent(groups) {
-  const domain = `.${extractRootDomain(window.location.hostname)}`;
+  const domain      = `.${extractRootDomain(window.location.hostname)}`;
   const cookieValue = buildConsentCookie(groups);
-  const expiration = new Date();
+  const expiration  = new Date();
   expiration.setFullYear(expiration.getFullYear() + 1);
-  setCookieValue(CONSENT_COOKIE, cookieValue, { path: '/', domain, expiration });
+
+  setCookieValue(CONSENT_COOKIE,     cookieValue,              { path: '/', domain, expiration });
   setCookieValue(INTERACTION_COOKIE, expiration.toISOString(), { path: '/', domain, expiration });
+
+  updateOneTrustRuntime(groups);
+  attachOneTrustSyncHook();
+
+  if (window.OneTrust && typeof window.OneTrust.SaveConsent === 'function') {
+    try { window.OneTrust.SaveConsent(); } catch (_) { /* silent */ }
+  }
+  updateOneTrustRuntime(groups);
+  setTimeout(() => updateOneTrustRuntime(groups), 0);
+
   fireConsentEvent();
 }
 
-// For implicit consent (ROW)
 function setImplicitConsent() {
   setConsent(CATEGORIES_ALL);
 }
-
 function on(event, cb) {
   window.addEventListener(`adobePrivacy:${event}`, cb);
 }
 
-
 const privacyState = {
-  // eslint-disable-next-line max-len
-  getConsent, setConsent, hasExistingConsent, hasFullConsent, hasCustomConsent, setImplicitConsent, on,
+  getConsent,
+  setConsent,
+  hasExistingConsent,
+  hasFullConsent,
+  hasCustomConsent,
+  setImplicitConsent,
+  on,
 };
 
 privacyState.activeCookieGroups = () => privacyState.getConsent()[0];

@@ -36,6 +36,10 @@ export function loadStyle(url) {
 }
 
 export function loadOneTrustScriptOnce(domainId) {
+    if (!domainId) {
+        console.warn('[Privacy] OneTrust domain script ID is missing – OneTrust SDK will not be loaded.');
+        return Promise.resolve();
+    }
     if (window.OneTrust) return Promise.resolve();
     if (window._otScriptLoadingPromise) return window._otScriptLoadingPromise;
     window._otScriptLoadingPromise = new Promise((resolve, reject) => {
