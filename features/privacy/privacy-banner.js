@@ -5,6 +5,7 @@ import isInSensitiveGroup from './utilities/helpers/isInSensitiveGroup.js';
 import isGPCEnabled from './utilities/helpers/isGPCEnabled.js';
 import { loadStyle } from './utilities/utilities.js';
 import { createTag } from './utilities/utilities.js';
+import { loadOneTrustScriptOnce } from './utilities/utilities.js';
 
 // Helper: fetch OneTrust config
 async function getOneTrustConfig(otDomainId) {
@@ -122,12 +123,26 @@ export default async function loadPrivacyBanner(config, getMetadata) {
   wrap.append(content, btnRow);
   banner.append(wrap);
 
-  btnAccept.onclick = () => {
+  btnAccept.onclick = async () => {
     privacyState.setConsent(initialConsent);
+
+    const otDomainId = config.privacyId || (config.privacy && config.privacy.otDomainId);
+    await loadOneTrustScriptOnce(otDomainId);
+    if (window.OneTrust && typeof window.OneTrust.AcceptAll === "function") {
+      window.OneTrust.AcceptAll();
+    }
+
     banner.remove();
   };
-  btnReject.onclick = () => {
+  btnReject.onclick = async () => {
     privacyState.setConsent(['C0001']);
+
+    const otDomainId = config.privacyId || (config.privacy && config.privacy.otDomainId);
+    await loadOneTrustScriptOnce(otDomainId);
+    if (window.OneTrust && typeof window.OneTrust.RejectAll === "function") {
+      window.OneTrust.RejectAll();
+    }
+
     banner.remove();
   };
   btnSettings.onclick = () => {

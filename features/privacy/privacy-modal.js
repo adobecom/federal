@@ -2,6 +2,7 @@ import privacyState from './privacy-state.js';
 import { setLibs, getLibs } from '../../scripts/utils.js';
 import { loadStyle } from './utilities/utilities.js';
 import { createTag } from './utilities/utilities.js';
+import { loadOneTrustScriptOnce } from './utilities/utilities.js';
 
 setLibs('/libs');
 const miloLibs = getLibs();
@@ -227,7 +228,9 @@ export default async function loadPrivacyModal(config, getMetadata) {
 
   // Button wiring
   actionsDiv.querySelectorAll('.privacy-modal-action').forEach((btn) => {
-    btn.onclick = () => {
+    btn.onclick = async () => {
+      const otDomainId = config.privacyId || (config.privacy && config.privacy.otDomainId);
+
       if (btn.dataset.action === "accept") {
         content.querySelectorAll('.privacy-modal-cookiegroup input[type="checkbox"]:not(:disabled)').forEach(cb => {
           cb.checked = true;
@@ -236,7 +239,11 @@ export default async function loadPrivacyModal(config, getMetadata) {
           content.querySelectorAll('.privacy-modal-cookiegroup')
         ).map(groupDiv => groupDiv.dataset.cat);
         privacyState.setConsent(allCats);
-  
+        // Call OneTrust API
+        await loadOneTrustScriptOnce(otDomainId);
+        if (window.OneTrust && typeof window.OneTrust.AcceptAll === "function") {
+          window.OneTrust.AcceptAll();
+        }
       } else if (btn.dataset.action === "reject") {
         // Disable all except strictly necessary: uncheck all, check only C0001 in UI and consent
         content.querySelectorAll('.privacy-modal-cookiegroup input[type="checkbox"]:not(:disabled)').forEach(cb => {
@@ -244,9 +251,18 @@ export default async function loadPrivacyModal(config, getMetadata) {
         });
         privacyState.setConsent(['C0001']);
   
+        await loadOneTrustScriptOnce(otDomainId);
+        if (window.OneTrust && typeof window.OneTrust.RejectAll === "function") {
+          window.OneTrust.RejectAll();
+        }
       } else if (btn.dataset.action === "confirm") {
         const checkedCats = collectConsentFromModal(content);
         privacyState.setConsent(checkedCats);
+
+        await loadOneTrustScriptOnce(otDomainId);
+        if (window.OneTrust && typeof window.OneTrust.SaveConsent === "function") {
+         window.OneTrust.SaveConsent();
+        }
       }
       showPrivacyToaster();
       closeModal();

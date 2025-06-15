@@ -1,4 +1,3 @@
-
 export function createTag(tag, attributes, html, options = {}) {
     const el = document.createElement(tag);
     // Handle HTML content (string, Node, DocumentFragment, Array)
@@ -36,5 +35,19 @@ export function loadStyle(url) {
     });
 }
 
+export function loadOneTrustScriptOnce(domainId) {
+    if (window.OneTrust) return Promise.resolve();
+    if (window._otScriptLoadingPromise) return window._otScriptLoadingPromise;
+    window._otScriptLoadingPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.cookielaw.org/scripttemplates/otSDKStub.js';
+      script.setAttribute('data-domain-script', domainId);
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+    return window._otScriptLoadingPromise;
+  }
 
   
