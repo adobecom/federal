@@ -9,7 +9,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { UnavConfig } from "./PostRendering/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems } from "./Utils/Utils";
-
+import './styles/global-navigation.css';
 
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -64,6 +64,7 @@ mountpoint: HTMLElement
 ): Promise<HTMLElement> => {
   const navHTML = renderGnavString(data)
   mountpoint.innerHTML = navHTML;
+  mountpoint.classList.add('site-pivot');
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup > ul')
   ]
