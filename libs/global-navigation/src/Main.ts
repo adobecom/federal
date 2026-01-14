@@ -10,8 +10,9 @@ import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems } from "./Utils/Utils";
 import './styles/styles.css';
 import { tabs } from "./Components/Tab/Render";
+import { combineWithFederalPlaceholders } from "./Utils/Placeholders";
 
-// TODO implement Analytics
+// TODO implement Analytcs
 
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -28,7 +29,8 @@ export type Input = {
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
-
+  miloConfig: MiloConfig;
+  placeholders: Promise<Map<string, string>>;
   getStageDomainMap: (domainmap: unknown[], env: string) =>
     { [key: string]: string }
   // MEP: {
@@ -37,12 +39,51 @@ export type Input = {
   // }
 };
 
+type MiloConfig = {
+  locale: Locale;
+};
+
+type Locale = {
+  // Core properties (always present)
+  ietf: string;              // e.g., 'en-US', 'ja-JP'
+  prefix: string;            // e.g., '', '/kr', '/ja/jp'
+  
+  // Common properties
+  tk?: string;               // Typekit/font token, e.g., 'hah7vzn.css'
+  region?: string;           // e.g., 'us', 'jp'
+  language?: string;         // e.g., 'en', 'ja', 'kr'
+  dir?: string;              // Text direction: 'ltr' or 'rtl'
+  
+  // Added by setConfig
+  contentRoot?: string;      // Full URL path with origin + prefix + contentRoot
+  
+  // For language-based routing
+  languageBased?: boolean;   // Whether language-based routing is enabled
+  
+  // For base locales with regional variants
+  regions?: Record<string, Locale> | Array<{
+    region: string;
+    ietf?: string;
+    tk?: string;
+  }>;
+  
+  // For child locales that reference a base
+  base?: string;             // Reference to base locale key
+  
+  // Any additional properties from config
+  [key: string]: unknown;
+};
+
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   if (!(input.gnavSource instanceof URL)) {
     throw new IrrecoverableError("gnavSource needs to be a URL object");
   }
+  // We kick off the request for the federal placeholders in parallel
+  // TODO
+  input.placeholders = combineWithFederalPlaceholders(input);
+
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError)
     throw initial;
@@ -67,7 +108,7 @@ export const renderGnav = (
 ) => async (
 mountpoint: HTMLElement
 ): Promise<HTMLElement> => {
-  const navHTML = renderGnavString(data)
+  const navHTML = renderGnavString(data);
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
   const megaMenus = [
