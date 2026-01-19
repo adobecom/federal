@@ -1,4 +1,5 @@
 import { IrrecoverableError } from "../Error/Error";
+import { getPlaceholders, replacePlaceholders } from "./Placeholders";
 
 export const isDesktop = window.matchMedia('(min-width: 900px)');
 
@@ -168,8 +169,9 @@ export const fetchAndProcessPlainHTML = async (
     if (!response.ok)
       return new IrrecoverableError(`Request for ${modifiedSource} failed`);
     const htmlText = await response.text();
-  
-    const { body } = new DOMParser().parseFromString(htmlText, "text/html");
+    const resolvedPlaceholders = await getPlaceholders();
+    const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);
+    const { body } = new DOMParser().parseFromString(processedHtml, "text/html");
     return body;
   } catch (error) {
     // @ts-expect-error errors usually have a message

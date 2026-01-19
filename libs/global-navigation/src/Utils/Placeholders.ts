@@ -1,6 +1,6 @@
 import { Input } from "../Main";
 import { RecoverableError } from "../test-exports";
-import { getFederatedContentRoot } from "./Utils";
+import { getFederatedContentRoot, getMiloConfig } from "./Utils";
 // TODO: avoid circular dependencies between Main and
 // This file (or any other file.
 
@@ -15,8 +15,8 @@ type PlaceholderResponse = {
 export const combineWithFederalPlaceholders = async (
   input: Input
 ): Promise<Map<string, string>> => {
-  const { placeholders, miloConfig } = input;
-  const { locale } = miloConfig;
+  const { placeholders } = input;
+  const { locale } = getMiloConfig();
   const origin = getFederatedContentRoot();
   const url = `${origin}${locale.prefix}/federal/globalnav/placeholders.json`;
   const [
@@ -30,9 +30,12 @@ export const combineWithFederalPlaceholders = async (
   return new Map([...federalPlaceholders, ...cloudPlaceholders]);
 };
 
+const cache = new Map<string, Map<string, string>>();
 const getFederalPlaceholders = async (
   url: string
 ): Promise<Map<string, string>> => {
+  const cached = cache.get(url);
+  if (cached) return cached;
   try {
     const response = await fetch(url);
     if (!response.ok)
@@ -40,7 +43,11 @@ const getFederalPlaceholders = async (
     const obj = parseResponse(await response.json());
     if (obj instanceof RecoverableError)
       throw obj;
-    return new Map(obj.data.map(({ key, value }) => [key, value]));
+    const placeholders = new Map(
+      obj.data.map(({ key, value }) => [key, value])
+    );
+    cache.set(url, placeholders);
+    return placeholders;
   } catch (e) {
     if (e instanceof RecoverableError) {
       console.error(e.message);
@@ -75,3 +82,38 @@ const parseResponse = (
     return err;
   }
 }
+
+export function replacePlaceholders(
+  s: string,
+  placeholders: Map<string, string>
+): string {
+  const regex = /{{(.*?)}}|%7B%7B(.*?)%7D%7D/g;
+  const match = regex.test(s);
+  if (!match) return s;
+  return s.replace(regex, (_: string, p1?: string, p2?: string) => {
+      const k = p1 ?? p2 ?? '';
+      return placeholders.get(k) ?? k;
+  });
+};
+
+type PlaceholdersStateFunctions = [
+  (p: Promise<Map<string, string>>) => void,
+  () => Promise<Map<string, string>>
+];
+
+export const [setPlaceholders, getPlaceholders] = ((): PlaceholdersStateFunctions => {
+  let placeholdersPromise: Promise<Map<string, string>> | undefined;
+
+  return [
+    (p: Promise<Map<string, string>>): void => {
+      if (placeholdersPromise) return;
+      placeholdersPromise = p;
+    },
+    (): Promise<Map<string, string>> => {
+      if (!placeholdersPromise) {
+        throw new Error('Placeholders not initialized. Call setPlaceholders() first.');
+      }
+      return placeholdersPromise;
+    },
+  ];
+})();

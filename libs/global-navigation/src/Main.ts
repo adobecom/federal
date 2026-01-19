@@ -10,7 +10,7 @@ import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig } from "./Utils/Utils";
 import './styles/styles.css';
 import { tabs } from "./Components/Tab/Render";
-import { combineWithFederalPlaceholders } from "./Utils/Placeholders";
+import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 
 // TODO implement Analytcs
 
@@ -39,41 +39,6 @@ export type Input = {
   // }
 };
 
-type MiloConfig = {
-  locale: Locale;
-};
-
-type Locale = {
-  // Core properties (always present)
-  ietf: string;              // e.g., 'en-US', 'ja-JP'
-  prefix: string;            // e.g., '', '/kr', '/ja/jp'
-  
-  // Common properties
-  tk?: string;               // Typekit/font token, e.g., 'hah7vzn.css'
-  region?: string;           // e.g., 'us', 'jp'
-  language?: string;         // e.g., 'en', 'ja', 'kr'
-  dir?: string;              // Text direction: 'ltr' or 'rtl'
-  
-  // Added by setConfig
-  contentRoot?: string;      // Full URL path with origin + prefix + contentRoot
-  
-  // For language-based routing
-  languageBased?: boolean;   // Whether language-based routing is enabled
-  
-  // For base locales with regional variants
-  regions?: Record<string, Locale> | Array<{
-    region: string;
-    ietf?: string;
-    tk?: string;
-  }>;
-  
-  // For child locales that reference a base
-  base?: string;             // Reference to base locale key
-  
-  // Any additional properties from config
-  [key: string]: unknown;
-};
-
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
@@ -81,9 +46,14 @@ export const main = async (
   if (!(gnavSource instanceof URL)) {
     throw new IrrecoverableError("gnavSource needs to be a URL object");
   }
+  // Initialize MiloConfig with validation
+  try {
+    setMiloConfig(miloConfig);
+  } catch (error) {
+    throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
+  }
   // We kick off the request for the federal placeholders in parallel
-  // TODO
-  input.placeholders = combineWithFederalPlaceholders(input);
+  setPlaceholders(combineWithFederalPlaceholders(input));
 
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError)
@@ -91,13 +61,6 @@ export const main = async (
   const { mainNav, aside: _aside } = initial;
   if (mainNav instanceof IrrecoverableError)
     throw mainNav;
-
-  // Initialize MiloConfig with validation
-  try {
-    setMiloConfig(miloConfig);
-  } catch (error) {
-    throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
-  }
 
   const gnavData = parseNavigation(mainNav, unavEnabled);
   if (gnavData instanceof IrrecoverableError)
