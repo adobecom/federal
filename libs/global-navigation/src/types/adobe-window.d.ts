@@ -35,7 +35,7 @@ declare global {
     /** Adobe Experience Platform Web SDK (Alloy) */
     alloy?: (command: string) => Promise<AlloyIdentityData>;
 
-    lana: Lana;
+    lana?: Lana;
     
     /** Universal Navigation Component */
     UniversalNav?: {
