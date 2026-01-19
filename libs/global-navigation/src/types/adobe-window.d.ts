@@ -12,6 +12,7 @@
  */
 
 import type { AlloyIdentityData, UnavConfig } from '../PostRendering/Unav/Unav.types';
+import { Lana } from '../Utils/Log';
 
 declare global {
   interface Window {
@@ -33,6 +34,8 @@ declare global {
     
     /** Adobe Experience Platform Web SDK (Alloy) */
     alloy?: (command: string) => Promise<AlloyIdentityData>;
+
+    lana: Lana;
     
     /** Universal Navigation Component */
     UniversalNav?: {
