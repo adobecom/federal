@@ -36,7 +36,7 @@ export const lanaLog = (message: string, tags = 'default', errorType: 'e' | 'i' 
   if (!window.lana)
     console.warn('lana logging unavailable in the gnav');
 
-  window?.lana.log(`${message} | gnav-source: ${url} | href: ${window.location.href}`, {
+  window?.lana?.log(`${message} | gnav-source: ${url} | href: ${window.location.href}`, {
     clientId: LANA_CLIENT_ID,
     sampleRate: 1,
     tags,
