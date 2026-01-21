@@ -1,4 +1,5 @@
 import { IrrecoverableError } from "../Error/Error";
+import { getPlaceholders, replacePlaceholders } from "./Placeholders";
 
 export const isDesktop = window.matchMedia('(min-width: 900px)');
 
@@ -168,8 +169,9 @@ export const fetchAndProcessPlainHTML = async (
     if (!response.ok)
       return new IrrecoverableError(`Request for ${modifiedSource} failed`);
     const htmlText = await response.text();
-  
-    const { body } = new DOMParser().parseFromString(htmlText, "text/html");
+    const resolvedPlaceholders = await getPlaceholders();
+    const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);
+    const { body } = new DOMParser().parseFromString(processedHtml, "text/html");
     return body;
   } catch (error) {
     // @ts-expect-error errors usually have a message
@@ -302,10 +304,10 @@ export const isDarkMode = (): boolean => {
 /**
  * Configuration options for dynamically loading link elements
  */
-type LoadLinkOptions = {
+type LoadLinkOptions<T> = {
   id?: string;
   as?: string;
-  callback?: (type: string) => void;
+  callback?: (type: string) => T;
   crossorigin?: string;
   rel: string;
   fetchpriority?: string;
@@ -313,7 +315,8 @@ type LoadLinkOptions = {
 
 /**
  * Dynamically loads a link element into the document head.
- * Prevents duplicate loading by checking if a link with the same href already exists.
+ * Prevents duplicate loading by checking if a link 
+ * with the same href already exists.
  * 
  * @param href - URL of the resource to load
  * @param options - Configuration options for the link element
@@ -327,7 +330,7 @@ type LoadLinkOptions = {
  *   callback: (type) => console.log(`Stylesheet ${type}`)
  * });
  */
-export function loadLink(
+export function loadLink<T>(
   href: string,
   {
     id,
@@ -336,30 +339,31 @@ export function loadLink(
     crossorigin,
     rel,
     fetchpriority,
-  }: LoadLinkOptions = { rel: 'stylesheet' }
+  }: LoadLinkOptions<T> = { rel: 'stylesheet' }
 ): HTMLLinkElement {
   // Check if link already exists to prevent duplicates
-  let link = document.head.querySelector(`link[href="${href}"]`) as HTMLLinkElement | null;
-  if (!link) {
-    // Create new link element with specified attributes
-    link = document.createElement('link');
-    link.setAttribute('rel', rel);
-    if (id) link.setAttribute('id', id);
-    if (as) link.setAttribute('as', as);
-    if (crossorigin) link.setAttribute('crossorigin', crossorigin);
-    if (fetchpriority) link.setAttribute('fetchpriority', fetchpriority);
-    link.setAttribute('href', href);
-    
-    // Attach load/error event handlers if callback provided
-    if (callback) {
-      link.onload = (e: Event) => callback(e.type);
-      link.onerror = (e: string | Event) => callback(typeof e === 'string' ? 'error' : e.type);
-    }
-    document.head.appendChild(link);
-  } else if (callback) {
-    // Link already exists, invoke callback with 'noop' to indicate no action taken
-    callback('noop');
+  const existingLink = document.head.querySelector(`link[href="${href}"]`);
+  if (existingLink) {
+    // Link already exists, invoke callback with 
+    // 'noop' to indicate no action taken
+    callback?.('noop');
+    return existingLink as HTMLLinkElement;
   }
+  // Create new link element with specified attributes
+  const link = document.createElement('link');
+  link.setAttribute('rel', rel);
+  if (id !== undefined) link.setAttribute('id', id);
+  if (as !== undefined) link.setAttribute('as', as);
+  if (crossorigin !== undefined) link.setAttribute('crossorigin', crossorigin);
+  if (fetchpriority !== undefined) link.setAttribute('fetchpriority', fetchpriority);
+  link.setAttribute('href', href);
+  
+  // Attach load/error event handlers if callback provided
+  if (callback) {
+    link.onload = (e: Event): T => callback(e.type);
+    link.onerror = (e: string | Event): T => callback(typeof e === 'string' ? 'error' : e.type);
+  }
+  document.head.appendChild(link);
   return link;
 }
 
@@ -370,7 +374,10 @@ export function loadLink(
  * @param callback - Optional callback invoked on load/error events
  * @returns The created or existing HTMLLinkElement
  */
-export function loadStyle(href: string, callback?: (type: string) => void): HTMLLinkElement {
+export function loadStyle(
+  href: string,
+  callback?: (type: string) => void
+): HTMLLinkElement {
   return loadLink(href, { rel: 'stylesheet', callback });
 }
 
@@ -380,7 +387,7 @@ export function loadStyle(href: string, callback?: (type: string) => void): HTML
  * @param url - URL of the stylesheet to load
  * @param override - Whether to load the stylesheet (defaults to false)
  */
-export function loadStyles(url: string, override = false) {
+export function loadStyles(url: string, override = false): void {
   if (!override) return;
   loadStyle(url);
 }
@@ -389,7 +396,8 @@ export function loadStyles(url: string, override = false) {
  * Configuration options for dynamically loading script elements
  */
 type LoadScriptOptions = {
-  /** Loading strategy: 'async' for parallel execution, 'defer' for sequential after DOM parsing */
+  /** Loading strategy: 'async' for parallel execution, 
+    * 'defer' for sequential after DOM parsing */
   mode?: 'async' | 'defer';
   /** Unique identifier for the script element */
   id?: string;
@@ -397,7 +405,8 @@ type LoadScriptOptions = {
 
 /**
  * Dynamically loads a JavaScript file into the document head.
- * Returns a Promise that resolves when the script loads successfully or rejects on error.
+ * Returns a Promise that resolves when the script loads successfully 
+ * or rejects on error.
  * Prevents duplicate loading and tracks loaded state via data-loaded attribute.
  * 
  * @param url - URL of the script to load
@@ -417,14 +426,14 @@ export const loadScript = (
   { mode, id }: LoadScriptOptions = {}
 ): Promise<HTMLScriptElement> => new Promise((resolve, reject) => {
   // Check if script already exists to prevent duplicates
-  let script = document.querySelector(`head > script[src="${url}"]`) as HTMLScriptElement | null;
+  let script: HTMLScriptElement | null = document.querySelector(`head > script[src="${url}"]`);
   if (!script) {
     // Create new script element with specified attributes
     const { head } = document;
     script = document.createElement('script');
     script.setAttribute('src', url);
-    if (id) script.setAttribute('id', id);
-    if (type) {
+    if (id !== null && id !== undefined) script.setAttribute('id', id);
+    if (type !== null && type !== undefined) {
       script.setAttribute('type', type);
     }
     // Set loading mode (async or defer) if specified
@@ -433,22 +442,23 @@ export const loadScript = (
   }
 
   // If script was previously loaded, resolve immediately
-  if ((script as HTMLScriptElement).dataset.loaded) {
-    resolve(script as HTMLScriptElement);
+  const loaded = script.dataset.loaded;
+  if (loaded !== null && loaded !== undefined) {
+    resolve(script);
     return;
   }
 
   // Set up event handler for load and error events
-  const onScript = (event: Event) => {
-    (script as HTMLScriptElement).removeEventListener('load', onScript);
-    (script as HTMLScriptElement).removeEventListener('error', onScript);
+  const onScript = (event: Event): void => {
+    script.removeEventListener('load', onScript);
+    script.removeEventListener('error', onScript);
 
     if (event.type === 'error') {
-      reject(new Error(`error loading script: ${(script as HTMLScriptElement).src}`));
+      reject(new Error(`error loading script: ${script.src}`));
     } else if (event.type === 'load') {
       // Mark script as loaded to prevent re-execution
-      (script as HTMLScriptElement).dataset.loaded = 'true';
-      resolve(script as HTMLScriptElement);
+      script.dataset.loaded = 'true';
+      resolve(script);
     }
   };
 
@@ -458,12 +468,15 @@ export const loadScript = (
 
 /**
  * Retrieves metadata content from the document's head section.
- * Automatically determines whether to use 'name' or 'property' attribute based on the metadata name.
+ * Automatically determines whether to use 'name' or 'property' 
+ * attribute based on the metadata name.
  * 
- * Uses 'property' attribute for Open Graph and other namespaced metadata (containing ':'),
+ * Uses 'property' attribute for Open Graph and other namespaced
+ *  metadata (containing ':'),
  * and 'name' attribute for standard HTML metadata.
  * 
- * @param name - The metadata name or property to search for (e.g., 'description', 'og:title')
+ * @param name - The metadata name or property to search for
+ * (e.g., 'description', 'og:title')
  * @param doc - The document to search in (defaults to current document)
  * @returns The metadata content value, or null if not found
  * 
@@ -475,15 +488,19 @@ export const loadScript = (
  * // Get Open Graph meta tag
  * const ogTitle = getMetadata('og:title');
  */
-export function getMetadata(name: string, doc: Document = document): string | null {
-  // Use 'property' for namespaced metadata (e.g., Open Graph), 'name' for standard metadata
+export function getMetadata(
+  name: string,
+  doc: Document = document
+): string | null {
+  // Use 'property' for namespaced metadata (e.g., Open Graph), 'name' 
+  // for standard metadata
   const attr = name && name.includes(':') ? 'property' : 'name';
-  const meta = doc.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
-  return meta && meta.content;
+  const meta = doc.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement;
+  return meta?.content ?? null;
 }
 
 type MiloConfigEnv = {
-  name: string;                    // REQUIRED - Environment name: 'local', 'stage', or 'prod'
+  name: string;                    // Env name: 'local', 'stage', or 'prod'
   ims?: string;                    // IMS environment: 'stg1' or 'prod'
   adobeIO?: string;                // Adobe I/O hostname
   adminconsole?: string;           // Admin Console hostname
@@ -499,13 +516,13 @@ type MiloConfigEnv = {
 };
 
 type MiloConfigLocale = {
-  prefix: string;                  // REQUIRED - e.g., '', '/fr', '/de', '/jp/ja'
+  prefix: string;                  // e.g., '', '/fr', '/de', '/jp/ja'
   ietf?: string;                   // e.g., 'en-US', 'fr-FR', 'de-DE'
   tk?: string;                     // Typekit font ID, e.g., 'hah7vzn.css'
-  region?: string;                 // Region/country code, e.g., 'us', 'gb', 'fr'
+  region?: string;                 // Region/country code, e.g. 'us', 'gb', 'fr'
   regions?: Record<string, unknown>; // Regional configuration mapping
   contentRoot?: string;            // Full content path with origin
-  language?: string;               // Language code (new routing), e.g., 'en', 'fr', 'de'
+  language?: string;               // Langcode (new routing)e.g., 'en','fr','de'
   dir?: string;                    // Text direction: 'ltr' or 'rtl'
   
   // Allow additional locale-specific properties
@@ -514,8 +531,8 @@ type MiloConfigLocale = {
 
 type UnavProfileConfig = {
   messageEventListener?: (event: CustomEvent) => void;
-  complexConfig?: Record<string, any> | null;
-  config?: Record<string, any>;
+  complexConfig?: Record<string, unknown> | null;
+  config?: Record<string, unknown>;
   signInCtaStyle?: 'primary' | 'secondary';
 }
 
@@ -523,13 +540,13 @@ type UnavConfig = {
   unavHelpChildren?: Array<{ type: string }>;
   profile?: UnavProfileConfig;
   uncAppId?: string;
-  uncConfig?: Record<string, any>;
+  uncConfig?: Record<string, unknown>;
   showSectionDivider?: boolean;
 }
 
 type JarvisConfig = {
   id: string;
-  callbacks?: Record<string, Function>;
+  callbacks?: Record<string, () => unknown>;
 }
 
 export type MiloConfig = {
@@ -546,17 +563,19 @@ export type MiloConfig = {
  * @returns true if valid, false otherwise
  */
 const isValidMiloConfig = (config: unknown): config is MiloConfig => {
-  if (!config || typeof config !== 'object') return false;
-  
-  const cfg = config as Record<string, unknown>;
-  
+  const cfg = config as MiloConfig;
+
+  const invalid = (x: unknown): boolean => x === null || x === undefined || typeof x !== 'object';
+
+  if (invalid(cfg)) return false;
+
   // Validate locale structure
-  if (!cfg.locale || typeof cfg.locale !== 'object') return false;
+  if (invalid(cfg.locale)) return false;
   const locale = cfg.locale as Record<string, unknown>;
   if (typeof locale.prefix !== 'string') return false;
   
   // Validate env structure
-  if (!cfg.env || typeof cfg.env !== 'object') return false;
+  if (invalid(cfg.env)) return false;
   const env = cfg.env as Record<string, unknown>;
   if (typeof env.name !== 'string') return false;
   
@@ -598,11 +617,15 @@ const isValidMiloConfig = (config: unknown): config is MiloConfig => {
 
 /**
  * MiloConfig Configuration State Management
- * Implements closure-based singleton pattern for global configuration with validation
+ * Implements closure-based singleton pattern 
+ * for global configuration with validation
  * 
  * @throws Error if config validation fails or if accessed before initialization
  */
-export const [setMiloConfig, getMiloConfig] = (() => {
+
+ type ConfigStateFunctions = [ (config: unknown) => void, () => MiloConfig]
+
+export const [setMiloConfig, getMiloConfig] = ((): ConfigStateFunctions => {
   let miloConfig: MiloConfig | undefined;
   let isInitialized = false;
 
@@ -753,7 +776,15 @@ function getDefaultLangstoreCountry(language: string): string {
 
 const LANG_STORE_PREFIX = 'langstore/';
 
-export function getMiloLocaleSettings(miloLocale: MiloConfigLocale) {
+type MiloLocaleSettings = {
+  language: string;
+  country: string;
+  locale: `${string}_${string}`;
+};
+
+export function getMiloLocaleSettings(
+  miloLocale: MiloConfigLocale
+): MiloLocaleSettings {
   const localePrefix = miloLocale?.prefix || 'US_en';
   const geo = localePrefix.replace('/', '') ?? '';
   let [country = 'US', language = 'en'] = (GeoMap[geo as keyof typeof GeoMap] ?? geo).split('_', 2);

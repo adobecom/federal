@@ -9,7 +9,7 @@ type Initial = {
 
 export const getInitialHTML = async ({
   gnavSource,
-  asideSource
+  asideSource,
 }: Input): Promise<Initial | IrrecoverableError> => {
   const mainNav = await fetchAndProcessPlainHTML(gnavSource);
   if (mainNav instanceof IrrecoverableError)

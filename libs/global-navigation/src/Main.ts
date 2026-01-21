@@ -10,8 +10,9 @@ import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig } from "./Utils/Utils";
 import './styles/styles.css';
 import { tabs } from "./Components/Tab/Render";
+import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 
-// TODO implement Analytics
+// TODO implement Analytcs
 
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -28,8 +29,8 @@ export type Input = {
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
+  placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
-
   getStageDomainMap: (domainmap: unknown[], env: string) =>
     { [key: string]: string }
   // MEP: {
@@ -45,19 +46,21 @@ export const main = async (
   if (!(gnavSource instanceof URL)) {
     throw new IrrecoverableError("gnavSource needs to be a URL object");
   }
-  const initial = await getInitialHTML(input);
-  if (initial instanceof IrrecoverableError)
-    throw initial;
-  const { mainNav, aside: _aside } = initial;
-  if (mainNav instanceof IrrecoverableError)
-    throw mainNav;
-
   // Initialize MiloConfig with validation
   try {
     setMiloConfig(miloConfig);
   } catch (error) {
     throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
   }
+  // We kick off the request for the federal placeholders in parallel
+  setPlaceholders(combineWithFederalPlaceholders(input));
+
+  const initial = await getInitialHTML(input)
+  if (initial instanceof IrrecoverableError)
+    throw initial;
+  const { mainNav, aside: _aside } = initial;
+  if (mainNav instanceof IrrecoverableError)
+    throw mainNav;
 
   const gnavData = parseNavigation(mainNav, unavEnabled);
   if (gnavData instanceof IrrecoverableError)
@@ -76,7 +79,7 @@ export const renderGnav = (
 ) => async (
 mountpoint: HTMLElement
 ): Promise<HTMLElement> => {
-  const navHTML = renderGnavString(data)
+  const navHTML = renderGnavString(data);
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
   const megaMenus = [
