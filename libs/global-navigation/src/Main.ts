@@ -178,8 +178,10 @@ export const postRenderingTasks = async (
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
   const unav = await loadUnav(input.mountpoint);
-  if (unav instanceof RecoverableError)
+  if (unav instanceof RecoverableError) {
     errors.add(unav);
+    lanaLog(unav.message);
+  }
   else 
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
   initClickListeners(input.mountpoint);
