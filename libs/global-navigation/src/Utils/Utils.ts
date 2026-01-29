@@ -1,4 +1,5 @@
 import { IrrecoverableError } from "../Error/Error";
+import { lanaLog } from "./Log";
 import { getPlaceholders, replacePlaceholders } from "./Placeholders";
 
 export const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -166,8 +167,10 @@ export const fetchAndProcessPlainHTML = async (
       return new IrrecoverableError('URL is null');
     const modifiedSource = federateUrl(`${source.origin}${source.pathname.replace(/(\.html$|$)/, '.plain.html')}${source.hash}`);
     const response = await fetch(modifiedSource);
-    if (!response.ok)
+    if (!response.ok) {
+      lanaLog(`Request for ${modifiedSource} failed`);
       return new IrrecoverableError(`Request for ${modifiedSource} failed`);
+    }
     const htmlText = await response.text();
     const resolvedPlaceholders = await getPlaceholders();
     const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);

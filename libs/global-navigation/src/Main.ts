@@ -11,6 +11,7 @@ import { renderListItems, setMiloConfig, MiloConfig } from "./Utils/Utils";
 import './styles/styles.css';
 import { tabs } from "./Components/Tab/Render";
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
+import { lanaLog } from "./Utils/Log";
 
 // TODO implement Analytcs
 
@@ -43,28 +44,37 @@ export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const { gnavSource, mountpoint, unavEnabled, miloConfig } = input;
+
   if (!(gnavSource instanceof URL)) {
+    lanaLog(`gnavSource is invalid: ${gnavSource}`)
     throw new IrrecoverableError("gnavSource needs to be a URL object");
   }
   // Initialize MiloConfig with validation
   try {
     setMiloConfig(miloConfig);
   } catch (error) {
+    lanaLog(`Failed to initialize MiloConfig: ${error}`);
     throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
   }
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
 
   const initial = await getInitialHTML(input)
-  if (initial instanceof IrrecoverableError)
+  if (initial instanceof IrrecoverableError) {
+    lanaLog(initial.message);
     throw initial;
+  }
   const { mainNav, aside: _aside } = initial;
-  if (mainNav instanceof IrrecoverableError)
+  if (mainNav instanceof IrrecoverableError) {
+    lanaLog(mainNav.message);
     throw mainNav;
+  }
 
   const gnavData = parseNavigation(mainNav, unavEnabled);
-  if (gnavData instanceof IrrecoverableError)
+  if (gnavData instanceof IrrecoverableError) {
+    lanaLog(gnavData.message);
     throw gnavData;
+  }
   
   // TODO: Implement Aside
   
@@ -168,8 +178,10 @@ export const postRenderingTasks = async (
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
   const unav = await loadUnav(input.mountpoint);
-  if (unav instanceof RecoverableError)
+  if (unav instanceof RecoverableError) {
     errors.add(unav);
+    lanaLog(unav.message);
+  }
   else 
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
   initClickListeners(input.mountpoint);
