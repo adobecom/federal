@@ -20,18 +20,38 @@ declare global {
     adobeProfile?: {
       getUserProfile: () => Promise<unknown>;
     };
-    
+
     /** Adobe Identity Management System */
     adobeIMS?: {
+      initialized?: boolean;
       signIn: (context: object) => void;
+      signOut: () => void;
       isSignedInUser: () => boolean;
+      getAccessToken: () => { token: string };
+      getProfile: () => Promise<{ displayName: string; email: string }>;
     };
-    
+
     /** IMS Client Configuration */
     adobeid?: {
-      client_id?: string;
+      client_id: string;
+      scope: string;
+      locale: string;
+      redirect_uri?: string;
+      autoValidateToken: boolean;
+      environment?: string;
+      useLocalStorage: boolean;
+      onReady: () => void;
+      onError: (error: Error) => void;
+      api_parameters?: {
+        check_token?: {
+          guest_allowed: boolean;
+        };
+      };
+      enableGuestAccounts?: boolean;
+      enableGuestTokenForceRefresh?: boolean;
+      [key: string]: unknown;
     };
-    
+
     /** Adobe Experience Platform Web SDK (Alloy) */
     alloy?: (command: string) => Promise<AlloyIdentityData>;
 
@@ -46,4 +66,4 @@ declare global {
   }
 }
 
-export {};
+export { };

@@ -5,7 +5,8 @@ import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
-import { loadUnav } from "./PostRendering/Unav/Unav";
+import { ims } from "./PostRendering/ImsManager";
+import { decorateProfile } from "./PostRendering/ProfileDecorator";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig } from "./Utils/Utils";
 import './styles/styles.css';
@@ -125,6 +126,7 @@ export const renderGnavString = ({
   components,
   productCTA,
   unavEnabled,
+  hasProfile,
 }: GlobalNavigationData
 ): string => `
 <nav>
@@ -168,7 +170,7 @@ export const renderGnavString = ({
     })()}
   </ul>
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
-  ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  ${unavEnabled ? '<div class="feds-utilities"></div>' : hasProfile ? '<div data-cs-mask class="feds-profile"></div>' : ''}
 </nav>
 `;
 
@@ -176,21 +178,18 @@ export const renderGnavString = ({
 export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
-  const errors = new Set<RecoverableError>();
-  const unav = await loadUnav(input.mountpoint);
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
-  }
-  else 
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
+  // Initialize IMS and load UNAV/profile
+  const { reloadUnav, errors: imsErrors } = await ims({ 
+    unavEnabled: input.unavEnabled, 
+    mountpoint: input.mountpoint,
+    decorateProfile: input.unavEnabled ? undefined : () => decorateProfile(input.mountpoint),
+  });
+  
+  // Collect all errors
+  const errors = new Set<RecoverableError>([...imsErrors]);
+  
   initClickListeners(input.mountpoint);
   initKeyboardNav(input.mountpoint);
-  
-  const reloadUnav
-    = unav instanceof RecoverableError
-    ? (): void => {}
-    : unav.reloadUnav;
 
   return {
     closeEverything,

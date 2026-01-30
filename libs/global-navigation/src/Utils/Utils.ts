@@ -558,6 +558,14 @@ export type MiloConfig = {
   unav?: UnavConfig;
   jarvis?: JarvisConfig;
   signInContext?: object;          // IMS sign-in context for UNAV
+  
+  // IMS Configuration fields
+  imsClientId?: string;
+  imsScope?: string;   
+  imsTimeout?: number; 
+  base?: string;       
+  adobeid?: Record<string, unknown>;
+  entitlements?: (entitlements?: string[]) => void;
 };
 
 /**
@@ -634,6 +642,13 @@ export const [setMiloConfig, getMiloConfig] = ((): ConfigStateFunctions => {
 
   return [
     (config: unknown): void => {
+      // Allow resetting for tests
+      if (config === null) {
+        isInitialized = false;
+        miloConfig = undefined;
+        return;
+      }
+
       if (isInitialized) {
         return;
       }

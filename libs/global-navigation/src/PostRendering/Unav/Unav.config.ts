@@ -20,7 +20,7 @@ import { getMiloConfig, getMetadata } from '../../Utils/Utils';
  * Context identifier for Adobe IMS sign-in
  * Retrieved from MiloConfig if provided, otherwise empty object
  */
-const getSignInContext = (): object => {
+export const getSignInContext = (): object => {
   try {
     const config = getMiloConfig();
     return config.signInContext || {};
