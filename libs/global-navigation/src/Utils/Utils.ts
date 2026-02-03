@@ -159,6 +159,44 @@ export const setupMobileDesktopListeners = ({
   });
 };
 
+export type PersonalizationConfig = {
+  commands: unknown[];
+  handleCommands: (
+    commands: unknown[],
+    rootEl: Document | HTMLElement
+  ) => unknown;
+};
+
+type PersonalizationStateFunctions = [
+  (config: PersonalizationConfig) => void,
+  () => PersonalizationConfig
+];
+
+// TODO: Consolidate all global state handlers into
+// a single file (but still probably keep them separate)
+export const [setPersonalizationConfig, getPersonalizationConfig] = 
+  ((): PersonalizationStateFunctions => {
+    let personalizationConfig: PersonalizationConfig | undefined;
+    let isInitialized = false;
+
+    return [
+      (config: PersonalizationConfig): void => {
+        if (isInitialized) {
+          return;
+        }
+
+        personalizationConfig = config;
+        isInitialized = true;
+      },
+      (): PersonalizationConfig => {
+        if (!personalizationConfig) {
+          throw new Error('PersonalizationConfig not initialized. Call setPersonalizationConfig() first.');
+        }
+        return personalizationConfig;
+      },
+    ];
+  })();
+
 export const fetchAndProcessPlainHTML = async (
   source: URL | null
 ): Promise<HTMLElement | IrrecoverableError> => {
@@ -175,6 +213,18 @@ export const fetchAndProcessPlainHTML = async (
     const resolvedPlaceholders = await getPlaceholders();
     const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);
     const { body } = new DOMParser().parseFromString(processedHtml, "text/html");
+    
+    // Apply personalization to the fetched HTML
+    try {
+      const { handleCommands, commands } = getPersonalizationConfig();
+      handleCommands(commands, body);
+    } catch (error) {
+      // PersonalizationConfig not initialized or personalization failed
+      // This is non-fatal, so we just log and continue
+      // @ts-expect-error errors usually have a message
+      lanaLog(`Personalization not applied: ${error?.message}`);
+    }
+    
     return body;
   } catch (error) {
     // @ts-expect-error errors usually have a message

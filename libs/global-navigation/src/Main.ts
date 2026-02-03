@@ -7,7 +7,7 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig } from "./Utils/Utils";
 import './styles/styles.css';
 import { tabs } from "./Components/Tab/Render";
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
@@ -34,28 +34,47 @@ export type Input = {
   miloConfig?: MiloConfig;
   getStageDomainMap: (domainmap: unknown[], env: string) =>
     { [key: string]: string }
-  // MEP: {
-  //   commands: unknown;
-  //   handleCommands: (_: unknown) => unknown;
-  // }
+  // for now we only support inBlock commands.
+  // Since MEP on gnav is relatively rare we'll
+  // keep it at this and see if any problems crop up.
+  // The Milo gnav MEP implementation is a little
+  // more entangled than what we have here.
+  // For example we're not dealing with adding manifestId to the body
+  // and so on. But the whole idea behind this refactor is
+  // that we want to reduce coupling.
+  // So we'll keep it at this for now and re-evaluate at a
+  // later date.
+  personalization: PersonalizationConfig;
 };
 
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
-  const { gnavSource, mountpoint, unavEnabled, miloConfig } = input;
+  // TODO: implement a function that verifies that Input
+  // is the correct type up front.
+
+  const {
+    gnavSource,
+    mountpoint,
+    unavEnabled,
+    miloConfig,
+    personalization
+  } = input;
 
   if (!(gnavSource instanceof URL)) {
     lanaLog(`gnavSource is invalid: ${gnavSource}`)
     throw new IrrecoverableError("gnavSource needs to be a URL object");
   }
-  // Initialize MiloConfig with validation
+
   try {
     setMiloConfig(miloConfig);
   } catch (error) {
     lanaLog(`Failed to initialize MiloConfig: ${error}`);
     throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
   }
+  
+  setPersonalizationConfig(personalization);
+  
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
 
