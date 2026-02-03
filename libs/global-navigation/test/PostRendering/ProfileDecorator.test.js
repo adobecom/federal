@@ -77,6 +77,7 @@ describe('ProfileDecorator', () => {
     window.adobeIMS = {
       isSignedInUser: () => true,
       getAccessToken: () => ({ token: 'test-token' }),
+      getProfile: () => Promise.resolve({ displayName: 'Test User', email: 'test@adobe.com' }),
     };
 
     window.fetch = async () => new Response('Server Error', { status: 500 });
@@ -84,7 +85,7 @@ describe('ProfileDecorator', () => {
     const errors = await decorateProfile(mountpoint);
     expect(errors.size).to.equal(1);
     const error = [...errors][0];
-    expect(error.message).to.include('Failed to fetch profile data');
+    expect(error.message).to.include('ProfileData: Failed to fetch profile data with status 500');
   });
 
   it('should do nothing if the profile placeholder is not found', async () => {

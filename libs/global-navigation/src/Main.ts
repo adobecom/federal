@@ -13,6 +13,7 @@ import './styles/styles.css';
 import { tabs } from "./Components/Tab/Render";
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
+import type { ProfileType } from "./Components/Profile/types";
 
 // TODO implement Analytcs
 
@@ -30,7 +31,7 @@ export type Input = {
   gnavTop?: number;
   isLocalNav: boolean;
   mountpoint: HTMLElement;
-  unavEnabled: boolean;
+  profileType?: ProfileType;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   getStageDomainMap: (domainmap: unknown[], env: string) =>
@@ -44,7 +45,8 @@ export type Input = {
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
-  const { gnavSource, mountpoint, unavEnabled, miloConfig } = input;
+  const { gnavSource, mountpoint, miloConfig } = input;
+  const profileType = input.profileType ?? 'Empty';
 
   if (!(gnavSource instanceof URL)) {
     lanaLog(`gnavSource is invalid: ${gnavSource}`)
@@ -71,7 +73,7 @@ export const main = async (
     throw mainNav;
   }
 
-  const gnavData = parseNavigation(mainNav, unavEnabled);
+  const gnavData = parseNavigation(mainNav, profileType);
   if (gnavData instanceof IrrecoverableError) {
     lanaLog(gnavData.message);
     throw gnavData;
@@ -125,8 +127,7 @@ mountpoint: HTMLElement
 export const renderGnavString = ({
   components,
   productCTA,
-  unavEnabled,
-  hasProfile,
+  profileType,
 }: GlobalNavigationData
 ): string => `
 <nav>
@@ -170,7 +171,7 @@ export const renderGnavString = ({
     })()}
   </ul>
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
-  ${unavEnabled ? '<div class="feds-utilities"></div>' : hasProfile ? '<div data-cs-mask class="feds-profile"></div>' : ''}
+  ${profileType === 'Unav' ? '<div class="feds-utilities"></div>' : profileType === 'FedsProfile' ? '<div data-cs-mask class="feds-profile"></div>' : ''}
 </nav>
 `;
 
@@ -178,13 +179,13 @@ export const renderGnavString = ({
 export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
+  const profileType = input.profileType ?? 'Empty';
   // Initialize IMS and load UNAV/profile
   const { reloadUnav, errors: imsErrors } = await ims({ 
-    unavEnabled: input.unavEnabled, 
+    profileType, 
     mountpoint: input.mountpoint,
-    decorateProfile: input.unavEnabled ? undefined : () => decorateProfile(input.mountpoint),
+    decorateProfile: profileType === 'Unav' ? undefined : () => decorateProfile(input.mountpoint),
   });
-  
   // Collect all errors
   const errors = new Set<RecoverableError>([...imsErrors]);
   

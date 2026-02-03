@@ -4,41 +4,33 @@ import { Link, parseLink } from "../Components/Link/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
 import { parseListAndAccumulateErrors } from "../Utils/Utils";
 import { setStoredProfile } from "../PostRendering/ProfileDecorator";
+import type { ProfileType } from "../Components/Profile/types";
 
 export type GlobalNavigationData = {
   breadcrumbs: List<Link>;
   components: List<Component>;
   productCTA: ProductEntryCTA | null;
   localnav: boolean;
-  hasProfile: boolean;
+  profileType: ProfileType;
   errors: List<RecoverableError>;
-  unavEnabled: boolean;
 };
 
 export const parseNavigation = (
   mainNav: HTMLElement,
-  unavEnabled: boolean
+  profileType: ProfileType
 ): GlobalNavigationData | IrrecoverableError => {
-  // Extract and store profile if UNAV is disabled
-  let hasProfile = false;
+  // Extract and store profile if needed
   const mainNavChildren = [...mainNav.children];
   const profileWrapper = mainNavChildren.find(child => 
     child.querySelector('.profile')
   );
-  
   if (profileWrapper) {
     const profileElement = profileWrapper.querySelector('.profile');
-    if (profileElement) {
-      // Store profile HTML in memory via ProfileDecorator on in case of UNAV disabled
-      if (!unavEnabled) {
-        setStoredProfile(profileElement.outerHTML);
-      }
-      // Remove profile wrapper from mainNav to avoid parsing as component
-      profileWrapper.remove();
-      hasProfile = true;
+    if (profileElement && profileType === 'FedsProfile') {
+      setStoredProfile(profileElement.outerHTML);
     }
+    profileWrapper.remove();
   }
-  
   const [breadcrumbs, breadcrumbErrors]
     = parseListAndAccumulateErrors(
       [...document.querySelectorAll('.breadcrumbs ul > li > a') ?? []],
@@ -74,8 +66,7 @@ export const parseNavigation = (
     components,
     productCTA,
     localnav,
-    hasProfile,
+    profileType,
     errors,
-    unavEnabled,
   }
 };

@@ -27,15 +27,15 @@ export const fetchProfileData = async (): Promise<[ProfileData | null, Set<Recov
             return [null, errors];
         }
 
-        // Fetch from Adobe IO profile endpoint
+        // Fetch from Adobe IO profile endpoint and IMS profile concurrently
         const headers = new Headers({
             Authorization: `Bearer ${accessToken.token}`
         });
 
-        const response = await fetch(
-            `https://${adobeIO}/profile`,
-            { headers }
-        );
+        const [response, imsProfile] = await Promise.all([
+            fetch(`https://${adobeIO}/profile`, { headers }),
+            window.adobeIMS.getProfile()
+        ]);
 
         // Error handling
         if (response.status !== 200) {
@@ -51,9 +51,6 @@ export const fetchProfileData = async (): Promise<[ProfileData | null, Set<Recov
             errors.add(new RecoverableError('ProfileData: Invalid response - missing avatar'));
             return [null, errors];
         }
-
-        // Get profile from IMS
-        const imsProfile = await window.adobeIMS.getProfile();
 
         return [{
             avatar: user.avatar,

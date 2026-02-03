@@ -65,13 +65,10 @@ export async function loadIms(): Promise<void> {
       
     loadScript(path);
   }).then(() => {
-    if (!window.adobeIMS?.isSignedInUser()) {
-      const config = getMiloConfig();
-      config.entitlements?.([]);
-    }
+    // After IMS is loaded
   }).catch((e) => {
-    const config = getMiloConfig();
-    config.entitlements?.([]);
+    // Reset imsLoaded on failure to allow retry
+    imsLoaded = undefined;
     throw e;
   });
 

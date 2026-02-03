@@ -1,4 +1,9 @@
 /**
+ * Profile type determines which profile implementation to use
+ */
+export type ProfileType = 'Unav' | 'FedsProfile' | 'Empty';
+
+/**
  * Team or Enterprise management section
  */
 export type ManagementItem = {

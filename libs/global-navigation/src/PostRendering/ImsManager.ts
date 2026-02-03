@@ -7,6 +7,7 @@ import { loadUnav } from './Unav/Unav.loader';
 import { setUserProfile } from './Unav/Unav.utils';
 import { RecoverableError } from '../Error/Error';
 import { lanaLog } from '../Utils/Log';
+import type { ProfileType } from '../Components/Profile/types';
 
 /**
  * Result of IMS initialization with UNAV/profile tasks
@@ -23,19 +24,19 @@ const yieldToMain = (): Promise<void> => {
 };
 
 export type ImsManagerOptions = {
-  unavEnabled: boolean;
+  profileType: ProfileType;
   mountpoint?: HTMLElement;
   decorateProfile?: () => Promise<Set<RecoverableError>>;
 };
 
 export const imsReady = async (options: ImsManagerOptions): Promise<ImsResult> => {
-  const { unavEnabled, mountpoint, decorateProfile } = options;
+  const { profileType, mountpoint, decorateProfile } = options;
 
-  if (!window.adobeIMS?.isSignedInUser() || !unavEnabled) {
+  if (!window.adobeIMS?.isSignedInUser() || profileType !== 'Unav') {
     setUserProfile({});
   }
 
-  if (unavEnabled && mountpoint) {
+  if (profileType === 'Unav' && mountpoint) {
     try {
       await yieldToMain();
       const unav = await loadUnav(mountpoint);

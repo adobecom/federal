@@ -804,13 +804,8 @@ async function loadIms() {
     const path = PAGE_URL.searchParams.get("useAlternateImsDomain") ? "https://auth.services.adobe.com/imslib/imslib.min.js" : `${base}/deps/imslib.min.js`;
     loadScript(path);
   }).then(() => {
-    if (!window.adobeIMS?.isSignedInUser()) {
-      const config = getMiloConfig();
-      config.entitlements?.([]);
-    }
   }).catch((e) => {
-    const config = getMiloConfig();
-    config.entitlements?.([]);
+    imsLoaded = void 0;
     throw e;
   });
   return imsLoaded;
@@ -1199,11 +1194,11 @@ var init_ImsManager = __esm({
       });
     };
     imsReady = async (options) => {
-      const { unavEnabled, mountpoint, decorateProfile: decorateProfile2 } = options;
-      if (!window.adobeIMS?.isSignedInUser() || !unavEnabled) {
+      const { profileType, mountpoint, decorateProfile: decorateProfile2 } = options;
+      if (!window.adobeIMS?.isSignedInUser() || profileType !== "Unav") {
         setUserProfile({});
       }
-      if (unavEnabled && mountpoint) {
+      if (profileType === "Unav" && mountpoint) {
         try {
           await yieldToMain();
           const unav = await loadUnav(mountpoint);
@@ -1277,7 +1272,7 @@ var init_ImsManager = __esm({
 });
 
 // src/Components/Profile/Parse.ts
-var parseProfileHTML;
+var parseProfileHTML, findSignInAnchor;
 var init_Parse4 = __esm({
   "src/Components/Profile/Parse.ts"() {
     "use strict";
@@ -1289,6 +1284,9 @@ var init_Parse4 = __esm({
         hasDropdown: dropdownElem !== null,
         dropdownHTML: dropdownElem?.innerHTML ?? null
       };
+    };
+    findSignInAnchor = (container) => {
+      return container.querySelector('[href$="?sign-in=true"]');
     };
   }
 });
@@ -1311,6 +1309,7 @@ var init_Render3 = __esm({
   "src/Components/Profile/Render.ts"() {
     "use strict";
     init_profile();
+    init_Parse4();
     renderSignInButton = (signInLabel) => `
   <button 
     class="feds-signIn" 
@@ -1344,7 +1343,7 @@ var init_Render3 = __esm({
     processDropdownContent = (dropdownHTML) => {
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = dropdownHTML;
-      const signInAnchor = tempDiv.querySelector('[href$="?sign-in=true"]');
+      const signInAnchor = findSignInAnchor(tempDiv);
       if (signInAnchor) {
         const signInText = signInAnchor.textContent || "";
         const buttonHTML = `<button class="feds-signIn" data-signin-trigger>${signInText}</button>`;
@@ -1399,10 +1398,10 @@ var init_ProfileData = __esm({
         const headers = new Headers({
           Authorization: `Bearer ${accessToken.token}`
         });
-        const response = await fetch(
-          `https://${adobeIO}/profile`,
-          { headers }
-        );
+        const [response, imsProfile] = await Promise.all([
+          fetch(`https://${adobeIO}/profile`, { headers }),
+          window.adobeIMS.getProfile()
+        ]);
         if (response.status !== 200) {
           errors.add(new RecoverableError(`ProfileData: Failed to fetch profile data with status ${response.status}`));
           return [null, errors];
@@ -1413,7 +1412,6 @@ var init_ProfileData = __esm({
           errors.add(new RecoverableError("ProfileData: Invalid response - missing avatar"));
           return [null, errors];
         }
-        const imsProfile = await window.adobeIMS.getProfile();
         return [{
           avatar: user.avatar,
           displayName: imsProfile.displayName,

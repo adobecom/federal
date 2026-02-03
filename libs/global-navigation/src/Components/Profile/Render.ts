@@ -1,4 +1,5 @@
 import './profile.css';
+import { findSignInAnchor } from './Parse';
 
 export const renderSignInButton = (signInLabel: string): string => `
   <button 
@@ -40,7 +41,7 @@ export const processDropdownContent = (dropdownHTML: string): string => {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = dropdownHTML;
   
-  const signInAnchor = tempDiv.querySelector('[href$="?sign-in=true"]');
+  const signInAnchor = findSignInAnchor(tempDiv);
   if (signInAnchor) {
     const signInText = signInAnchor.textContent || '';
     const buttonHTML = `<button class="feds-signIn" data-signin-trigger>${signInText}</button>`;

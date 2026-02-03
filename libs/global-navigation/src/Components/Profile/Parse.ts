@@ -18,8 +18,6 @@ export const parseProfileHTML = (rawHTML: string): ProfileData => {
   };
 };
 
-export const findSignInAnchor = (dropdownHTML: string): HTMLAnchorElement | null => {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = dropdownHTML;
-  return tempDiv.querySelector('[href$="?sign-in=true"]');
+export const findSignInAnchor = (container: HTMLElement): HTMLAnchorElement | null => {
+  return container.querySelector('[href$="?sign-in=true"]');
 };

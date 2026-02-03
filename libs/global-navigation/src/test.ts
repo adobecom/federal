@@ -11,7 +11,8 @@ const input = {
   asideSource: null,
   isLocalNav: true,
   mountpoint,
-  unavEnabled: false
+  // profileType is now optional and defaults to 'Empty'
+  profileType: 'FedsProfile'
 } as Input
 
 (async (): Promise<void> => {
@@ -22,7 +23,7 @@ const input = {
   if (mainNav instanceof IrrecoverableError)
     throw mainNav;
 
-  const gnavData = parseNavigation(mainNav, input.unavEnabled);
+  const gnavData = parseNavigation(mainNav, input.profileType ?? 'Empty');
   if (gnavData instanceof IrrecoverableError)
     throw gnavData;
   

@@ -69,13 +69,14 @@ describe('ProfileData', () => {
   it('should return an error if fetch fails', async () => {
     window.adobeIMS = {
       getAccessToken: () => ({ token: 'test-token' }),
+      getProfile: () => Promise.resolve({ displayName: 'Test User', email: 'test@adobe.com' }),
     };
     window.fetch = async () => new Response('Not Found', { status: 404 });
     const [data, errors] = await fetchProfileData();
     expect(data).to.be.null;
     expect(errors.size).to.equal(1);
     const error = [...errors][0];
-    expect(error.message).to.include('ProfileData: Failed to fetch profile data with status 404');
+    expect(error.message).to.equal('ProfileData: Failed to fetch profile data with status 404');
   });
 
   it('should return an error for invalid JSON response', async () => {
@@ -94,6 +95,7 @@ describe('ProfileData', () => {
   it('should handle exceptions during fetch', async () => {
     window.adobeIMS = {
       getAccessToken: () => ({ token: 'test-token' }),
+      getProfile: () => Promise.resolve({ displayName: 'Test User', email: 'test@adobe.com' }),
     };
     window.fetch = () => Promise.reject(new Error('Network error'));
     const [data, errors] = await fetchProfileData();
