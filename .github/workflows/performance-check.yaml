@@ -20,10 +20,6 @@ jobs:
     # Safety: don't run with base-branch token/secrets on fork PRs.
     if: github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.full_name == github.repository
     uses: adobecom/perf-metrics/.github/workflows/performance-check.yaml@main
-    # Optional inputs go under the "with" (test_url, throttle, baseline_path)
-    with:
-      # test_url: ...
-      # throttle: ...
-      # baseline_path: ...
+    # Optional inputs go under "with" (e.g., test_url, throttle, baseline_path)
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}  # required secret for the reusable workflow
