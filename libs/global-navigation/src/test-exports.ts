@@ -35,5 +35,5 @@ export { parseProfileHTML } from './Components/Profile/Parse';
 export type { ProfileData } from './Components/Profile/types';
 export { renderSignIn, renderSignInButton, renderSignInWithDropdown } from './Components/Profile/Render';
 export { renderSignedInProfile } from './Components/Profile/RenderProfile';
-export { fetchProfileData } from './Components/Profile/ProfileData';
+export { fetchProfileData, truncateEmail } from './Components/Profile/ProfileData';
 export { attachProfileEvents } from './Components/Profile/ProfileEvents';

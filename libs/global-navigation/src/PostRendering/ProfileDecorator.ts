@@ -61,12 +61,11 @@ const decorateSignIn = async (
     // We could create a non-fatal RecoverableError if we wanted to track it.
   }
 
-  const profileData = parseProfileHTML(rawElem);
+  const parsedProfileData = parseProfileHTML(rawElem);
 
   const signInHTML = renderSignIn(
     signInLabel,
-    profileData.hasDropdown,
-    profileData.dropdownHTML
+    parsedProfileData,
   );
 
   decoratedElem.innerHTML = signInHTML;

@@ -33,19 +33,17 @@ export const fetchProfileData = async (): Promise<[ProfileData | null, Set<Recov
         });
 
         const [response, imsProfile] = await Promise.all([
-            fetch(`https://${adobeIO}/profile`, { headers }),
+            fetch(`https://${adobeIO}/profile`, { headers }).then(res => {
+                if (res.status !== 200) {
+                    // Attach status to error for later use
+                    throw new RecoverableError(`ProfileData: Failed to fetch profile data with status ${res.status}`);
+                }
+                return res.json();
+            }),
             window.adobeIMS.getProfile()
         ]);
 
-        // Error handling
-        if (response.status !== 200) {
-            errors.add(new RecoverableError(`ProfileData: Failed to fetch profile data with status ${response.status}`));
-            return [null, errors];
-        }
-
-        // Parse response
-        const data = await response.json();
-        const { sections, user } = data;
+        const { sections, user } = response;
 
         if (!user?.avatar) {
             errors.add(new RecoverableError('ProfileData: Invalid response - missing avatar'));

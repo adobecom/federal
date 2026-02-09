@@ -298,6 +298,20 @@ export const sanitize = (str: string): string => {
     .replace(/^(\d)/, 'id-$1')
 };
 
+/**
+ * Escape HTML special characters to prevent XSS attacks
+ * @param str - String to escape
+ * @returns Escaped string safe for HTML insertion
+ */
+export const escapeHTML = (str: string): string => {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+};
+
 
 export const isDarkMode = (): boolean => {
   // TODO: Implement dark mode detection

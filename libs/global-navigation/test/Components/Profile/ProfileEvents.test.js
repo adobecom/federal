@@ -88,4 +88,24 @@ describe('ProfileEvents', () => {
 
     expect(assignCalled).to.be.false;
   });
+
+  it('should not throw error when IMS is not loaded during sign-out', () => {
+    window.adobeIMS = undefined;
+
+    let eventDispatched = false;
+    window.dispatchEvent = (event) => {
+        eventDispatched = true;
+    };
+
+    attachProfileEvents(container);
+
+    const signOutLink = container.querySelector('[data-signout-trigger]');
+    expect(signOutLink).to.exist;
+
+    // Should not throw error even when IMS is unavailable
+    expect(() => signOutLink.click()).to.not.throw();
+    
+    // Event should still be dispatched
+    expect(eventDispatched).to.be.true;
+  });
 });

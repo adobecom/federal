@@ -37,6 +37,18 @@ export type ProfileData = {
 };
 
 /**
+ * Parsed profile HTML data
+ */
+export type ParsedProfileData = {
+    /** Whether the profile contains a dropdown menu */
+    hasDropdown: boolean;
+    /** HTML content of the dropdown (if exists) */
+    dropdownHTML: string | null;
+    /** Text content of sign-in anchor (if exists in dropdown) */
+    signInText: string | null;
+};
+
+/**
  * Parameters for rendering signed-in profile component
  */
 export type RenderSignedInProfileParams = {

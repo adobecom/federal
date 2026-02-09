@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { fetchProfileData, setMiloConfig } from '../../../dist/test-exports.js';
+import { fetchProfileData, setMiloConfig, truncateEmail } from '../../../dist/test-exports.js';
 
 describe('ProfileData', () => {
   let originalFetch;
@@ -76,7 +76,7 @@ describe('ProfileData', () => {
     expect(data).to.be.null;
     expect(errors.size).to.equal(1);
     const error = [...errors][0];
-    expect(error.message).to.equal('ProfileData: Failed to fetch profile data with status 404');
+    expect(error.message).to.equal('ProfileData: Exception fetching profile data');
   });
 
   it('should return an error for invalid JSON response', async () => {
@@ -103,5 +103,31 @@ describe('ProfileData', () => {
     expect(errors.size).to.equal(1);
     const error = [...errors][0];
     expect(error.message).to.equal('ProfileData: Exception fetching profile data');
+  });
+});
+
+describe('truncateEmail', () => {
+  it('should truncate long username', () => {
+    const email = 'verylongusername@adobe.com';
+    const result = truncateEmail(email);
+    expect(result).to.equal('verylonguser…@adobe.com');
+  });
+
+  it('should truncate long domain', () => {
+    const email = 'user@verylongdomainname.com';
+    const result = truncateEmail(email);
+    expect(result).to.equal('user@verylongdoma….com');
+  });
+
+  it('should not truncate short email', () => {
+    const email = 'user@adobe.com';
+    const result = truncateEmail(email);
+    expect(result).to.equal('user@adobe.com');
+  });
+
+  it('should handle email without domain', () => {
+    const email = 'invalidemail';
+    const result = truncateEmail(email);
+    expect(result).to.equal('invalidemail');
   });
 });

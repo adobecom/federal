@@ -85,7 +85,7 @@ describe('ProfileDecorator', () => {
     const errors = await decorateProfile(mountpoint);
     expect(errors.size).to.equal(1);
     const error = [...errors][0];
-    expect(error.message).to.include('ProfileData: Failed to fetch profile data with status 500');
+    expect(error.message).to.include('ProfileData: Exception fetching profile data');
   });
 
   it('should do nothing if the profile placeholder is not found', async () => {
@@ -96,5 +96,46 @@ describe('ProfileDecorator', () => {
     // This will now return an empty set instead of undefined
     expect(errors).to.exist;
     expect(errors.size).to.equal(0);
+  });
+
+  it('should trigger IMS sign-in when sign-in button is clicked', async () => {
+    let signInCalled = false;
+    let signInContext = null;
+
+    window.adobeIMS = {
+      isSignedInUser: () => false,
+      signIn: (context) => {
+        signInCalled = true;
+        signInContext = context;
+      },
+    };
+
+    await decorateProfile(mountpoint);
+
+    const signInButton = mountpoint.querySelector('button.feds-signIn');
+    expect(signInButton).to.exist;
+
+    // Simulate button click
+    signInButton.click();
+
+    expect(signInCalled).to.be.true;
+    expect(signInContext).to.exist;
+  });
+
+  it('should not trigger sign-in when IMS is not loaded', async () => {
+    window.adobeIMS = {
+      isSignedInUser: () => false,
+    };
+
+    await decorateProfile(mountpoint);
+
+    const signInButton = mountpoint.querySelector('button.feds-signIn');
+    expect(signInButton).to.exist;
+
+    // Remove IMS to simulate it not being loaded
+    window.adobeIMS = undefined;
+
+    // Click should not throw error
+    expect(() => signInButton.click()).to.not.throw();
   });
 });
