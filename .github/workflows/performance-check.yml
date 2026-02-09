@@ -7,7 +7,7 @@ on:
 jobs:
   perf:
     uses: adobecom/perf-metrics/.github/workflows/performance-check.yaml@main
-    # Optional inputs go under "with" (test_url, throttle, baseline_path)
+    # Optional inputs go under the "with" (test_url, throttle, baseline_path)
     with:
       # test_url: ...
       # throttle: ...
