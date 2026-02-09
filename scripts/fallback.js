@@ -21,7 +21,7 @@ var locFallbackEntries = {
   'ar': 'متصفحك غير محدثة. لمزيد من الأمان والراحة وأفضل تجربة على هذا الموقع ، يرجى التحديث إلى متصفح حديث أو استخدامه',
   'ru': 'Ваш веб-браузер устарел. Для большей безопасности, удобства и наилучшего взаимодействия с этим сайтом обновите или используйте современный браузер.',
   'pt': 'Seu navegador da web está desatualizado. Para mais segurança, conforto e a melhor experiência neste site, atualize ou use um navegador moderno.',
-  'ko': '웹 브라우저가 오래되었습니다. 이 사이트에서 더 많은 보안, 편안함 및 최상의 경험을 위해 최신 브라우저로 업데이트하거나 사용하십시오.',
+  'ko': '웹 브라우저가 오래되었습니다.사이트에서 더 많은 보안, 편안함 및 최상의 경험을 위해 최신 브라우저로 업데이트하거나 사용하십시오.',
 };
 
 var userLocale = navigator.language || navigator.userLanguage;
