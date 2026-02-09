@@ -1,11 +1,24 @@
 name: Performance Check
 
 on:
-  pull_request:
+  # NOTE:
+  # `pull_request` workflows are loaded from the PR's *head* commit.
+  # If a PR branch was created before this workflow existed, GitHub won't find it
+  # and nothing will run. `pull_request_target` loads workflows from the *base*
+  # branch so it runs for every PR.
+  pull_request_target:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
 
 jobs:
   perf:
+    # Safety: don't run with base-branch token/secrets on fork PRs.
+    if: github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.full_name == github.repository
     uses: adobecom/perf-metrics/.github/workflows/performance-check.yaml@main
     # Optional inputs go under the "with" (test_url, throttle, baseline_path)
     with:
