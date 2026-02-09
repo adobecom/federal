@@ -1,4 +1,5 @@
 name: Performance Check
+
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -6,5 +7,10 @@ on:
 jobs:
   perf:
     uses: adobecom/perf-metrics/.github/workflows/performance-check.yaml@main
+    # Optional inputs go under "with" (test_url, throttle, baseline_path)
     with:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      # test_url: ...
+      # throttle: ...
+      # baseline_path: ...
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}  # required secret for the reusable workflow
