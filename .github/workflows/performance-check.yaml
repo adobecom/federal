@@ -9,4 +9,4 @@ jobs:
     with:
       throttle: "4g"
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}   # required secret (from caller repo)
+      token: ${{ secrets.GITHUB_TOKEN }}
