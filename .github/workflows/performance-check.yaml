@@ -1,0 +1,12 @@
+name: Performance Check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  perf:
+    uses: adobecom/perf-metrics/.github/workflows/performance-check.yaml@main
+    with:
+      throttle: "4g"
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}   # required secret (from caller repo)
