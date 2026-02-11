@@ -7,6 +7,6 @@ jobs:
   perf:
     uses: adobecom/perf-metrics/.github/workflows/performance-check.yaml@main
     with:
-      throttle: "4g"
+      baseline_path: ".github/performance/baseline.json"
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}   # required secret (from caller repo)
+      token: ${{ secrets.GITHUB_TOKEN }}
