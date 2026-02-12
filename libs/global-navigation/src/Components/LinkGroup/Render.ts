@@ -1,8 +1,5 @@
 import { LinkGroup, LinkGroupBlue, LinkGroupHeader, LinkGroupLink } from "./Parse";
 
-// css
-import "./linkGroup.css";
-
 export const linkGroup = (lg: LinkGroup): HTML => {
   switch (lg.type) {
     case "LinkGroupHeader": return linkGroupHeader(lg);

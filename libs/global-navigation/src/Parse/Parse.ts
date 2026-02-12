@@ -37,10 +37,11 @@ export const parseNavigation = (
       return [null, []];
     }
   })();
-  const localnav = components
-    .filter((component): boolean =>
-            component.type === "MegaMenu" &&
-            component.isSection).length === 1;
+  // const localnav = components
+  //   .filter((component): boolean =>
+  //           component.type === "MegaMenu" &&
+  //           component.isSection).length === 1;
+  const localnav = false;
   const errors = [
     breadcrumbErrors,
     componentErrors,

@@ -7,8 +7,6 @@ import { Link, parseLink } from "./Link/Parse";
 import { link } from "./Link/Render";
 import { MegaMenu, parseMegaMenu } from "./MegaMenu/Parse";
 import { megaMenu } from "./MegaMenu/Render";
-import { parseSmallMenu, SmallMenu } from "./SmallMenu/Parse";
-import { smallMenu } from "./SmallMenu/Render";
 import { parseText, Text } from "./Text/Parse";
 import { text } from "./Text/Render";
 
@@ -18,7 +16,6 @@ export type Component
   | SecondaryCTA
   | PrimaryCTA
   | Brand
-  | SmallMenu
   | MegaMenu;
 
 export const parseComponent = (
@@ -34,9 +31,6 @@ export const parseComponent = (
   const largeMenu = element.querySelector('.large-menu');
   if (largeMenu !== null)
     return parseMegaMenu(largeMenu);
-
-  if (element.querySelector('h5, ul, link-group') !== null)
-    return parseSmallMenu(element);
 
   if (element.querySelector('strong') !== null)
     return parsePrimaryCTA(element);
@@ -59,7 +53,6 @@ export const component = (
     case "SecondaryCTA": return secondaryCTA(c);
     case "PrimaryCTA": return primaryCTA(c);
     case "Brand": return brand(c);
-    case "SmallMenu": return smallMenu(c);
     case "MegaMenu": return megaMenu(c);
     default: {
       const exhaustive : never = c;

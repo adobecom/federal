@@ -1,18 +1,19 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
-import { fetchAndProcessPlainHTML, inlineNestedFragments, parseListAndAccumulateErrors } from "../../Utils/Utils";
-import { parseTab } from "../Tab/Parse";
-import { Link, parseLink } from "../Link/Parse";
-import { Tab } from "../Tab/Parse";
+import { fetchAndProcessPlainHTML, inlineNestedFragments } from "../../Utils/Utils";
+import { Panels, parsePanels } from "../Panels/Parse";
+import { parseProductList, ProductList } from "../ProductList/Parse";
+import { parseUseCaseCards, UseCaseCards } from "../UseCaseCards/Parse";
 
 
 export type MegaMenu = {
   type: "MegaMenu";
   title: string;
-  tabs: Promise<Parsed<List<Tab>, RecoverableError>>;
-  crossCloudMenu: List<Link>;
-  isSection: boolean;
+  content: Promise<Parsed<MegaMenuContent, RecoverableError>>;
 };
 
+export type MegaMenuContent = ProductList
+                            | UseCaseCards
+                            | Panels;
 
 export const parseMegaMenu = (
   element: Element | null
@@ -25,10 +26,10 @@ export const parseMegaMenu = (
   if (title === "")
     errors.add(new RecoverableError(ERRORS.noTitle))
 
-  const tabs = (async (): 
-                   Promise<Parsed<List<Tab>, RecoverableError>> => {
+  const content = (async (): 
+                   Promise<Parsed<MegaMenuContent, RecoverableError>> => {
     try {
-      const fragment: HTMLAnchorElement | null = element.querySelector('h2 > a');
+      const fragment: HTMLAnchorElement | null = element.querySelector('a');
       const fragmentURL = new URL(fragment?.href ?? "");
       const initialFragment =
         await fetchAndProcessPlainHTML(fragmentURL);
@@ -37,37 +38,30 @@ export const parseMegaMenu = (
       const megaMenuFragment = await inlineNestedFragments(initialFragment);
       if (megaMenuFragment instanceof IrrecoverableError)
         throw new Error(megaMenuFragment.message);
-      const unparsedTabs = [...megaMenuFragment.children]
-      const [tabs, errors] = parseListAndAccumulateErrors(
-        unparsedTabs,
-        parseTab,
-      );
-      return [tabs.flat(), errors];
+      if (element.classList.contains('product-list'))
+        return parseProductList(megaMenuFragment);
+      if (element.classList.contains('use-case-cards'))
+        return parseUseCaseCards(megaMenuFragment); 
+      if (element.classList.contains('panels'))
+        return parsePanels(megaMenuFragment)
+
+      throw new IrrecoverableError("unrecognized mega menu item (did you forget to label it correctly?");
     } catch (e) {
         // @ts-expect-error errors usually have a message
         throw new IrrecoverableError(e?.message);
     }
   })();
-  const unparsedCrossCloud = element.querySelectorAll(
-    '.cross-cloud-menu ul > li > a'
-  );
-  const [crossCloudMenu, ccmErrors] = parseListAndAccumulateErrors(
-    [...unparsedCrossCloud],
-    parseLink
-  );
 
-  const isSection = element.classList.contains('section');
+  if (content instanceof IrrecoverableError)
+    throw content;
 
   return [
     {
       type: "MegaMenu",
       title,
-      tabs,
-      crossCloudMenu,
-      isSection
+      content,
     },
     [
-      ...ccmErrors,
       ...errors
     ]
   ]

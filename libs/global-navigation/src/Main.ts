@@ -1,6 +1,5 @@
 import { component } from "./Components/Component";
 import { productEntryCTA } from "./Components/CTA/Render";
-import { renderGhostTabs} from "./Components/MegaMenu/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
@@ -9,9 +8,9 @@ import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig } from "./Utils/Utils";
 import './styles/styles.css';
-import { tabs } from "./Components/Tab/Render";
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
+import { popup } from "./Components/MegaMenu/Render";
 
 // TODO implement Analytcs
 
@@ -112,29 +111,17 @@ mountpoint: HTMLElement
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
   const megaMenus = [
-    ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup > ul')
+    ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
   ]
   megaMenus.forEach(mm => {
-    mm.innerHTML = renderGhostTabs(mm.textContent?.trim() ?? '');
+    mm.innerHTML = '';
   });
   const mmPromises = data.components
     .filter(com => com.type === "MegaMenu")
-    .map(com => com.tabs);
+    .map(com => com.content);
   const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
-    const [parsedTabs, errors] = await mmPromise;
-    const brand = mountpoint.querySelector('.feds-brand-container')?.outerHTML ?? '';
-    const title = megaMenus[idx].parentElement?.previousElementSibling?.textContent ?? '';
-    const breadcrumbs = mountpoint.querySelector('.breadcrumbs')?.outerHTML ?? '';
-    const fedsPopupId = megaMenus[idx].querySelector('.feds-popup')?.id ?? '';
-    const isLocalNav = megaMenus.length === 1;
-    const renderedTabs = tabs(
-      brand,
-      title,
-      breadcrumbs,
-      fedsPopupId,
-      isLocalNav
-    )(parsedTabs);
-    megaMenus[idx].innerHTML = renderedTabs;
+    const [content, errors] = await mmPromise;
+    megaMenus[idx].innerHTML = popup(content);
     return errors;
   }).flat());
   return mountpoint;

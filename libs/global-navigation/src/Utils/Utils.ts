@@ -271,6 +271,10 @@ export const getFederatedContentRoot = (): string => {
 // at the start of the url
 // and make the check more strict.
 export const federateUrl = (url = ''): string => {
+  // TEMPORARY REMOVE LATER
+  if (url.includes('c2-poc--milo--adobecom')) {
+    return url.replace('c2-poc--milo--adobecom', 'main--federal--adobecom');
+  }
   if (typeof url !== 'string' || !url.includes('/federal/')) return url;
   if (url.startsWith('/')) return `${getFederatedContentRoot()}${url}`;
   try {
@@ -307,12 +311,7 @@ export const inlineNestedFragments = async (
             if (fragmentBody instanceof IrrecoverableError)
               throw fragmentBody;
             await processElement(fragmentBody, visitedUrls);
-            const parentDiv = anchorElement.closest('div');
-            if (parentDiv) {
-              parentDiv.replaceWith(...fragmentBody.children);
-            } else {
-              anchorElement.replaceWith(...fragmentBody.children);
-            }
+            anchorElement.replaceWith(...fragmentBody.children);
             return;
           } catch {
             return;

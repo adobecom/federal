@@ -77,7 +77,7 @@ const parseLinkGroupLink = (
   if (!element)
     throw new IrrecoverableError(ERRORS.elementNull);
 
-  const titleElement = element.querySelector("p a");
+  const titleElement = element.querySelector("p a") ?? element.querySelector('div ~ div > a');
   if (!titleElement)
     throw new IrrecoverableError(ERRORS.noTitleAnchor);
 
@@ -93,17 +93,18 @@ const parseLinkGroupLink = (
     ?.closest("p")
     ?.nextElementSibling;
   if (!subtitleElement)
-    throw new IrrecoverableError(ERRORS.noSubtitleP);
+    errors.add(new RecoverableError(ERRORS.noSubtitleP));
 
-  const subtitle = subtitleElement.textContent ?? '';
+  const subtitle = subtitleElement?.textContent ?? '';
   if (subtitle === '')
     errors.add(new RecoverableError(ERRORS.noSubtitle));
 
-  const [iconHref = null, iconAlt = null] = (element
+  const [iconHref, iconAlt = null] = (element
     .firstElementChild
     ?.firstElementChild
     ?.textContent
     ?.split("|") ?? []).map(x => x.trim());
+
   return [
     {
       type: "LinkGroupLink",

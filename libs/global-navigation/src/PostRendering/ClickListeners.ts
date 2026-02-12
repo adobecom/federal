@@ -5,8 +5,8 @@ type CleanupFunction = () => void
 const mobileClickListeners = (
   gnav: HTMLElement
 ): CleanupFunction => {
-  const tabButtons = [...gnav.querySelectorAll('.tabs > button[role="tab"]')];
-  const tabPanels = [...gnav.querySelectorAll('.tab-content > div')];
+  const tabButtons = [...gnav.querySelectorAll('.tabs button[role="tab"]')];
+  const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
       tabButtons.forEach(tabButton => {
         tabButton.setAttribute('aria-selected', 'false');
