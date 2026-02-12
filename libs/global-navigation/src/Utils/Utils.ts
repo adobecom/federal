@@ -275,6 +275,12 @@ export const federateUrl = (url = ''): string => {
   if (url.includes('c2-poc--milo--adobecom')) {
     return url.replace('c2-poc--milo--adobecom', 'main--federal--adobecom');
   }
+  if (url.includes('c2-poc-feds-gnav--milo--adobecom')) {
+    return url.replace('c2-poc-feds-gnav--milo--adobecom', 'main--federal--adobecom');
+  }
+  if (url.includes('localhost:3000')) {
+    return url.replace('localhost:3000', 'main--federal--adobecom.aem.page');
+  }
   if (typeof url !== 'string' || !url.includes('/federal/')) return url;
   if (url.startsWith('/')) return `${getFederatedContentRoot()}${url}`;
   try {
