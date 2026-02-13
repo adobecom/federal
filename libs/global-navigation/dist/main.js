@@ -662,6 +662,14 @@ var me=async e=>{let{placeholders:n}=e,{locale:t}=x(),o=`${z()}${t.prefix}/feder
   opacity: 1;
 }
 
+.global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
+  color: white;
+}
+.global-navigation.site-pivot:has(:popover-open) .universal-nav-container .profile-signed-out button,
+.global-navigation.site-pivot .universal-nav-container .profile-signed-out button:hover {
+  color: inherit;
+}
+
 ::backdrop {
   opacity: 1;
 }
@@ -965,6 +973,7 @@ body:has(:popover-open) {
     grid-template-columns: 1fr;
   }
 }
+
 `,on=document.createElement("style");on.textContent=Qn;document.head.appendChild(on);var Jo=async e=>{let{gnavSource:n,mountpoint:t,unavEnabled:r,miloConfig:o,personalization:a}=e;if(!(n instanceof URL))throw y(`gnavSource is invalid: ${n}`),new s("gnavSource needs to be a URL object");try{ae(o)}catch(g){throw y(`Failed to initialize MiloConfig: ${g}`),new s(`Failed to initialize MiloConfig: ${g}`)}be(a),he(me(e));let i=await rn(e);if(i instanceof s)throw y(i.message),i;let{mainNav:l,aside:c}=i;if(l instanceof s)throw y(l.message),l;let p=en(l,r);if(p instanceof s)throw y(p.message),p;return await et(p)(t),tt(e)},et=e=>async n=>{let t=nt(e);n.innerHTML=t,n.classList.add("site-pivot");let r=[...n.querySelectorAll(".mega-menu ~ .feds-popup")];r.forEach(i=>{i.innerHTML=""});let o=e.components.filter(i=>i.type==="MegaMenu").map(i=>i.content),a=await Promise.all(o.map(async(i,l)=>{let[c,p]=await i;return r[l].innerHTML=Ke(c),p}).flat());return n},nt=({components:e,productCTA:n,unavEnabled:t})=>`
 <nav>
   <ul>

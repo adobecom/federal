@@ -24,6 +24,14 @@
   opacity: 1;
 }
 
+.global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
+  color: white;
+}
+.global-navigation.site-pivot:has(:popover-open) .universal-nav-container .profile-signed-out button,
+.global-navigation.site-pivot .universal-nav-container .profile-signed-out button:hover {
+  color: inherit;
+}
+
 ::backdrop {
   opacity: 1;
 }
@@ -327,3 +335,4 @@ body:has(:popover-open) {
     grid-template-columns: 1fr;
   }
 }
+
