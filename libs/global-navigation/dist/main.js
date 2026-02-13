@@ -89,7 +89,7 @@ var me=async e=>{let{placeholders:n}=e,{locale:t}=x(),o=`${z()}${t.prefix}/feder
     <a href="${e}" class="feds-brand" daa-ll="Brand"${t}>
       ${n}
     </a>
-  </div>`.trim(),ce=e=>{let{data:n}=e;switch(n.type){case"LabelledBrand":return V(n.href,le(n.image,!1)+`<span class="feds-brand-label">${n.label}</span>`);case"BrandImageOnly":{let t=n.alt?` aria-label="${n.alt}"`:"";return V(n.href,le(n.image,!0),t)}case"ImageOnlyBrand":{let t=n.alt?` aria-label="${n.alt}"`:"";return V(n.href,le(n.image,!1),t)}case"BrandLabelOnly":return V(n.href,`<span class="feds-brand-label">${n.label}</span>`);case"NoRender":return"";default:return""}};var pe=["appswitcher","help"],K={cs:["cz"],da:["dk"],de:["at"],en:["africa","au","ca","ie","in","mt","ng","nz","sg","za"],es:["ar","cl","co","cr","ec","gt","la","mx","pe","pr"],et:["ee"],ja:["jp"],ko:["kr"],nb:["no"],pt:["br"],sl:["si"],sv:["se"],uk:["ua"],zh:["cn","tw"]},[N,Me]=(()=>{let e,n,t,r=new Promise(o=>{n=o,t=setTimeout(()=>{e={},o(e)},5e3)});return[o=>{o&&!e&&(e=o,clearTimeout(t),n?.(e))},()=>r]})();function J(e,n=!1){let l=(/uc_carts=/.test(document.cookie)?e:e?.filter(p=>p!=="cart"))??[],c=l.length??3;if(n){let p=l.filter(f=>pe.includes(f)).length;return`calc(92px + ${p*32}px + ${p*.25}rem)`}return`calc(${c*32}px + ${(c-1)*.25}rem)`}var X=e=>{if(!e.prefix||e.prefix==="/")return"en_US";let n=e.prefix.replace("/","");if(n.includes("_")){let[r,o]=n.split("_").reverse();return`${r.toLowerCase()}_${o.toUpperCase()}`}if(n==="uk")return"en_GB";let t=Object.keys(K).find(r=>K[r].includes(n));return t?`${t.toLowerCase()}_${n.toUpperCase()}`:`${n.toLowerCase()}_${n.toUpperCase()}`},En={Mac:"macOS",Win:"windows",Linux:"linux",CrOS:"chromeOS",Android:"android",iPad:"iPadOS",iPhone:"iOS"},Y=()=>{let e=navigator.userAgent;for(let[n,t]of Object.entries(En))if(e.includes(n))return t;return"linux"},Q=async()=>{let e=window;return e.alloy?await e.alloy("getIdentity").then(n=>n?.identity?.ECID).catch(()=>{}):void 0};var Te=()=>{try{return x().signInContext||{}}catch{return{}}},Pn=()=>{let e=x();return U("signin-cta-style")==="primary"||e?.unav?.profile?.signInCtaStyle==="primary"?"primary":"secondary"},Mn=()=>{let n=x()?.unav?.profile?.messageEventListener;return n||(t=>{let{name:r,payload:o,executeDefaultAction:a}=t.detail;if(!(!r||r!=="System"||!o||typeof a!="function"))switch(o.subType){case"AppInitiated":window.adobeProfile?.getUserProfile().then(i=>{N(i)}).catch(()=>{N({})});break;case"SignOut":a();break;case"ProfileSwitch":Promise.resolve(a()).then(i=>{i&&window.location.reload()});break;default:break}})};function Tn(){let{unav:e}=x();return e?.unavHelpChildren||[{type:"Support"},{type:"Community"}]}var B=()=>{let e=x();return{profile:{name:"profile",attributes:{accountMenuContext:{sharedContextConfig:{enableLocalSection:!0,enableProfileSwitcher:!0,miniAppContext:{logger:{trace:()=>{},debug:()=>{},info:()=>{},warn:()=>{},error:()=>{}}},complexConfig:e?.unav?.profile?.complexConfig||null,...e?.unav?.profile?.config},messageEventListener:Mn()},signInCtaStyle:Pn(),isSignUpRequired:!1,callbacks:{onSignIn:()=>{window.adobeIMS?.signIn(Te())},onSignUp:()=>{window.adobeIMS?.signIn(Te())}}}},appswitcher:{name:"app-switcher"},notifications:{name:"notifications",attributes:{notificationsConfig:{applicationContext:{appID:e?.unav?.uncAppId||"adobecom",...e?.unav?.uncConfig}}}},help:{name:"help",attributes:{children:Tn()}},jarvis:{name:"jarvis",attributes:{appid:e?.jarvis?.id,callbacks:e?.jarvis?.callbacks}},cart:{name:"cart"}}};var Se=(e,n)=>{e[0]&&"attributes"in e[0]&&e[0].attributes&&typeof e[0].attributes=="object"&&"isSignUpRequired"in e[0].attributes&&(e[0].attributes.isSignUpRequired=n)},ee=async(e,n)=>{try{let t=e.querySelector(".feds-utilities");if(!(t instanceof HTMLElement))return new d('missing ".feds-utilities" container');let r=new Set,o=document.head.querySelector('meta[name="universal-nav"]'),a=o instanceof HTMLMetaElement?o.content??"":"";o instanceof HTMLMetaElement||r.add(new d('metadata "universal-nav" is missing'));let i=a.trim();o instanceof HTMLMetaElement&&i.length===0&&r.add(new d('metadata "universal-nav" has no value'));let l=!window.adobeIMS?.isSignedInUser(),c=i.split(",").map(m=>m.trim()).filter(m=>Object.keys(B()).includes(m)||m==="signup");if(l){let m=J(c,l);t.style.setProperty("min-width",m)}let p;try{p=x()}catch{throw new Error("MiloConfig not available for UNAV initialization")}let g=X(p.locale),f=p.env.name==="prod"?"prod":"stage",C=await Q(),b=new URLSearchParams(window.location.search).get("unavVersion");/^\d+(\.\d+)?$/.test(b??"")||(b="1.5"),await Promise.all([ie(`https://${f}.adobeccstatic.com/unav/${b}/UniversalNav.js`),oe(`https://${f}.adobeccstatic.com/unav/${b}/UniversalNav.css`,!0)]);let k=()=>{let m=B(),h=[m.profile];return Se(h,!1),c?.forEach(T=>{if(T==="profile")return;if(T==="signup"){Se(h,!0);return}let F=m[T];F&&h.push(F)}),h},E=()=>({target:t,env:f,locale:g,countryCode:Ee(p?.locale)?.country||"US",imsClientId:window?.adobeid?.client_id,theme:"light",analyticsContext:{consumer:{name:"adobecom",version:"1.0",platform:"Web",device:Y(),os_version:navigator.platform},event:{visitor_guid:C}},children:k(),isSectionDividerRequired:!!p?.unav?.showSectionDivider,showTrayExperience:!I.matches});await window?.UniversalNav?.(E()),l||t?.style.removeProperty("min-width");let L=m=>{window?.UniversalNav?.reload(E())};return I.addEventListener("change",()=>{L()}),{reloadUnav:L,errors:r}}catch(t){let r=t instanceof Error?t.message:"failed to load universal nav";return new d(r)}};var Sn="feds-milo",y=(e,n="default",t="e")=>{let{locale:r}=x(),o=U("gnav-source")??`${r.contentRoot??""}/gnav`;window.lana||console.warn("lana logging unavailable in the gnav"),window?.lana?.log(`${e} | gnav-source: ${o} | href: ${window.location.href}`,{clientId:Sn,sampleRate:1,tags:n,errorType:t})};var s=class e extends Error{constructor(n){super(n),Object.setPrototypeOf(this,e.prototype)}},d=class e extends Error{constructor(n,t="Minor"){super(n),Object.setPrototypeOf(this,e.prototype),t==="Critical"&&y(n)}};var Ae=e=>n=>{if(n===null)throw new Error("");let t=n.querySelector(An(e));if(!t)throw new Error("");let[{text:r,href:o},a]=v(t);return[{type:e.type,text:r,href:o},a]},de=Ae({type:"PrimaryCTA"}),D=Ae({type:"SecondaryCTA"}),Ie=e=>$(de).or(D).eval(e),An=({type:e})=>{switch(e){case"PrimaryCTA":return"strong > a";case"SecondaryCTA":return"em > a";default:throw new Error("")}};var ue=({text:e,href:n})=>`
+  </div>`.trim(),ce=e=>{let{data:n}=e;switch(n.type){case"LabelledBrand":return V(n.href,le(n.image,!1)+`<span class="feds-brand-label">${n.label}</span>`);case"BrandImageOnly":{let t=n.alt?` aria-label="${n.alt}"`:"";return V(n.href,le(n.image,!0),t)}case"ImageOnlyBrand":{let t=n.alt?` aria-label="${n.alt}"`:"";return V(n.href,le(n.image,!1),t)}case"BrandLabelOnly":return V(n.href,`<span class="feds-brand-label">${n.label}</span>`);case"NoRender":return"";default:return""}};var pe=["appswitcher","help"],K={cs:["cz"],da:["dk"],de:["at"],en:["africa","au","ca","ie","in","mt","ng","nz","sg","za"],es:["ar","cl","co","cr","ec","gt","la","mx","pe","pr"],et:["ee"],ja:["jp"],ko:["kr"],nb:["no"],pt:["br"],sl:["si"],sv:["se"],uk:["ua"],zh:["cn","tw"]},[N,Me]=(()=>{let e,n,t,r=new Promise(o=>{n=o,t=setTimeout(()=>{e={},o(e)},5e3)});return[o=>{o&&!e&&(e=o,clearTimeout(t),n?.(e))},()=>r]})();function X(e,n=!1){let l=(/uc_carts=/.test(document.cookie)?e:e?.filter(p=>p!=="cart"))??[],c=l.length??3;if(n){let p=l.filter(f=>pe.includes(f)).length;return`calc(92px + ${p*32}px + ${p*.25}rem)`}return`calc(${c*32}px + ${(c-1)*.25}rem)`}var J=e=>{if(!e.prefix||e.prefix==="/")return"en_US";let n=e.prefix.replace("/","");if(n.includes("_")){let[r,o]=n.split("_").reverse();return`${r.toLowerCase()}_${o.toUpperCase()}`}if(n==="uk")return"en_GB";let t=Object.keys(K).find(r=>K[r].includes(n));return t?`${t.toLowerCase()}_${n.toUpperCase()}`:`${n.toLowerCase()}_${n.toUpperCase()}`},En={Mac:"macOS",Win:"windows",Linux:"linux",CrOS:"chromeOS",Android:"android",iPad:"iPadOS",iPhone:"iOS"},Y=()=>{let e=navigator.userAgent;for(let[n,t]of Object.entries(En))if(e.includes(n))return t;return"linux"},Q=async()=>{let e=window;return e.alloy?await e.alloy("getIdentity").then(n=>n?.identity?.ECID).catch(()=>{}):void 0};var Te=()=>{try{return x().signInContext||{}}catch{return{}}},Pn=()=>{let e=x();return U("signin-cta-style")==="primary"||e?.unav?.profile?.signInCtaStyle==="primary"?"primary":"secondary"},Mn=()=>{let n=x()?.unav?.profile?.messageEventListener;return n||(t=>{let{name:r,payload:o,executeDefaultAction:a}=t.detail;if(!(!r||r!=="System"||!o||typeof a!="function"))switch(o.subType){case"AppInitiated":window.adobeProfile?.getUserProfile().then(i=>{N(i)}).catch(()=>{N({})});break;case"SignOut":a();break;case"ProfileSwitch":Promise.resolve(a()).then(i=>{i&&window.location.reload()});break;default:break}})};function Tn(){let{unav:e}=x();return e?.unavHelpChildren||[{type:"Support"},{type:"Community"}]}var B=()=>{let e=x();return{profile:{name:"profile",attributes:{accountMenuContext:{sharedContextConfig:{enableLocalSection:!0,enableProfileSwitcher:!0,miniAppContext:{logger:{trace:()=>{},debug:()=>{},info:()=>{},warn:()=>{},error:()=>{}}},complexConfig:e?.unav?.profile?.complexConfig||null,...e?.unav?.profile?.config},messageEventListener:Mn()},signInCtaStyle:Pn(),isSignUpRequired:!1,callbacks:{onSignIn:()=>{window.adobeIMS?.signIn(Te())},onSignUp:()=>{window.adobeIMS?.signIn(Te())}}}},appswitcher:{name:"app-switcher"},notifications:{name:"notifications",attributes:{notificationsConfig:{applicationContext:{appID:e?.unav?.uncAppId||"adobecom",...e?.unav?.uncConfig}}}},help:{name:"help",attributes:{children:Tn()}},jarvis:{name:"jarvis",attributes:{appid:e?.jarvis?.id,callbacks:e?.jarvis?.callbacks}},cart:{name:"cart"}}};var Se=(e,n)=>{e[0]&&"attributes"in e[0]&&e[0].attributes&&typeof e[0].attributes=="object"&&"isSignUpRequired"in e[0].attributes&&(e[0].attributes.isSignUpRequired=n)},ee=async(e,n)=>{try{let t=e.querySelector(".feds-utilities");if(!(t instanceof HTMLElement))return new d('missing ".feds-utilities" container');let r=new Set,o=document.head.querySelector('meta[name="universal-nav"]'),a=o instanceof HTMLMetaElement?o.content??"":"";o instanceof HTMLMetaElement||r.add(new d('metadata "universal-nav" is missing'));let i=a.trim();o instanceof HTMLMetaElement&&i.length===0&&r.add(new d('metadata "universal-nav" has no value'));let l=!window.adobeIMS?.isSignedInUser(),c=i.split(",").map(m=>m.trim()).filter(m=>Object.keys(B()).includes(m)||m==="signup");if(l){let m=X(c,l);t.style.setProperty("min-width",m)}let p;try{p=x()}catch{throw new Error("MiloConfig not available for UNAV initialization")}let g=J(p.locale),f=p.env.name==="prod"?"prod":"stage",C=await Q(),b=new URLSearchParams(window.location.search).get("unavVersion");/^\d+(\.\d+)?$/.test(b??"")||(b="1.5"),await Promise.all([ie(`https://${f}.adobeccstatic.com/unav/${b}/UniversalNav.js`),oe(`https://${f}.adobeccstatic.com/unav/${b}/UniversalNav.css`,!0)]);let k=()=>{let m=B(),h=[m.profile];return Se(h,!1),c?.forEach(T=>{if(T==="profile")return;if(T==="signup"){Se(h,!0);return}let F=m[T];F&&h.push(F)}),h},E=()=>({target:t,env:f,locale:g,countryCode:Ee(p?.locale)?.country||"US",imsClientId:window?.adobeid?.client_id,theme:"light",analyticsContext:{consumer:{name:"adobecom",version:"1.0",platform:"Web",device:Y(),os_version:navigator.platform},event:{visitor_guid:C}},children:k(),isSectionDividerRequired:!!p?.unav?.showSectionDivider,showTrayExperience:!I.matches});await window?.UniversalNav?.(E()),l||t?.style.removeProperty("min-width");let L=m=>{window?.UniversalNav?.reload(E())};return I.addEventListener("change",()=>{L()}),{reloadUnav:L,errors:r}}catch(t){let r=t instanceof Error?t.message:"failed to load universal nav";return new d(r)}};var Sn="feds-milo",y=(e,n="default",t="e")=>{let{locale:r}=x(),o=U("gnav-source")??`${r.contentRoot??""}/gnav`;window.lana||console.warn("lana logging unavailable in the gnav"),window?.lana?.log(`${e} | gnav-source: ${o} | href: ${window.location.href}`,{clientId:Sn,sampleRate:1,tags:n,errorType:t})};var s=class e extends Error{constructor(n){super(n),Object.setPrototypeOf(this,e.prototype)}},d=class e extends Error{constructor(n,t="Minor"){super(n),Object.setPrototypeOf(this,e.prototype),t==="Critical"&&y(n)}};var Ae=e=>n=>{if(n===null)throw new Error("");let t=n.querySelector(An(e));if(!t)throw new Error("");let[{text:r,href:o},a]=v(t);return[{type:e.type,text:r,href:o},a]},de=Ae({type:"PrimaryCTA"}),D=Ae({type:"SecondaryCTA"}),Ie=e=>$(de).or(D).eval(e),An=({type:e})=>{switch(e){case"PrimaryCTA":return"strong > a";case"SecondaryCTA":return"em > a";default:throw new Error("")}};var ue=({text:e,href:n})=>`
 <a href="${n}" class="feds-primary-cta">
   ${e}
 </a>
@@ -140,15 +140,32 @@ var me=async e=>{let{placeholders:n}=e,{locale:t}=x(),o=`${z()}${t.prefix}/feder
 
 .panels  .list-image-panel li:hover {
   background-color: white;
+  position: relative;
 }
 
 .panels .list-image-panel li:hover .feds-link {
   color: black;
 }
 
+.panels .list-image-panel .feds-secondary-cta:hover{
+  color: black;
+}
+
+.panels .list-image-panel li:hover .feds-link::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  width: 4px;
+  height: 4px;
+  border-right: 2px solid #000;
+  border-top: 2px solid #000;
+  transform: translateY(8%) translateX(100%) rotate(45deg);
+}
+
+
 .panels h4 {
   font-family: var(--feds-heading-font);
-  font-size: 18px;
+  font-size: 24px;
   line-height: 1.25;
   margin-left: 24px;
 }
@@ -163,6 +180,17 @@ var me=async e=>{let{placeholders:n}=e,{locale:t}=x(),o=`${z()}${t.prefix}/feder
   color: #000;
   margin-left: 24px;
   padding-left: 0;
+  margin-top: auto;
+}
+
+.global-navigation.site-pivot .panels .link-panel + .feds-link::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-right: 2px solid #000;
+  border-top: 2px solid #000;
+  transform: translateY(8%) translateX(8px) rotate(45deg);
+
 }
 
 .panels .link-panel .feds-link,
@@ -170,16 +198,12 @@ var me=async e=>{let{placeholders:n}=e,{locale:t}=x(),o=`${z()}${t.prefix}/feder
   display: inline-flex;
   align-items: center;
   margin: 0;
-  padding: 6px 0;
+  padding: 12px 0;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1.35;
   color: #000;
-}
-
-.panels .link-panel .feds-link:hover,
-.panels .panel-footer-link .feds-link:hover {
 }
 
 .panels .link-panel-container > .feds-secondary-cta,
@@ -197,10 +221,6 @@ var me=async e=>{let{placeholders:n}=e,{locale:t}=x(),o=`${z()}${t.prefix}/feder
   color: white;
   margin: auto 0 12px 0;
   width: calc(100% - 24px);
-}
-
-.panels .list-image-panel .feds-secondary-cta:hover{
-  color: black;
 }
 
 .list-image-panel {
@@ -616,7 +636,7 @@ var me=async e=>{let{placeholders:n}=e,{locale:t}=x(),o=`${z()}${t.prefix}/feder
   </button>
   <div id="${W(e)}" popover class="feds-popup">
   </div>
-`,Ke=e=>{switch(e.type){case"ProductList":return We(e);case"UseCaseCards":return Ze(e);case"Panels":return Fe(e);default:}return""};var Je={elementNull:"Error when parsing text. Element is null",textContentNull:"Error when parsing text. Element has no textContent"},Xe=e=>{if(e===null)return[{type:"Text",content:""},[new d(Je.elementNull,"Minor")]];let n=e.textContent;return n===null?[{type:"Text",content:""},[new d(Je.textContentNull,"Minor")]]:[{type:"Text",content:n},[]]};var Ye=({content:e})=>e;var Qe=e=>{if(e===null)throw new s(Kn.elementNull);if(e.querySelector(".gnav-brand")!==null)return se(e);let t=e.querySelector(".large-menu");return t!==null?De(t):e.querySelector("strong")!==null?de(e):e.querySelector("em")!==null?D(e):e.querySelector("a")===null?Xe(e):v(e.querySelector("a"))},ge=e=>{switch(e.type){case"Text":return Ye(e);case"Link":return M(e);case"SecondaryCTA":return A(e);case"PrimaryCTA":return ue(e);case"Brand":return ce(e);case"MegaMenu":return Ve(e);default:return console.error(`Failed to recognize component: ${e}`),""}},Kn={elementNull:"Element is null"};var en=(e,n)=>{let[t,r]=w([...document.querySelectorAll(".breadcrumbs ul > li > a")??[]],v),[o,a]=w([...e.children],Qe),i=e.querySelector(".product-entry-cta"),[l,c]=(()=>{try{return Ie(i)}catch{return[null,[]]}})(),p=!1,g=[r,a,c].flat();return{breadcrumbs:t,components:o,productCTA:l,localnav:p,errors:g,unavEnabled:n}};var Jn=e=>{let n=[...e.querySelectorAll('.tabs button[role="tab"]')],t=[...e.querySelectorAll(".tab-content ul")],r=n.map((o,a)=>()=>{n.forEach(i=>{i.setAttribute("aria-selected","false")}),t.forEach(i=>{i.setAttribute("hidden","true")}),t[a]?.removeAttribute("hidden"),o.setAttribute("aria-selected","true")});return n.forEach((o,a)=>{o.addEventListener("click",r[a])}),()=>{n.forEach((o,a)=>{o.removeEventListener("click",r[a])})}};var nn=Jn;var Xn=e=>()=>console.log(e),Yn=e=>()=>console.log(e),tn=ye({mobileEventListeners:Yn,desktopEventListeners:Xn});var rn=async({gnavSource:e,asideSource:n})=>{let t=await _(e);if(t instanceof s)return t;let r=await _(n);return{mainNav:t,aside:r}};var Qn=`/**
+`,Ke=e=>{switch(e.type){case"ProductList":return We(e);case"UseCaseCards":return Ze(e);case"Panels":return Fe(e);default:}return""};var Xe={elementNull:"Error when parsing text. Element is null",textContentNull:"Error when parsing text. Element has no textContent"},Je=e=>{if(e===null)return[{type:"Text",content:""},[new d(Xe.elementNull,"Minor")]];let n=e.textContent;return n===null?[{type:"Text",content:""},[new d(Xe.textContentNull,"Minor")]]:[{type:"Text",content:n},[]]};var Ye=({content:e})=>e;var Qe=e=>{if(e===null)throw new s(Kn.elementNull);if(e.querySelector(".gnav-brand")!==null)return se(e);let t=e.querySelector(".large-menu");return t!==null?De(t):e.querySelector("strong")!==null?de(e):e.querySelector("em")!==null?D(e):e.querySelector("a")===null?Je(e):v(e.querySelector("a"))},ge=e=>{switch(e.type){case"Text":return Ye(e);case"Link":return M(e);case"SecondaryCTA":return A(e);case"PrimaryCTA":return ue(e);case"Brand":return ce(e);case"MegaMenu":return Ve(e);default:return console.error(`Failed to recognize component: ${e}`),""}},Kn={elementNull:"Element is null"};var en=(e,n)=>{let[t,r]=w([...document.querySelectorAll(".breadcrumbs ul > li > a")??[]],v),[o,a]=w([...e.children],Qe),i=e.querySelector(".product-entry-cta"),[l,c]=(()=>{try{return Ie(i)}catch{return[null,[]]}})(),p=!1,g=[r,a,c].flat();return{breadcrumbs:t,components:o,productCTA:l,localnav:p,errors:g,unavEnabled:n}};var Xn=e=>{let n=[...e.querySelectorAll('.tabs button[role="tab"]')],t=[...e.querySelectorAll(".tab-content ul")],r=n.map((o,a)=>()=>{n.forEach(i=>{i.setAttribute("aria-selected","false")}),t.forEach(i=>{i.setAttribute("hidden","true")}),t[a]?.removeAttribute("hidden"),o.setAttribute("aria-selected","true")});return n.forEach((o,a)=>{o.addEventListener("click",r[a])}),()=>{n.forEach((o,a)=>{o.removeEventListener("click",r[a])})}};var nn=Xn;var Jn=e=>()=>console.log(e),Yn=e=>()=>console.log(e),tn=ye({mobileEventListeners:Yn,desktopEventListeners:Jn});var rn=async({gnavSource:e,asideSource:n})=>{let t=await _(e);if(t instanceof s)return t;let r=await _(n);return{mainNav:t,aside:r}};var Qn=`/**
  * Global Navigation Styles
  * Styles for the federal global navigation component
  */
@@ -945,7 +965,7 @@ body:has(:popover-open) {
     grid-template-columns: 1fr;
   }
 }
-`,on=document.createElement("style");on.textContent=Qn;document.head.appendChild(on);var Xo=async e=>{let{gnavSource:n,mountpoint:t,unavEnabled:r,miloConfig:o,personalization:a}=e;if(!(n instanceof URL))throw y(`gnavSource is invalid: ${n}`),new s("gnavSource needs to be a URL object");try{ae(o)}catch(g){throw y(`Failed to initialize MiloConfig: ${g}`),new s(`Failed to initialize MiloConfig: ${g}`)}be(a),he(me(e));let i=await rn(e);if(i instanceof s)throw y(i.message),i;let{mainNav:l,aside:c}=i;if(l instanceof s)throw y(l.message),l;let p=en(l,r);if(p instanceof s)throw y(p.message),p;return await et(p)(t),tt(e)},et=e=>async n=>{let t=nt(e);n.innerHTML=t,n.classList.add("site-pivot");let r=[...n.querySelectorAll(".mega-menu ~ .feds-popup")];r.forEach(i=>{i.innerHTML=""});let o=e.components.filter(i=>i.type==="MegaMenu").map(i=>i.content),a=await Promise.all(o.map(async(i,l)=>{let[c,p]=await i;return r[l].innerHTML=Ke(c),p}).flat());return n},nt=({components:e,productCTA:n,unavEnabled:t})=>`
+`,on=document.createElement("style");on.textContent=Qn;document.head.appendChild(on);var Jo=async e=>{let{gnavSource:n,mountpoint:t,unavEnabled:r,miloConfig:o,personalization:a}=e;if(!(n instanceof URL))throw y(`gnavSource is invalid: ${n}`),new s("gnavSource needs to be a URL object");try{ae(o)}catch(g){throw y(`Failed to initialize MiloConfig: ${g}`),new s(`Failed to initialize MiloConfig: ${g}`)}be(a),he(me(e));let i=await rn(e);if(i instanceof s)throw y(i.message),i;let{mainNav:l,aside:c}=i;if(l instanceof s)throw y(l.message),l;let p=en(l,r);if(p instanceof s)throw y(p.message),p;return await et(p)(t),tt(e)},et=e=>async n=>{let t=nt(e);n.innerHTML=t,n.classList.add("site-pivot");let r=[...n.querySelectorAll(".mega-menu ~ .feds-popup")];r.forEach(i=>{i.innerHTML=""});let o=e.components.filter(i=>i.type==="MegaMenu").map(i=>i.content),a=await Promise.all(o.map(async(i,l)=>{let[c,p]=await i;return r[l].innerHTML=Ke(c),p}).flat());return n},nt=({components:e,productCTA:n,unavEnabled:t})=>`
 <nav>
   <ul>
     ${(()=>{let r=e.find(c=>c.type==="Brand")??null,o=e.filter(c=>c.type!=="Brand"),a=`
@@ -978,5 +998,5 @@ body:has(:popover-open) {
   ${n===null?"":_e(n)}
   ${t?'<div class="feds-utilities"></div>':""}
 </nav>
-`,tt=async e=>{let n=new Set,t=await ee(e.mountpoint);t instanceof d?(n.add(t),y(t.message)):t.errors.forEach(o=>n.add(o)),nn(e.mountpoint),tn(e.mountpoint);let r=t instanceof d?()=>{}:t.reloadUnav;return{closeEverything:rt,reloadUnav:r,errors:n,setGnavTopPosition:o=>{},getGnavTopPosition:()=>0}},rt=()=>{};export{Xo as main,tt as postRenderingTasks,et as renderGnav,nt as renderGnavString};
+`,tt=async e=>{let n=new Set,t=await ee(e.mountpoint);t instanceof d?(n.add(t),y(t.message)):t.errors.forEach(o=>n.add(o)),nn(e.mountpoint),tn(e.mountpoint);let r=t instanceof d?()=>{}:t.reloadUnav;return{closeEverything:rt,reloadUnav:r,errors:n,setGnavTopPosition:o=>{},getGnavTopPosition:()=>0}},rt=()=>{};export{Jo as main,tt as postRenderingTasks,et as renderGnav,nt as renderGnavString};
 //# sourceMappingURL=main.js.map
