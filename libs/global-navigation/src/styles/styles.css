@@ -32,6 +32,10 @@
   color: inherit;
 }
 
+.global-navigation.site-pivot .feds-utilities {
+  margin-left:auto;
+}
+
 ::backdrop {
   opacity: 1;
 }
@@ -52,7 +56,6 @@
 .global-navigation nav > ul {
     display: flex;
     width: 100%;
-    max-width: var(--feds-maxWidth-nav);
     height: inherit;
     align-items: center;
     background: inherit
@@ -75,7 +78,6 @@
 .global-navigation.site-pivot nav {
     display: flex;
     align-items: center;
-    max-width: var(--feds-maxWidth-nav);
     height: var(--feds-height-nav);
     justify-content: flex-start;
 }
@@ -178,7 +180,6 @@
     .global-navigation.site-pivot nav {
         display: flex;
         align-items: center;
-        max-width: var(--feds-maxWidth-nav);
         padding-left: 24px;
         justify-content: flex-start;
     }
