@@ -1,7 +1,7 @@
 .global-navigation .feds-popup ul.use-case-cards {
   list-style: none;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr;
   padding: 12px 24px 24px 24px;
   gap: 8px;
   width: 100%;
@@ -91,4 +91,11 @@
   align-self: stretch;
   width: auto;
   margin: 24px 12px 12px 12px;
+}
+
+@media (min-width: 900px) {
+  .global-navigation .feds-popup ul.use-case-cards {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 8px;
+  }
 }

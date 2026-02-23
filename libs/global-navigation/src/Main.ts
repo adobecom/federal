@@ -116,12 +116,12 @@ mountpoint: HTMLElement
   megaMenus.forEach(mm => {
     mm.innerHTML = '';
   });
-  const mmPromises = data.components
-    .filter(com => com.type === "MegaMenu")
-    .map(com => com.content);
+  const megaMenuComponents = data.components.filter(com => com.type === "MegaMenu");
+  const mmPromises = megaMenuComponents.map(com => com.content);
   const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
     const [content, errors] = await mmPromise;
-    megaMenus[idx].innerHTML = popup(content);
+    const title = megaMenuComponents[idx].title;
+    megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, title);
     return errors;
   }).flat());
   return mountpoint;

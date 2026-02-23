@@ -1,4 +1,4 @@
-import { sanitize } from "../../Utils/Utils";
+import { sanitize, icons } from "../../Utils/Utils";
 import { panels } from "../Panels/Render";
 import { productlist } from "../ProductList/Render";
 import { usecasecards } from "../UseCaseCards/Render";
@@ -19,13 +19,37 @@ export const megaMenu = ({
 `;
 
 export const popup = (
-  data: MegaMenuContent
+  data: MegaMenuContent,
+  popupId: string,
+  title: string,
 ): HTML => {
+  const popupHeader = `
+    <div class="feds-popup-header">
+      <button
+        type="button"
+        class="feds-popup-back-button"
+        popovertarget="${sanitize(popupId)}"
+        popovertargetaction="hide"
+        aria-label="Back"
+      >
+        ${icons.arrowBack}
+      </button>
+      <span class="feds-popup-title">${title}</span>
+    </div>
+  `.trim();
+
+  let popupContent: HTML = '';
   switch (data.type) {
-    case "ProductList": return productlist(data);
-    case "UseCaseCards": return usecasecards(data);
-    case "Panels": return panels(data);
+    case "ProductList":
+      popupContent = productlist(data);
+      break;
+    case "UseCaseCards":
+      popupContent = usecasecards(data);
+      break;
+    case "Panels":
+      popupContent = panels(data);
+      break;
     default: data satisfies never;
   }
-  return '';
+  return `${popupHeader}${popupContent}`;
 }
