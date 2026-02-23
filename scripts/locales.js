@@ -97,4 +97,3 @@ export default {
   cis_ru: { ietf: 'ru', tk: 'qxw8hzm.css' },
   sea: { ietf: 'en', tk: 'hah7vzn.css' },
   };
-  
