@@ -1,5 +1,6 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { fetchAndProcessPlainHTML, inlineNestedFragments } from "../../Utils/Utils";
+import { LinksCard, parseLinksCard } from "../LinksCard/Parse";
 import { Panels, parsePanels } from "../Panels/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
 import { parseFeaturedCards, FeaturedCards } from "../FeaturedCards/Parse";
@@ -13,6 +14,7 @@ export type MegaMenu = {
 
 export type MegaMenuContent = ProductList
                             | FeaturedCards
+                            | LinksCard
                             | Panels;
 
 export const parseMegaMenu = (
@@ -42,6 +44,8 @@ export const parseMegaMenu = (
         return parseProductList(megaMenuFragment);
       if (element.classList.contains('featured-cards'))
         return parseFeaturedCards(megaMenuFragment); 
+      if (element.classList.contains('links-card'))
+        return parseLinksCard(megaMenuFragment);
       if (element.classList.contains('panels'))
         return parsePanels(megaMenuFragment)
 

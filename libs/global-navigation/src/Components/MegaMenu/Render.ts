@@ -1,4 +1,5 @@
 import { sanitize, icons } from "../../Utils/Utils";
+import { linkscard } from "../LinksCard/Render";
 import { panels } from "../Panels/Render";
 import { productlist } from "../ProductList/Render";
 import { featuredcards } from "../FeaturedCards/Render";
@@ -45,6 +46,9 @@ export const popup = (
       break;
     case "FeaturedCards":
       popupContent = featuredcards(data);
+      break;
+    case "LinksCard":
+      popupContent = linkscard(data);
       break;
     case "Panels":
       popupContent = panels(data);
