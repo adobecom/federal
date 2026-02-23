@@ -2,7 +2,7 @@ import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { fetchAndProcessPlainHTML, inlineNestedFragments } from "../../Utils/Utils";
 import { Panels, parsePanels } from "../Panels/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
-import { parseUseCaseCards, UseCaseCards } from "../UseCaseCards/Parse";
+import { parseFeaturedCards, FeaturedCards } from "../FeaturedCards/Parse";
 
 
 export type MegaMenu = {
@@ -12,7 +12,7 @@ export type MegaMenu = {
 };
 
 export type MegaMenuContent = ProductList
-                            | UseCaseCards
+                            | FeaturedCards
                             | Panels;
 
 export const parseMegaMenu = (
@@ -40,8 +40,8 @@ export const parseMegaMenu = (
         throw new Error(megaMenuFragment.message);
       if (element.classList.contains('product-list'))
         return parseProductList(megaMenuFragment);
-      if (element.classList.contains('use-case-cards'))
-        return parseUseCaseCards(megaMenuFragment); 
+      if (element.classList.contains('featured-cards'))
+        return parseFeaturedCards(megaMenuFragment); 
       if (element.classList.contains('panels'))
         return parsePanels(megaMenuFragment)
 

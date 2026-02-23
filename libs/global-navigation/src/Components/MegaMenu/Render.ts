@@ -1,7 +1,7 @@
 import { sanitize, icons } from "../../Utils/Utils";
 import { panels } from "../Panels/Render";
 import { productlist } from "../ProductList/Render";
-import { usecasecards } from "../UseCaseCards/Render";
+import { featuredcards } from "../FeaturedCards/Render";
 import { MegaMenu, MegaMenuContent } from "./Parse";
 
 export const megaMenu = ({
@@ -43,8 +43,8 @@ export const popup = (
     case "ProductList":
       popupContent = productlist(data);
       break;
-    case "UseCaseCards":
-      popupContent = usecasecards(data);
+    case "FeaturedCards":
+      popupContent = featuredcards(data);
       break;
     case "Panels":
       popupContent = panels(data);
