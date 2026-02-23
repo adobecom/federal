@@ -5,14 +5,10 @@ import { LinksCard, LinksCardItem } from "./Parse";
 import "./links-card.css";
 
 export const linkscard = ({
-  cards
-}: LinksCard): HTML => `
-  <ul class="links-cards">
-    ${cards.map(c => `<li>${card(c)}</li>`).join("")}
-  </ul>
-`;
+  card
+}: LinksCard): HTML => renderCard(card);
 
-const card = ({
+const renderCard = ({
   title,
   links,
   footerCTA

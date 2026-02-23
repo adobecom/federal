@@ -1,9 +1,12 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
-import { fetchAndProcessPlainHTML, inlineNestedFragments } from "../../Utils/Utils";
+import {
+  fetchAndProcessPlainHTML,
+  inlineNestedFragments,
+  parseListAndAccumulateErrors
+} from "../../Utils/Utils";
 import { LinksCard, parseLinksCard } from "../LinksCard/Parse";
-import { Panels, parsePanels } from "../Panels/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
-import { parseFeaturedCards, FeaturedCards } from "../FeaturedCards/Parse";
+import { parseFeaturedCard, FeaturedCard } from "../FeaturedCard/Parse";
 
 
 export type MegaMenu = {
@@ -13,9 +16,12 @@ export type MegaMenu = {
 };
 
 export type MegaMenuContent = ProductList
-                            | FeaturedCards
-                            | LinksCard
-                            | Panels;
+                            | GnavCards;
+
+export type GnavCards = {
+  type: "GnavCards";
+  sections: List<FeaturedCard | LinksCard>;
+};
 
 export const parseMegaMenu = (
   element: Element | null
@@ -42,14 +48,7 @@ export const parseMegaMenu = (
         throw new Error(megaMenuFragment.message);
       if (element.classList.contains('product-list'))
         return parseProductList(megaMenuFragment);
-      if (element.classList.contains('featured-cards'))
-        return parseFeaturedCards(megaMenuFragment); 
-      if (element.classList.contains('links-card'))
-        return parseLinksCard(megaMenuFragment);
-      if (element.classList.contains('panels'))
-        return parsePanels(megaMenuFragment)
-
-      throw new IrrecoverableError("unrecognized mega menu item (did you forget to label it correctly?");
+      return parseGnavCards(megaMenuFragment);
     } catch (e) {
         // @ts-expect-error errors usually have a message
         throw new IrrecoverableError(e?.message);
@@ -74,4 +73,46 @@ export const parseMegaMenu = (
 const ERRORS = {
   elementNull: "Element is null",
   noTitle: "Large Menu has no Title",
+};
+
+const parseGnavCards = (
+  fragment: Element | HTMLElement
+): Parsed<GnavCards, RecoverableError> => {
+  const directCardSections = [...fragment.children]
+    .filter((el) =>
+      el.classList.contains('featured-card')
+      || el.classList.contains('links-card')
+    );
+  const cardSections = directCardSections.length > 0
+    ? directCardSections
+    : [...fragment.querySelectorAll('.featured-card, .links-card')];
+  if (cardSections.length === 0) {
+    throw new IrrecoverableError(
+      "Unrecognized mega menu item (did you forget to label it correctly?)"
+    );
+  }
+  const [sections, errors]
+    = parseListAndAccumulateErrors(cardSections, parseGnavCardSection);
+  if (sections.length === 0) {
+    throw new IrrecoverableError("Failed to parse gnav cards sections");
+  }
+  return [
+    {
+      type: "GnavCards",
+      sections,
+    },
+    errors
+  ];
+};
+
+const parseGnavCardSection = (
+  section: Element
+): Parsed<FeaturedCard | LinksCard, RecoverableError> => {
+  if (section.classList.contains('featured-card')) {
+    return parseFeaturedCard(section);
+  }
+  if (section.classList.contains('links-card')) {
+    return parseLinksCard(section);
+  }
+  throw new IrrecoverableError("Unsupported gnav cards section");
 };

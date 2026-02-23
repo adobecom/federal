@@ -1,9 +1,9 @@
 import { sanitize, icons } from "../../Utils/Utils";
 import { linkscard } from "../LinksCard/Render";
-import { panels } from "../Panels/Render";
 import { productlist } from "../ProductList/Render";
-import { featuredcards } from "../FeaturedCards/Render";
-import { MegaMenu, MegaMenuContent } from "./Parse";
+import { featuredcards } from "../FeaturedCard/Render";
+import "./gnav-cards.css";
+import { GnavCards, MegaMenu, MegaMenuContent } from "./Parse";
 
 export const megaMenu = ({
   title,
@@ -44,16 +44,27 @@ export const popup = (
     case "ProductList":
       popupContent = productlist(data);
       break;
-    case "FeaturedCards":
-      popupContent = featuredcards(data);
-      break;
-    case "LinksCard":
-      popupContent = linkscard(data);
-      break;
-    case "Panels":
-      popupContent = panels(data);
+    case "GnavCards":
+      popupContent = gnavCards(data);
       break;
     default: data satisfies never;
   }
   return `${popupHeader}${popupContent}`;
 }
+
+const gnavCards = ({
+  sections
+}: GnavCards): HTML => `
+  <ul class="feds-gnav-cards">
+    ${sections.map((section) => {
+      switch (section.type) {
+        case "FeaturedCard":
+          return `<li>${featuredcards(section)}</li>`;
+        case "LinksCard":
+          return `<li>${linkscard(section)}</li>`;
+        default: section satisfies never;
+      }
+      return "";
+    }).join("")}
+  </ul>
+`;

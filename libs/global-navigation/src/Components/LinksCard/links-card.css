@@ -1,17 +1,3 @@
-.global-navigation .feds-popup ul.links-cards {
-  list-style: none;
-  display: grid;
-  grid-template-columns: 1fr;
-  padding: 12px 24px 24px;
-  gap: 8px;
-  width: 100%;
-  color: #000;
-}
-
-.feds-popup .links-cards > li {
-  min-width: 0;
-}
-
 .feds-popup .links-card {
   border-radius: 14px;
   background: #f6f6f6;
@@ -58,12 +44,4 @@
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
-}
-
-@media (min-width: 900px) {
-  .global-navigation .feds-popup ul.links-cards {
-    grid-template-columns: repeat(auto-fit, 342px);
-    gap: 12px;
-    justify-content: start;
-  }
 }

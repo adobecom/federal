@@ -1,26 +1,22 @@
 import { link } from "../Link/Render";
-import { Card, FeaturedCards } from "./Parse";
+import { Card, FeaturedCard } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
 
-import './featured-cards.css';
+import './featured-card.css';
 
 export const featuredcards = ({
-  cards
-}: FeaturedCards): HTML => `
-  <ul class="featured-cards">
-    ${cards.map(c => `<li>${card(c)}</li>`).join('')}
-  </ul>
-`;
+  card
+}: FeaturedCard): HTML => renderCard(card);
 
 
-const card = ({
+const renderCard = ({
   title,
   subtitle,
   eyeBrow,
   footerCTA,
   bodyLink,
 }: Card): HTML => `
-  <article class="card">
+  <article class="featured-card">
     <div>
       <div class="featured-eyebrow">${eyeBrow}</div>
       <h4>${title}</h4>

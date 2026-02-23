@@ -1,0 +1,27 @@
+.feds-popup .feds-gnav-cards {
+  list-style: none;
+  margin: 0;
+  padding: 12px 24px 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+.feds-popup .feds-gnav-cards > li {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .feds-popup .feds-gnav-cards {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .feds-popup .feds-gnav-cards > li {
+    flex: 0 0 auto;
+  }
+}

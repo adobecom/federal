@@ -1,10 +1,9 @@
 import { IrrecoverableError, Link, parseLink, RecoverableError } from "../../test-exports";
-import { parseListAndAccumulateErrors } from "../../Utils/Utils";
 import { parseSecondaryCTA, SecondaryCTA } from "../CTA/Parse";
 
-export type FeaturedCards = {
-  type: "FeaturedCards";
-  cards: List<Card>;
+export type FeaturedCard = {
+  type: "FeaturedCard";
+  card: Card;
 };
 
 export type Card = {
@@ -16,17 +15,14 @@ export type Card = {
   footerCTA: SecondaryCTA;
 };
 
-export const parseFeaturedCards = (
+export const parseFeaturedCard = (
   element: HTMLElement | Element
-): Parsed<FeaturedCards, RecoverableError> => {
-  const [
-    cards,
-    errors
-  ] = parseListAndAccumulateErrors([...element.children], parseCard);
+): Parsed<FeaturedCard, RecoverableError> => {
+  const [card, errors] = parseCard(element);
   return [
     {
-      type: "FeaturedCards",
-      cards,
+      type: "FeaturedCard",
+      card,
     },
     errors
   ];
@@ -69,3 +65,4 @@ const parseCard = (
     [...ctaErrors, ...linkErrors]
   ];
 };
+

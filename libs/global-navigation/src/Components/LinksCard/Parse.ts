@@ -9,7 +9,7 @@ import { parseSecondaryCTA, SecondaryCTA } from "../CTA/Parse";
 
 export type LinksCard = {
   type: "LinksCard";
-  cards: List<LinksCardItem>;
+  card: LinksCardItem;
 };
 
 export type LinksCardItem = {
@@ -22,14 +22,11 @@ export type LinksCardItem = {
 export const parseLinksCard = (
   element: HTMLElement | Element
 ): Parsed<LinksCard, RecoverableError> => {
-  const [
-    cards,
-    errors
-  ] = parseListAndAccumulateErrors([...element.children], parseCard);
+  const [card, errors] = parseCard(element);
   return [
     {
       type: "LinksCard",
-      cards,
+      card,
     },
     errors
   ];
@@ -76,3 +73,4 @@ const parseCard = (
     [...linkErrors, ...ctaErrors]
   ];
 };
+
