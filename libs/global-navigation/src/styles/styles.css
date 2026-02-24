@@ -345,6 +345,29 @@ body:has(:popover-open) {
     font-size: 14px;
   }
 
+  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+    position: relative;
+  }
+
+  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link::after {
+    content: "";
+    position: static;
+    right: auto;
+    width: 6px;
+    height: 6px;
+    margin-left: 6px;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: rotate(45deg) translateY(-1px);
+  }
+
+  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link:has(~ .feds-popup:popover-open)::after {
+    transform: rotate(-135deg) translateY(-4px);
+    margin-left: 10px;
+  }
+
   .feds-popup .feds-popup-header {
     display: none;
   }
