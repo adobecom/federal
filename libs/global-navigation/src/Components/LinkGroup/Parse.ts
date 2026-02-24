@@ -6,6 +6,8 @@ export type LinkGroupHeader = {
   type: "LinkGroupHeader";
   title: string;
   classes: string[];
+  daaLl: string | null;
+  daaLh: string | null;
 };
 
 export type LinkGroupLink = {
@@ -15,11 +17,15 @@ export type LinkGroupLink = {
   title: string;
   href: string;
   subtitle: string;
+  daaLl: string | null;
+  daaLh: string | null;
 }
 
 export type LinkGroupBlue = {
   type: "LinkGroupBlue";
   link: Link;
+  daaLl: string | null;
+  daaLh: string | null;
 };
 
 export type LinkGroup
@@ -88,6 +94,8 @@ const parseLinkGroupLink = (
   const href = titleElement.getAttribute("href") ?? '';
   if (href === '')
     errors.add(new RecoverableError(ERRORS.noHref));
+  const daaLl = titleElement.getAttribute("daa-ll");
+  const daaLh = titleElement.getAttribute("daa-lh");
 
   const subtitleElement = titleElement
     ?.closest("p")
@@ -112,7 +120,9 @@ const parseLinkGroupLink = (
       iconAlt,
       title,
       href,
-      subtitle
+      subtitle,
+      daaLl,
+      daaLh
     },
     [...errors]
   ]
@@ -130,6 +140,8 @@ const parseLinkGroupHeader = (
     throw new IrrecoverableError(ERRORS.notAHeader);
 
   const title = element.querySelector('a')?.textContent ?? "";
+  const daaLl = element.querySelector('a')?.getAttribute('daa-ll') ?? null;
+  const daaLh = element.querySelector('a')?.getAttribute('daa-lh') ?? null;
   if(title === "")
     throw new IrrecoverableError(ERRORS.noTitle);
 
@@ -138,6 +150,8 @@ const parseLinkGroupHeader = (
       type: "LinkGroupHeader",
       title,
       classes,
+      daaLl,
+      daaLh,
     },
     []
   ];
@@ -154,11 +168,15 @@ const parseLinkGroupBlue = (
 
   const a = element.querySelector('a');
   const [link, es] = parseLink(a);
+  const daaLl = a?.getAttribute('daa-ll') ?? null;
+  const daaLh = a?.getAttribute('daa-lh') ?? null;
 
   return [
     {
       type: "LinkGroupBlue",
-      link
+      link,
+      daaLl,
+      daaLh,
     },
     es
   ];

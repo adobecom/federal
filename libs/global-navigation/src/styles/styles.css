@@ -162,6 +162,7 @@
 
 .global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-nav-toggle::before {
     content: "\2715"; 
+    color: var(--feds-color-black-v2);
 }
 
 .global-navigation.site-pivot ul {
@@ -184,6 +185,7 @@
 
 .feds-popup:popover-open {
   display: block;
+  background: #f8f8f8;
 }
 
 body:has(:popover-open) {
@@ -199,8 +201,8 @@ body:has(:popover-open) {
 .feds-popup .feds-popup-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  padding: 10px 24px;
+  gap: 6px;
 }
 
 .feds-popup .feds-popup-back-button {
@@ -222,7 +224,7 @@ body:has(:popover-open) {
 }
 
 .feds-popup .feds-popup-title {
-  font-size: 16px;
+  font-size: 32px;
   font-weight: 700;
   color: #2c2c2c;
 }
@@ -233,14 +235,22 @@ body:has(:popover-open) {
   gap: 10px;
   min-height: 52px;
   align-items: start;
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 16px;
+  padding: 16px;
   text-decoration: none;
   color: #2c2c2c;
 }
 
-.feds-popup .feds-link-group:hover {
-  background: #f5f5f5;
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover {
+  background: #000;
+  .feds-link-group__title {
+    color: #fff;
+  }
+}
+
+.feds-popup .feds-link-group:hover .feds-link-group__title,
+.feds-popup .feds-link-group:hover .feds-link-group__subtitle {
+  color: #fff;
 }
 
 .feds-popup .feds-link-group__icon {
@@ -405,7 +415,6 @@ body:has(:popover-open) {
   .product-list .tabs button.tab {
     width: auto;
     min-height: 36px;
-    border: 1px solid #d7d7d7;
     border-radius: 999px;
     padding: 7px 12px;
   }

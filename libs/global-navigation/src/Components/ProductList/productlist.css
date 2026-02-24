@@ -19,21 +19,21 @@
 
 .product-list .tabs button.tab {
   display: inline-flex;
-  width: 100%;
   align-items: center;
   justify-content: flex-start;
   min-height: 44px;
   border: 0;
-  border-radius: 10px;
-  padding: 8px;
+  border-radius: 75px;
+  padding: 16px 24px;
   text-align: left;
-  font-family: var(--feds-heading-font);
-  font-size: 24px;
+  font-family: var(--body-font-family);
+  font-size: 16px;
   font-weight: 900;
   line-height: 24px;
   color: #2c2c2c;
-  background: transparent;
+  background: #0000000D;
   cursor: pointer;
+  margin-bottom: 4px;
 }
 
 .product-list .tabs button.tab[aria-selected="true"] {
@@ -64,14 +64,4 @@
   justify-content: space-between;
   height: 120px;
   background-color: white;
-}
-
-.product-list .tab-content [role="tabpanel"] .feds-link-group .feds-link-group__icon {
-  margin-top: 16px;
-  margin-left: 16px;
-}
-
-.product-list .tab-content [role="tabpanel"] .feds-link-group .feds-link-group__content {
-  margin-bottom: 16px;
-  margin-left: 16px;
 }

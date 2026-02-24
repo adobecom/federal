@@ -10,6 +10,8 @@ export type ProductList = {
 export type ProductCategory = {
   type: "ProductCategory";
   name: string;
+  daaLh: string | null;
+  daaLl: string | null;
   links: List<LinkGroup>;
 }
 
@@ -21,7 +23,6 @@ export const parseProductList = (
     categories,
     errors
   ] = parseListAndAccumulateErrors(unparsedCategories, parseProductCategory);
-  console.log(categories)
   return [
     {
       type: "ProductList",
@@ -39,6 +40,8 @@ const parseProductCategory = (
     throw new IrrecoverableError("Expected H2");
 
   const name = h2.textContent ?? '';
+  const daaLh = h2.getAttribute("daa-lh");
+  const daaLl = h2.getAttribute("daa-ll");
   const linkGroups = getNextSiblings(h2);
   const [
     links,
@@ -48,6 +51,8 @@ const parseProductCategory = (
     {
       type: "ProductCategory",
       name,
+      daaLh,
+      daaLl,
       links,
     },
     errors

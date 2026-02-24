@@ -1,4 +1,5 @@
 import { linkGroup } from "../LinkGroup/Render";
+import { getAnalyticsAttrs } from "../../Utils/Utils";
 import { ProductCategory, ProductList } from "./Parse";
 
 import './productlist.css';
@@ -6,18 +7,7 @@ import './productlist.css';
 export const productlist = ({ categories }: ProductList): HTML => {
   const tabs = `
     <ul class="tabs" role="tablist">
-      ${categories.map(({ name }: ProductCategory, i: number) => `
-      <li>
-        <button
-          role="tab"
-          class="tab"
-          aria-selected="${(i === 0).toString()}"
-          aria-controls="${i}"
-          >
-            ${name}
-          </button>
-      </li>
-  `.trim()).join('')}
+      ${categories.map(renderTab).join('')}
     </ul>
   `.trim();
   const tabcontent = `
@@ -42,4 +32,25 @@ export const productlist = ({ categories }: ProductList): HTML => {
     </div>
   `.trim();
 };
+
+const renderTab = (
+  {
+    name,
+    daaLh,
+    daaLl,
+  }: ProductCategory,
+  i: number
+): string => `
+      <li>
+        <button
+          role="tab"
+          class="tab"
+          aria-selected="${(i === 0).toString()}"
+          aria-controls="${i}"
+          ${getAnalyticsAttrs(daaLh, daaLl)}
+          >
+            ${name}
+          </button>
+      </li>
+  `.trim();
 

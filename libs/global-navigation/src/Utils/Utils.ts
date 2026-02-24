@@ -354,6 +354,19 @@ export const sanitize = (str: string): string => {
     .replace(/^(\d)/, 'id-$1')
 };
 
+export const getAnalyticsAttrs = (
+  daaLh: string | null,
+  daaLl: string | null
+): string => {
+  const daaLhAttr = daaLh !== null && daaLh !== ""
+    ? ` daa-lh="${daaLh}"`
+    : "";
+  const daaLlAttr = daaLl !== null && daaLl !== ""
+    ? ` daa-ll="${daaLl}"`
+    : "";
+  return `${daaLhAttr}${daaLlAttr}`;
+};
+
 
 export const isDarkMode = (): boolean => {
   // TODO: Implement dark mode detection

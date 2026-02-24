@@ -1,4 +1,5 @@
 import { LinkGroup, LinkGroupBlue, LinkGroupHeader, LinkGroupLink } from "./Parse";
+import { getAnalyticsAttrs } from "../../Utils/Utils";
 
 export const linkGroup = (lg: LinkGroup): HTML => {
   switch (lg.type) {
@@ -15,11 +16,14 @@ export const linkGroup = (lg: LinkGroup): HTML => {
 
 const linkGroupHeader = ({
   title,
-  classes
+  classes,
+  daaLl,
+  daaLh
 }: LinkGroupHeader): HTML => {
   const classNames = classes.slice(1).map(cls => `feds-link-group--${cls}`).join(' ');
+  const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   return `
-    <div role="heading" class="feds-link-group ${classNames}">
+    <div role="heading" class="feds-link-group ${classNames}"${analyticsAttrs}>
       <div class="feds-link-group__content">
         <div class="feds-link-group__title">${title}</div>
       </div>
@@ -32,9 +36,12 @@ const linkGroupLink = ({
   iconAlt,
   title,
   href,
-  subtitle
+  subtitle,
+  daaLl,
+  daaLh
 }: LinkGroupLink): HTML => {
   const hasIcon = iconAlt !== null && iconHref !== null;
+  const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   const icon = !hasIcon
     ? ""
     : `
@@ -48,7 +55,7 @@ const linkGroupLink = ({
       </picture>
     `;
   return `
-    <a class="feds-link-group" href="${href}" daa-ll="${title}">
+    <a class="feds-link-group" href="${href}"${analyticsAttrs}>
       ${icon}
       <div class="feds-link-group__content">
         <div class="feds-link-group__title">${title}</div>
@@ -59,11 +66,17 @@ const linkGroupLink = ({
 }
 
 const linkGroupBlue = ({
-  link
-}: LinkGroupBlue): HTML => `
-  <a href="${link.href}" class="feds-link-group feds-link-group--blue" daa-ll="${link.text}">
+  link,
+  daaLl,
+  daaLh
+}: LinkGroupBlue): HTML => {
+  const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? link.text);
+  return `
+  <a href="${link.href}" class="feds-link-group feds-link-group--blue"${analyticsAttrs}>
     <div class="feds-link-group__content">
         <div class="feds-link-group__title">${link.text}</div>
       </div>
   </a>
 `;
+};
+
