@@ -1,17 +1,18 @@
 import { IrrecoverableError, RecoverableError } from "../../test-exports";
 import { getNextSiblings, parseListAndAccumulateErrors } from "../../Utils/Utils";
 import { LinkGroup, parseLinkGroup } from "../LinkGroup/Parse";
+import { Link, parseLink } from "../Link/Parse";
 
 export type ProductList = {
   type: "ProductList";
   categories: List<ProductCategory>;
+  links: List<Link>;
 };
 
 export type ProductCategory = {
   type: "ProductCategory";
   name: string;
   daaLh: string | null;
-  daaLl: string | null;
   links: List<LinkGroup>;
 }
 
@@ -19,16 +20,22 @@ export const parseProductList = (
   element: HTMLElement | Element,
 ): Parsed<ProductList, RecoverableError> => {
   const unparsedCategories = [...element.querySelectorAll('li > div')];
+  const unparsedLinks = [...element.querySelectorAll('li > a')];
   const [
     categories,
-    errors
+    categoryErrors
   ] = parseListAndAccumulateErrors(unparsedCategories, parseProductCategory);
+  const [
+    links,
+    linkErrors
+  ] = parseListAndAccumulateErrors(unparsedLinks, parseLink);
   return [
     {
       type: "ProductList",
       categories,
+      links,
     },
-    errors
+    [...categoryErrors, ...linkErrors]
   ]
 };
 
@@ -40,8 +47,7 @@ const parseProductCategory = (
     throw new IrrecoverableError("Expected H2");
 
   const name = h2.textContent ?? '';
-  const daaLh = h2.getAttribute("daa-lh");
-  const daaLl = h2.getAttribute("daa-ll");
+  const daaLh = h2.textContent ?? '';
   const linkGroups = getNextSiblings(h2);
   const [
     links,
@@ -52,7 +58,6 @@ const parseProductCategory = (
       type: "ProductCategory",
       name,
       daaLh,
-      daaLl,
       links,
     },
     errors

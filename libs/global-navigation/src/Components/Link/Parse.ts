@@ -4,6 +4,7 @@ export type Link = {
   type: 'Link';
   text: string;
   href: string;
+  daaLl?: string | null;
 };
 
 const ERRORS = {
@@ -29,12 +30,14 @@ export const parseLink = (
   const href = anchor?.getAttribute("href") ?? '';
   if (href === '')
     throw new IrrecoverableError(ERRORS.hrefNotFound);
+  const daaLl = anchor.getAttribute("daa-ll");
 
   return [
     {
       type: "Link",
       text,
-      href
+      href,
+      daaLl
     },
     []
   ];

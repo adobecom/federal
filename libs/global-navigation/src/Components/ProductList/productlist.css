@@ -11,7 +11,8 @@
 }
 
 .product-list .tabs,
-.product-list .tab-content {
+.product-list .tab-content,
+.product-list .product-links {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -64,4 +65,14 @@
   justify-content: space-between;
   height: 120px;
   background-color: white;
+}
+
+.product-list .product-links a {
+  color: #2c2c2c;
+}
+
+.product-list .product-links .feds-link::after {
+  content: " >";
+  padding-left: 4px;
+  font-size: 16px;
 }

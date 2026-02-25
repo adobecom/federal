@@ -1,6 +1,8 @@
+import { getAnalyticsAttrs } from "../../Utils/Utils";
 import { Link } from "./Parse";
 
 export const link = ({
   text,
-  href
-}: Link): HTML => `<a class="feds-link" href="${href}">${text}</a>`;
+  href,
+  daaLl
+}: Link): HTML => `<a class="feds-link" href="${href}"${getAnalyticsAttrs(null, daaLl ?? text)}>${text}</a>`;
