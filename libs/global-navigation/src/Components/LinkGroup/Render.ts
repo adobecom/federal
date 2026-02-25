@@ -37,6 +37,9 @@ const linkGroupLink = ({
   title,
   href,
   subtitle,
+  badges = [],
+  oldPrice = null,
+  newPrice = null,
   daaLl,
   daaLh
 }: LinkGroupLink): HTML => {
@@ -54,12 +57,40 @@ const linkGroupLink = ({
         >
       </picture>
     `;
+  const badgesMarkup = badges.length === 0
+    ? ""
+    : `
+      <div class="feds-link-group__badges">
+        ${badges.map((badge, index) => `
+          <span class="feds-link-group__badge${index > 0 ? " feds-link-group__badge--filled" : ""}">
+            ${badge}
+          </span>
+        `).join("")}
+      </div>
+    `;
+  const subtitleMarkup = subtitle === ""
+    ? ""
+    : `<div class="feds-link-group__subtitle">${subtitle}</div>`;
+  const priceMarkup = oldPrice === null && newPrice === null
+    ? ""
+    : `
+      <div class="feds-link-group__price">
+        ${oldPrice === null ? "" : `<span class="feds-link-group__old-price">${oldPrice}</span>`}
+        ${newPrice === null ? "" : `<span class="feds-link-group__new-price">${newPrice}</span>`}
+      </div>
+    `;
+
   return `
     <a class="feds-link-group" href="${href}"${analyticsAttrs}>
-      ${icon}
+      <div class="feds-link-header">
+        ${icon}
+        ${badgesMarkup}
+      </div>
       <div class="feds-link-group__content">
+       
         <div class="feds-link-group__title">${title}</div>
-        <div class="feds-link-group__subtitle">${subtitle}</div>
+        ${subtitleMarkup}
+        ${priceMarkup}
       </div>
     </a>
   `

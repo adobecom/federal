@@ -272,6 +272,33 @@ body:has(:popover-open) {
   line-height: 1.25;
 }
 
+.feds-popup .feds-link-group__badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.feds-popup .feds-link-group__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 14px;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: #2c2c2c;
+}
+
+.feds-popup .feds-link-group__badge--filled {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+
 .feds-popup .feds-link-group__subtitle {
   margin-top: 2px;
   font-size: 13px;
@@ -280,12 +307,52 @@ body:has(:popover-open) {
   color: #5c5c5c;
 }
 
+.feds-popup .feds-link-group__price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.feds-popup .feds-link-group__old-price {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: line-through;
+  color: #6e6e73;
+}
+
+.feds-popup .feds-link-group__new-price {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+}
+
 .feds-popup .feds-link-group--blue {
   background: #e8f2ff;
 }
 
 .feds-popup .feds-link-group--blue:hover {
   background: #dcecff;
+}
+
+.feds-popup .feds-link-group:hover .feds-link-group__old-price,
+.feds-popup .feds-link-group:hover .feds-link-group__new-price,
+.feds-popup .feds-link-group:hover .feds-link-group__badge {
+  color: #fff;
+  border-color: #fff;
+}
+
+.feds-popup .feds-link-group:hover .feds-link-group__badge--filled {
+  background: #fff;
+  color: #000;
+}
+
+.feds-link-group .feds-link-header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
 }
 
 
@@ -337,10 +404,6 @@ body:has(:popover-open) {
       align-items: center;
       padding-left: 24px;
       justify-content: flex-start;
-  }
-
-  .global-navigation.site-pivot:has(.feds-popup:popover-open),
-  .global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) {
   }
 
   .global-navigation nav .feds-gnav-items {
