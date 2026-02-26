@@ -47,7 +47,7 @@ header.global-navigation:has(.feds-popup:popover-open) {
 }
 
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
-  color: white;
+  background-color: white;
 }
 .global-navigation.site-pivot:has(:popover-open) .universal-nav-container .profile-signed-out button,
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button:hover {
@@ -215,6 +215,22 @@ header.global-navigation:has(.feds-popup:popover-open) {
 .feds-popup:popover-open {
   display: block;
   background: #f8f8f8;
+}
+
+.global-navigation .unav-comp-app-switcher.unav-comp-icon svg {
+  fill: white;
+}
+
+.global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg {
+  fill: #000;
+}
+
+.global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button {
+  border: 1px solid #000;
+}
+
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
+  fill: inherit;
 }
 
 body:has(:popover-open) {
