@@ -192,6 +192,7 @@ export const postRenderingTasks = async (
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
   initClickListeners(input.mountpoint);
   initKeyboardNav(input.mountpoint);
+  initHeaderScrollState(input.mountpoint);
   
   const reloadUnav
     = unav instanceof RecoverableError
@@ -208,5 +209,35 @@ export const postRenderingTasks = async (
 };
 
 const closeEverything = (): void => {
+};
+
+const initHeaderScrollState = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest("header");
+  if (!header) {
+    return;
+  }
+
+  const menuWrapper = mountpoint.querySelector("#feds-menu-wrapper");
+  const isMenuOpen = (): boolean =>
+    menuWrapper?.matches(":popover-open") ?? false;
+  const hasScrolledPastThreshold = (): boolean => window.scrollY > 100;
+
+  const updateHeaderState = (): void => {
+    if (isMenuOpen()) {
+      header.classList.remove("feds-header-scrolled");
+      return;
+    }
+
+    if (hasScrolledPastThreshold()) {
+      header.classList.add("feds-header-scrolled");
+      return;
+    }
+
+    header.classList.remove("feds-header-scrolled");
+  };
+
+  updateHeaderState();
+  window.addEventListener("scroll", updateHeaderState, { passive: true });
+  menuWrapper?.addEventListener("toggle", updateHeaderState);
 };
 

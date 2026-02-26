@@ -1,3 +1,18 @@
+// src/Utils/Log.ts
+var LANA_CLIENT_ID = "feds-milo";
+var lanaLog = (message, tags = "default", errorType = "e") => {
+  const { locale } = getMiloConfig();
+  const url = getMetadata("gnav-source") ?? `${locale.contentRoot ?? ""}/gnav`;
+  if (!window.lana)
+    console.warn("lana logging unavailable in the gnav");
+  window?.lana?.log(`${message} | gnav-source: ${url} | href: ${window.location.href}`, {
+    clientId: LANA_CLIENT_ID,
+    sampleRate: 1,
+    tags,
+    errorType
+  });
+};
+
 // src/Error/Error.ts
 var IrrecoverableError = class _IrrecoverableError extends Error {
   constructor(message) {
@@ -9,10 +24,31 @@ var RecoverableError = class _RecoverableError extends Error {
   constructor(message, severity = "Minor") {
     super(message);
     Object.setPrototypeOf(this, _RecoverableError.prototype);
-    if (severity !== "Minor") {
+    if (severity === "Critical") {
+      lanaLog(message);
     }
   }
 };
+
+// src/Utils/Placeholders.ts
+var [
+  setPlaceholders,
+  getPlaceholders
+] = /* @__PURE__ */ (() => {
+  let placeholdersPromise;
+  return [
+    (p) => {
+      if (placeholdersPromise) return;
+      placeholdersPromise = p;
+    },
+    () => {
+      if (!placeholdersPromise) {
+        throw new Error("Placeholders not initialized. Call setPlaceholders() first.");
+      }
+      return placeholdersPromise;
+    }
+  ];
+})();
 
 // src/Utils/Utils.ts
 var isDesktop = window.matchMedia("(min-width: 900px)");
@@ -20,7 +56,8 @@ var icons = {
   brand: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" id="Layer_1" viewBox="0 0 64.57 35"><defs><style>.cls-1{fill: #eb1000;}</style></defs><path class="cls-1" d="M6.27,10.22h4.39l6.2,14.94h-4.64l-3.92-9.92-2.59,6.51h3.08l1.23,3.41H0l6.27-14.94ZM22.03,13.32c.45,0,.94.04,1.43.16v-3.7h3.88v14.72c-.89.4-2.81.89-4.73.89-3.48,0-6.47-1.98-6.47-5.93s2.88-6.13,5.89-6.13ZM22.52,22.19c.36,0,.65-.07.94-.16v-5.42c-.29-.11-.58-.16-.96-.16-1.27,0-2.45.94-2.45,2.92s1.2,2.81,2.47,2.81ZM34.25,13.32c3.23,0,5.98,2.18,5.98,6.02s-2.74,6.02-5.98,6.02-6-2.18-6-6.02,2.72-6.02,6-6.02ZM34.25,22.13c1.11,0,2.14-.89,2.14-2.79s-1.03-2.79-2.14-2.79-2.12.89-2.12,2.79.96,2.79,2.12,2.79ZM41.16,9.78h3.9v3.7c.47-.09.96-.16,1.45-.16,3.03,0,5.84,1.98,5.84,5.86,0,4.1-2.99,6.18-6.53,6.18-1.52,0-3.46-.31-4.66-.87v-14.72ZM45.91,22.17c1.34,0,2.56-.96,2.56-2.94,0-1.85-1.2-2.72-2.5-2.72-.36,0-.65.04-.91.16v5.35c.22.09.51.16.85.16ZM58.97,13.32c2.92,0,5.6,1.87,5.6,5.64,0,.51-.02,1-.09,1.49h-7.27c.4,1.32,1.56,1.94,3.01,1.94,1.18,0,2.27-.29,3.5-.82v2.97c-1.14.58-2.5.82-3.9.82-3.7,0-6.58-2.23-6.58-6.02s2.61-6.02,5.73-6.02ZM60.93,18.02c-.2-1.27-1.05-1.78-1.92-1.78s-1.58.54-1.87,1.78h3.79Z"/></svg>',
   company: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M14.2353 21.6209L12.4925 16.7699H8.11657L11.7945 7.51237L17.3741 21.6209H24L15.1548 0.379395H8.90929L0 21.6209H14.2353Z" fill="#EB1000"/></svg>',
   search: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false"><path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z"></path></svg>',
-  home: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 0 18 18" width="25"><path fill="#6E6E6E" d="M17.666,10.125,9.375,1.834a.53151.53151,0,0,0-.75,0L.334,10.125a.53051.53051,0,0,0,0,.75l.979.9785A.5.5,0,0,0,1.6665,12H2v4.5a.5.5,0,0,0,.5.5h4a.5.5,0,0,0,.5-.5v-5a.5.5,0,0,1,.5-.5h3a.5.5,0,0,1,.5.5v5a.5.5,0,0,0,.5.5h4a.5.5,0,0,0,.5-.5V12h.3335a.5.5,0,0,0,.3535-.1465l.979-.9785A.53051.53051,0,0,0,17.666,10.125Z"/></svg>'
+  home: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 0 18 18" width="25"><path fill="#6E6E6E" d="M17.666,10.125,9.375,1.834a.53151.53151,0,0,0-.75,0L.334,10.125a.53051.53051,0,0,0,0,.75l.979.9785A.5.5,0,0,0,1.6665,12H2v4.5a.5.5,0,0,0,.5.5h4a.5.5,0,0,0,.5-.5v-5a.5.5,0,0,1,.5-.5h3a.5.5,0,0,1,.5.5v5a.5.5,0,0,0,.5.5h4a.5.5,0,0,0,.5-.5V12h.3335a.5.5,0,0,0,.3535-.1465l.979-.9785A.53051.53051,0,0,0,17.666,10.125Z"/></svg>',
+  arrowBack: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>'
 };
 var alternative = (primaryFn) => {
   return {
@@ -34,6 +71,30 @@ var alternative = (primaryFn) => {
     })
   };
 };
+var [setPersonalizationConfig, getPersonalizationConfig] = /* @__PURE__ */ (() => {
+  let personalizationConfig;
+  let isInitialized = false;
+  return [
+    (config) => {
+      if (isInitialized) {
+        return;
+      }
+      personalizationConfig = config;
+      isInitialized = true;
+    },
+    () => {
+      if (!personalizationConfig) {
+        throw new Error("PersonalizationConfig not initialized. Call setPersonalizationConfig() first.");
+      }
+      return personalizationConfig;
+    }
+  ];
+})();
+var getAnalyticsAttrs = (daaLh, daaLl) => {
+  const daaLhAttr = daaLh !== null && daaLh !== "" ? ` daa-lh="${daaLh}"` : "";
+  const daaLlAttr = daaLl !== null && daaLl !== "" ? ` daa-ll="${daaLl}"` : "";
+  return `${daaLhAttr}${daaLlAttr}`;
+};
 var isDarkMode = () => {
   return true;
 };
@@ -45,23 +106,23 @@ function loadLink(href, {
   rel,
   fetchpriority
 } = { rel: "stylesheet" }) {
-  let link = document.head.querySelector(`link[href="${href}"]`);
-  if (!link) {
-    link = document.createElement("link");
-    link.setAttribute("rel", rel);
-    if (id) link.setAttribute("id", id);
-    if (as) link.setAttribute("as", as);
-    if (crossorigin) link.setAttribute("crossorigin", crossorigin);
-    if (fetchpriority) link.setAttribute("fetchpriority", fetchpriority);
-    link.setAttribute("href", href);
-    if (callback) {
-      link.onload = (e) => callback(e.type);
-      link.onerror = (e) => callback(typeof e === "string" ? "error" : e.type);
-    }
-    document.head.appendChild(link);
-  } else if (callback) {
-    callback("noop");
+  const existingLink = document.head.querySelector(`link[href="${href}"]`);
+  if (existingLink) {
+    callback?.("noop");
+    return existingLink;
   }
+  const link = document.createElement("link");
+  link.setAttribute("rel", rel);
+  if (id !== void 0) link.setAttribute("id", id);
+  if (as !== void 0) link.setAttribute("as", as);
+  if (crossorigin !== void 0) link.setAttribute("crossorigin", crossorigin);
+  if (fetchpriority !== void 0) link.setAttribute("fetchpriority", fetchpriority);
+  link.setAttribute("href", href);
+  if (callback) {
+    link.onload = (e) => callback(e.type);
+    link.onerror = (e) => callback(typeof e === "string" ? "error" : e.type);
+  }
+  document.head.appendChild(link);
   return link;
 }
 function loadStyle(href, callback) {
@@ -77,14 +138,15 @@ var loadScript = (url, type, { mode, id } = {}) => new Promise((resolve, reject)
     const { head } = document;
     script = document.createElement("script");
     script.setAttribute("src", url);
-    if (id) script.setAttribute("id", id);
-    if (type) {
+    if (id !== null && id !== void 0) script.setAttribute("id", id);
+    if (type !== null && type !== void 0) {
       script.setAttribute("type", type);
     }
     if (mode && ["async", "defer"].includes(mode)) script.setAttribute(mode, "");
     head.append(script);
   }
-  if (script.dataset.loaded) {
+  const loaded = script.dataset.loaded;
+  if (loaded !== null && loaded !== void 0) {
     resolve(script);
     return;
   }
@@ -104,15 +166,16 @@ var loadScript = (url, type, { mode, id } = {}) => new Promise((resolve, reject)
 function getMetadata(name, doc = document) {
   const attr = name && name.includes(":") ? "property" : "name";
   const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
-  return meta && meta.content;
+  return meta?.content ?? null;
 }
 var isValidMiloConfig = (config) => {
-  if (!config || typeof config !== "object") return false;
   const cfg = config;
-  if (!cfg.locale || typeof cfg.locale !== "object") return false;
+  const invalid = (x) => x === null || x === void 0 || typeof x !== "object";
+  if (invalid(cfg)) return false;
+  if (invalid(cfg.locale)) return false;
   const locale = cfg.locale;
   if (typeof locale.prefix !== "string") return false;
-  if (!cfg.env || typeof cfg.env !== "object") return false;
+  if (invalid(cfg.env)) return false;
   const env = cfg.env;
   if (typeof env.name !== "string") return false;
   if (cfg.unav !== void 0) {
@@ -316,11 +379,13 @@ var parseLink = (anchor) => {
   const href = anchor?.getAttribute("href") ?? "";
   if (href === "")
     throw new IrrecoverableError(ERRORS.hrefNotFound);
+  const daaLl = anchor.getAttribute("daa-ll");
   return [
     {
       type: "Link",
       text,
-      href
+      href,
+      daaLl
     },
     []
   ];
@@ -341,7 +406,7 @@ var parseLinkGroupLink = (element) => {
   const errors = /* @__PURE__ */ new Set();
   if (!element)
     throw new IrrecoverableError(ERRORS2.elementNull);
-  const titleElement = element.querySelector("p a");
+  const titleElement = element.querySelector("p a") ?? element.querySelector("div ~ div > a");
   if (!titleElement)
     throw new IrrecoverableError(ERRORS2.noTitleAnchor);
   const title = titleElement.textContent ?? "";
@@ -350,13 +415,26 @@ var parseLinkGroupLink = (element) => {
   const href = titleElement.getAttribute("href") ?? "";
   if (href === "")
     errors.add(new RecoverableError(ERRORS2.noHref));
+  const daaLl = titleElement.getAttribute("daa-ll");
+  const daaLh = titleElement.getAttribute("daa-lh");
   const subtitleElement = titleElement?.closest("p")?.nextElementSibling;
   if (!subtitleElement)
-    throw new IrrecoverableError(ERRORS2.noSubtitleP);
-  const subtitle = subtitleElement.textContent ?? "";
+    errors.add(new RecoverableError(ERRORS2.noSubtitleP));
+  const subtitle = subtitleElement?.textContent ?? "";
   if (subtitle === "")
     errors.add(new RecoverableError(ERRORS2.noSubtitle));
-  const [iconHref = null, iconAlt = null] = (element.firstElementChild?.firstElementChild?.textContent?.split("|") ?? []).map((x) => x.trim());
+  const badges = [];
+  let oldPrice = null;
+  let newPrice = null;
+  if (element.classList.contains("new")) {
+    badges.push("New");
+  }
+  if (element.classList.contains("show-offer")) {
+    badges.push("Save 20%");
+    oldPrice = "$29.99";
+    newPrice = "$19.99";
+  }
+  const [iconHref, iconAlt = null] = (element.firstElementChild?.firstElementChild?.textContent?.split("|") ?? []).map((x) => x.trim());
   return [
     {
       type: "LinkGroupLink",
@@ -364,7 +442,12 @@ var parseLinkGroupLink = (element) => {
       iconAlt,
       title,
       href,
-      subtitle
+      subtitle,
+      badges,
+      oldPrice,
+      newPrice,
+      daaLl,
+      daaLh
     },
     [...errors]
   ];
@@ -376,13 +459,17 @@ var parseLinkGroupHeader = (element) => {
   if (!classes.includes("header"))
     throw new IrrecoverableError(ERRORS2.notAHeader);
   const title = element.querySelector("a")?.textContent ?? "";
+  const daaLl = element.querySelector("a")?.getAttribute("daa-ll") ?? null;
+  const daaLh = element.querySelector("a")?.getAttribute("daa-lh") ?? null;
   if (title === "")
     throw new IrrecoverableError(ERRORS2.noTitle);
   return [
     {
       type: "LinkGroupHeader",
       title,
-      classes
+      classes,
+      daaLl,
+      daaLh
     },
     []
   ];
@@ -394,20 +481,18 @@ var parseLinkGroupBlue = (element) => {
     throw new Error("Not a Blue Link Group");
   const a = element.querySelector("a");
   const [link, es] = parseLink(a);
+  const daaLl = a?.getAttribute("daa-ll") ?? null;
+  const daaLh = a?.getAttribute("daa-lh") ?? null;
   return [
     {
       type: "LinkGroupBlue",
-      link
+      link,
+      daaLl,
+      daaLh
     },
     es
   ];
 };
-
-// src/Components/LinkGroup/linkGroup.css
-var css = "/**\n * Link Group Styles\n */\n.feds-link-group {\n    --title-color: #2f2f2f;\n    --sub-title-color: #4b4b4b;\n    --bg-hover-color: #e9e9e9;\n    --accent-color: #274dea;\n    --accent-color-hover: #1d3ecf;\n    --header-border-color: #b6b6b6;\n    --header-background-color: #eaeaea;\n    align-items: flex-start;\n    display: flex;\n    flex-direction: column;\n    padding: 12px;\n}\n\n.feds-link-group:hover {\n    background-color: var(--bg-hover-color);\n}\n\n.feds-link-group__title {\n    /* font-family: var(--heading-font-family); */\n    font-size: 0.875rem;\n    font-weight: 700;\n    line-height: 1rem;\n    color: var(--title-color);\n}\n\n.feds-link-group__subtitle {\n    font-size: 0.75rem;\n    line-height: 1rem;\n    color: var(--sub-title-color);\n}\n\n.feds-link-group--blue,\n.feds-link-group--blue .feds-link-group__title {\n    color: var(--accent-color);\n}\n\n.feds-link-group--blue:hover,\n.feds-link-group--blue:hover .feds-link-group__title {\n    color: var(--accent-color-hover);\n}\n\n/* styles overriden coming from styles.css */\n.feds-link-group.feds-link-group--blue {\n    text-decoration: underline;\n}\n\n.feds-link-group.feds-link-group--gray-gradient {\n    background-color: var(--header-background-color);\n}\n\n@media (min-width: 900px) {\n    .feds-link-group {\n        --title-color: #9f9f9f;\n        --sub-title-color: #9f9f9f;\n        --title-color-hover: #fff;\n        --sub-title-color-hover: #fff;\n        --bg-hover-color: transparent;\n        --header-background-color: transparent;\n        padding: 0;\n    }\n\n    .feds-link-group--blue,\n    .feds-link-group--blue:hover {\n        color: var(--title-color-hover);\n    }\n\n    .feds-link-group__content {\n        padding: 24px 0;\n    }\n\n    .feds-link-group__title {\n        font-size: 1.25rem;\n        line-height: 115%;\n        padding-bottom: 10px;\n    }\n\n    .feds-link-group:hover .feds-link-group__title {\n        color: var(--title-color-hover);\n    }\n\n    .feds-link-group__subtitle {\n        font-size: 0.875rem;\n        line-height: 140%;\n    }\n\n    .feds-link-group:hover .feds-link-group__subtitle {\n        color: var(--sub-title-color-hover);\n    }\n\n    .feds-link-group--blue .feds-link-group__title,\n    .feds-link-group.feds-link-group--gray-gradient .feds-link-group__title{\n        color: var(--title-color-hover);\n    }\n\n    .feds-link-group.feds-link-group--header .feds-link-group__title {\n        color: var(--title-color);\n        border-bottom: 1px solid var(--header-border-color);\n    }\n\n    .feds-link-group.feds-link-group--header .feds-link-group__content {\n        width: 100%;\n    }\n}\n";
-var style = document.createElement("style");
-style.textContent = css;
-document.head.appendChild(style);
 
 // src/Components/LinkGroup/Render.ts
 var linkGroup = (lg) => {
@@ -427,11 +512,14 @@ var linkGroup = (lg) => {
 };
 var linkGroupHeader = ({
   title,
-  classes
+  classes,
+  daaLl,
+  daaLh
 }) => {
   const classNames = classes.slice(1).map((cls) => `feds-link-group--${cls}`).join(" ");
+  const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   return `
-    <div role="heading" class="feds-link-group ${classNames}">
+    <div role="heading" class="feds-link-group ${classNames}"${analyticsAttrs}>
       <div class="feds-link-group__content">
         <div class="feds-link-group__title">${title}</div>
       </div>
@@ -443,9 +531,15 @@ var linkGroupLink = ({
   iconAlt,
   title,
   href,
-  subtitle
+  subtitle,
+  badges = [],
+  oldPrice = null,
+  newPrice = null,
+  daaLl,
+  daaLh
 }) => {
   const hasIcon = iconAlt !== null && iconHref !== null;
+  const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   const icon = !hasIcon ? "" : `
       <picture class="feds-link-group__icon">
         <img
@@ -456,25 +550,51 @@ var linkGroupLink = ({
         >
       </picture>
     `;
+  const badgesMarkup = badges.length === 0 ? "" : `
+      <div class="feds-link-group__badges">
+        ${badges.map((badge, index) => `
+          <span class="feds-link-group__badge${index > 0 ? " feds-link-group__badge--filled" : ""}">
+            ${badge}
+          </span>
+        `).join("")}
+      </div>
+    `;
+  const subtitleMarkup = subtitle === "" ? "" : `<div class="feds-link-group__subtitle">${subtitle}</div>`;
+  const priceMarkup = oldPrice === null && newPrice === null ? "" : `
+      <div class="feds-link-group__price">
+        ${oldPrice === null ? "" : `<span class="feds-link-group__old-price">${oldPrice}</span>`}
+        ${newPrice === null ? "" : `<span class="feds-link-group__new-price">${newPrice}</span>`}
+      </div>
+    `;
   return `
-    <a class="feds-link-group" href="${href}" daa-ll="${title}">
-      ${icon}
+    <a class="feds-link-group" href="${href}"${analyticsAttrs}>
+      <div class="feds-link-header">
+        ${icon}
+        ${badgesMarkup}
+      </div>
       <div class="feds-link-group__content">
+       
         <div class="feds-link-group__title">${title}</div>
-        <div class="feds-link-group__subtitle">${subtitle}</div>
+        ${subtitleMarkup}
+        ${priceMarkup}
       </div>
     </a>
   `;
 };
 var linkGroupBlue = ({
-  link
-}) => `
-  <a href="${link.href}" class="feds-link-group feds-link-group--blue" daa-ll="${link.text}">
+  link,
+  daaLl,
+  daaLh
+}) => {
+  const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? link.text);
+  return `
+  <a href="${link.href}" class="feds-link-group feds-link-group--blue"${analyticsAttrs}>
     <div class="feds-link-group__content">
         <div class="feds-link-group__title">${link.text}</div>
       </div>
   </a>
 `;
+};
 
 // src/Components/Brand/Parse.ts
 var ERRORS3 = {
@@ -563,10 +683,10 @@ var parseBrand = (element) => {
 };
 
 // src/Components/Brand/brand.css
-var css2 = ".feds-brand-container {\n    display: flex;\n    flex-shrink: 0;\n}\n\n.feds-brand {\n    display: flex;\n}\n\n.feds-brand,\n.feds-logo {\n    align-items: center;\n    outline-offset: 2px;\n    padding: 0 var(--feds-gutter);\n    column-gap: 10px;\n}\n\n.feds-brand-image,\n.feds-logo-image {\n    width: 25px;\n    flex-shrink: 0;\n}\n\n.feds-brand-image.brand-image-only {\n    height: 36px;\n    width: auto;\n    min-width: 66px;\n}\n\n.feds-brand-image.brand-image-only picture,\n.feds-brand-image.brand-image-only img,\n.feds-brand-image.brand-image-only svg {\n    width: auto;\n    height: 100%;\n}\n\n.feds-brand-image picture,\n.feds-brand-image img,\n.feds-brand-image svg,\n.feds-logo-image picture,\n.feds-logo-image img,\n.feds-logo-image svg {\n    width: 100%;\n    display: block;\n}\n\n.feds-brand-label,\n.feds-logo-label {\n    flex-shrink: 0;\n    font-weight: 700;\n    font-size: 18px;\n    color: var(--feds-color-adobeBrand);\n}\n\n@media (min-width: 900px) {\n    .feds-brand-image+.feds-brand-label {\n        display: flex;\n    }\n}";
-var style2 = document.createElement("style");
-style2.textContent = css2;
-document.head.appendChild(style2);
+var css = ".feds-brand-container {\n    display: flex;\n    flex-shrink: 0;\n}\n\n.feds-brand {\n    display: flex;\n}\n\n.feds-brand,\n.feds-logo {\n    align-items: center;\n    outline-offset: 2px;\n    padding: 0 var(--feds-gutter);\n    column-gap: 10px;\n}\n\n.feds-brand-image,\n.feds-logo-image {\n    width: 25px;\n    flex-shrink: 0;\n}\n\n.feds-brand-image.brand-image-only {\n    height: 36px;\n    width: auto;\n    min-width: 66px;\n}\n\n.feds-brand-image.brand-image-only picture,\n.feds-brand-image.brand-image-only img,\n.feds-brand-image.brand-image-only svg {\n    width: auto;\n    height: 100%;\n}\n\n.feds-brand-image picture,\n.feds-brand-image img,\n.feds-brand-image svg,\n.feds-logo-image picture,\n.feds-logo-image img,\n.feds-logo-image svg {\n    width: 100%;\n    display: block;\n}\n\n.feds-brand-label,\n.feds-logo-label {\n    flex-shrink: 0;\n    font-weight: 700;\n    font-size: 18px;\n    color: var(--feds-color-adobeBrand);\n}\n\n@media (min-width: 900px) {\n    .feds-brand-image+.feds-brand-label {\n        display: flex;\n    }\n}";
+var style = document.createElement("style");
+style.textContent = css;
+document.head.appendChild(style);
 
 // src/Components/Brand/Render.ts
 var renderImage = (image, imageOnly) => {

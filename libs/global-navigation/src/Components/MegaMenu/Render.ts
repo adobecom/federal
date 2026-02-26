@@ -1,4 +1,4 @@
-import { sanitize, icons } from "../../Utils/Utils";
+import { getAnalyticsAttrs, sanitize, icons } from "../../Utils/Utils";
 import { gnavCards } from "../GnavCards/Render";
 import { productlist } from "../ProductList/Render";
 import { MegaMenu, MegaMenuContent } from "./Parse";
@@ -10,6 +10,7 @@ export const megaMenu = ({
           aria-controls="${sanitize(title)}"
           class="mega-menu feds-link"
           popovertarget="${sanitize(title)}"
+          ${getAnalyticsAttrs(null, title)}
   >
     ${title}
   </button>
