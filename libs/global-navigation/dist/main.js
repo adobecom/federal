@@ -508,6 +508,10 @@ header.global-navigation:has(.feds-popup:popover-open) {
   font-weight: 900;
 }
 
+.global-navigation.feds-gnav-items > li > .feds-link:hover {
+  color: #fff;
+}
+
 /* .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link::after {
   content: '';
   position: absolute;
