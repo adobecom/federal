@@ -459,15 +459,6 @@ header.global-navigation {
   width: 100%;
 }
 
-header.feds-header-scrolled {
-  background-color: rgba(255, 255, 255, 0.81);
-  border-radius: 4px;
-  width: calc(100% - 8px);
-  border-radius: 6px;
-  margin: 4px 4px 0;
-  border: solid 1px rgba(0, 0, 0, 0.05);
-}
-
 header.feds-header-scrolled .feds-link {
   color: #000;
 }
@@ -1004,6 +995,49 @@ body:has(:popover-open) {
   }
 }
 
+@supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+  @keyframes scroll-transition-main-nav {
+    from {
+      background-color:transparent;
+      width: 100%;
+      border-radius: 0px;
+      margin: 0;
+      border: solid 0px rgba(0, 0, 0, 0);
+    }
+    to {
+      background-color: rgba(255, 255, 255, 0.81);
+      width: calc(100% - 8px);
+      border-radius: 6px;
+      margin: 4px 4px 0;
+      border: solid 1px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  @keyframes color-white-to-black {
+    from {
+      color: #fff;
+    }
+    to {
+      color: #000;
+    }
+  }
+
+  header.global-navigation:not(:has(:popover-open)) {
+    animation: scroll-transition-main-nav linear forwards;
+    animation-timeline: scroll();
+    animation-range: 0px 100px;
+  }
+}
+
+@supports (not ((animation-timeline: scroll()) and (animation-range: 0% 100%))) {
+  header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) {
+    background-color: rgba(255, 255, 255, 0.81);
+    border-radius: 6px;
+    width: calc(100% - 8px);
+    margin: 4px 4px 0;
+    border: solid 1px rgba(0, 0, 0, 0.05);
+  }
+}
 `,nn=document.createElement("style");nn.textContent=Fn;document.head.appendChild(nn);var Jo=async e=>{let{gnavSource:n,mountpoint:t,unavEnabled:r,miloConfig:o,personalization:i}=e;if(!(n instanceof URL))throw h(`gnavSource is invalid: ${n}`),new l("gnavSource needs to be a URL object");try{te(o)}catch(f){throw h(`Failed to initialize MiloConfig: ${f}`),new l(`Failed to initialize MiloConfig: ${f}`)}be(i),ge(ue(e));let a=await en(e);if(a instanceof l)throw h(a.message),a;let{mainNav:s,aside:c}=a;if(s instanceof l)throw h(s.message),s;let d=Ye(s,r);if(d instanceof l)throw h(d.message),d;return await qn(d)(t),Zn(e)},qn=e=>async n=>{let t=Wn(e);n.innerHTML=t,n.classList.add("site-pivot");let r=[...n.querySelectorAll(".mega-menu ~ .feds-popup")];r.forEach(s=>{s.innerHTML=""});let o=e.components.filter(s=>s.type==="MegaMenu"),i=o.map(s=>s.content),a=await Promise.all(i.map(async(s,c)=>{let[d,f]=await s,g=o[c].title;return r[c].innerHTML=We(d,r[c].id,g),f}).flat());return n},Wn=({components:e,productCTA:n,unavEnabled:t})=>`
 <nav>
   <ul>
