@@ -60,4 +60,3 @@ const getSelector = ({ type }: Pick<CTA, 'type'>): string => {
     default: throw new Error('');
   }
 }
-
