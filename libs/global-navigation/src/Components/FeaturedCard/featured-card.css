@@ -80,4 +80,7 @@
       color: white;
     }
   }
+  .feds-popup .feds-gnav-cards:has(.featured-card) {
+    flex-wrap: wrap;
+  }
 }
