@@ -1,6 +1,5 @@
 .feds-gnav-cards .promo-card {
     position: relative;
-    height: 163px;
 }
 
 .feds-gnav-cards .promo-card__bg {
@@ -67,6 +66,10 @@
 }
 
 @media (min-width: 1024px) {
+    .feds-gnav-cards .promo-card {
+        height: 100%;
+    }
+    
     .feds-gnav-cards .promo-card__bg-image {
         border-radius: 16px;
     }
