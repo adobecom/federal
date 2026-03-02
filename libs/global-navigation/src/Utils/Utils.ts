@@ -294,6 +294,25 @@ export const federateUrl = (url = ''): string => {
   return url;
 };
 
+export const replaceDotMedia = (path: string, ele: Element): void => {
+  const resetAttributeBase = (
+    tag: 'img' | 'source',
+    attr: 'src' | 'srcset'
+  ): void => {
+    const elements = ele.querySelectorAll<HTMLElement>(`${tag}[${attr}^="./media_"]`);
+    elements.forEach((el: HTMLElement) => {
+      const attrValue = el.getAttribute(attr);
+      if (!attrValue) return;
+      const absoluteUrl = federateUrl(new URL(attrValue, new URL(path, window.location.href)).href);
+      if (el instanceof HTMLImageElement || el instanceof HTMLSourceElement) {
+        (el)[attr] = absoluteUrl;
+      }
+    });
+  };
+  resetAttributeBase('img', 'src');
+  resetAttributeBase('source', 'srcset');
+};
+
 export const inlineNestedFragments = async (
   element: Element | HTMLElement
 ): Promise<Element | HTMLElement | IrrecoverableError> => {

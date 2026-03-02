@@ -2,11 +2,13 @@ import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import {
   fetchAndProcessPlainHTML,
   inlineNestedFragments,
-  parseListAndAccumulateErrors
+  parseListAndAccumulateErrors,
+  replaceDotMedia,
 } from "../../Utils/Utils";
 import { LinksCard, parseLinksCard } from "../LinksCard/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
 import { parseFeaturedCard, FeaturedCard } from "../FeaturedCard/Parse";
+import { parsePromoCard, PromoCard } from "../PromoCard/Parse";
 
 
 export type MegaMenu = {
@@ -18,9 +20,14 @@ export type MegaMenu = {
 export type MegaMenuContent = ProductList
                             | GnavCards;
 
+export type GnavColumn = {
+  type: "GnavColumn";
+  cards: List<FeaturedCard | LinksCard | PromoCard>;
+};
+
 export type GnavCards = {
   type: "GnavCards";
-  sections: List<FeaturedCard | LinksCard>;
+  sections: List<GnavColumn>;
 };
 
 export const parseMegaMenu = (
@@ -46,6 +53,7 @@ export const parseMegaMenu = (
       const megaMenuFragment = await inlineNestedFragments(initialFragment);
       if (megaMenuFragment instanceof IrrecoverableError)
         throw new Error(megaMenuFragment.message);
+      replaceDotMedia(fragmentURL.href, megaMenuFragment);
       if (element.classList.contains('product-list'))
         return parseProductList(megaMenuFragment);
       return parseGnavCards(megaMenuFragment);
@@ -78,21 +86,17 @@ const ERRORS = {
 const parseGnavCards = (
   fragment: Element | HTMLElement
 ): Parsed<GnavCards, RecoverableError> => {
-  const directCardSections = [...fragment.children]
-    .filter((el) =>
-      el.classList.contains('featured-card')
-      || el.classList.contains('links-card')
-    );
-  const cardSections = directCardSections.length > 0
-    ? directCardSections
-    : [...fragment.querySelectorAll('.featured-card, .links-card')];
-  if (cardSections.length === 0) {
+  // Get direct children divs - these represent columns
+  const columnDivs = [...fragment.children];
+  if (columnDivs.length === 0) {
     throw new IrrecoverableError(
-      "Unrecognized mega menu item (did you forget to label it correctly?)"
+      "No mega menu items found (did you forget to add them correctly?)"
     );
   }
+  
+  // Parse each column div and its child cards
   const [sections, errors]
-    = parseListAndAccumulateErrors(cardSections, parseGnavCardSection);
+    = parseListAndAccumulateErrors(columnDivs, (columnDiv) => parseGnavColumn(columnDiv));
   if (sections.length === 0) {
     throw new IrrecoverableError("Failed to parse gnav cards sections");
   }
@@ -105,14 +109,43 @@ const parseGnavCards = (
   ];
 };
 
+const parseGnavColumn = (
+  columnDiv: Element
+): Parsed<GnavColumn, RecoverableError> => {
+  // Find cards within this specific column div
+  const cardElements = [...columnDiv.querySelectorAll('.featured-card, .links-card, .promo-card')];
+  if (cardElements.length === 0) {
+    throw new IrrecoverableError(
+      "Column contains no cards (did you forget to label them correctly?)"
+    );
+  }
+  
+  const [cards, errors]
+    = parseListAndAccumulateErrors(cardElements, (card) => parseGnavCardSection(card));
+  if (cards.length === 0) {
+    throw new IrrecoverableError("Failed to parse cards in column");
+  }
+  
+  return [
+    {
+      type: "GnavColumn",
+      cards,
+    },
+    errors
+  ];
+};
+
 const parseGnavCardSection = (
   section: Element
-): Parsed<FeaturedCard | LinksCard, RecoverableError> => {
+): Parsed<FeaturedCard | LinksCard | PromoCard, RecoverableError> => {
   if (section.classList.contains('featured-card')) {
     return parseFeaturedCard(section);
   }
   if (section.classList.contains('links-card')) {
     return parseLinksCard(section);
+  }
+  if (section.classList.contains('promo-card')) {
+    return parsePromoCard(section);
   }
   throw new IrrecoverableError("Unsupported gnav cards section");
 };

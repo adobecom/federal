@@ -1,22 +1,29 @@
 import { featuredcards } from "../FeaturedCard/Render";
 import { linkscard } from "../LinksCard/Render";
-import { GnavCards } from "../MegaMenu/Parse";
+import { promoCard } from "../PromoCard/Render";
+import { GnavCards, GnavColumn } from "../MegaMenu/Parse";
 
 import "./gnav-cards.css";
+
+const renderCard = (card: GnavColumn["cards"][number]): HTML => {
+  switch (card.type) {
+    case "FeaturedCard":
+      return featuredcards(card);
+    case "LinksCard":
+      return linkscard(card);
+    case "PromoCard":
+      return promoCard(card);
+    default: card satisfies never;
+  }
+  return "";
+};
 
 export const gnavCards = ({
   sections
 }: GnavCards): HTML => `
   <ul class="feds-gnav-cards">
-    ${sections.map((section) => {
-      switch (section.type) {
-        case "FeaturedCard":
-          return `<li>${featuredcards(section)}</li>`;
-        case "LinksCard":
-          return `<li>${linkscard(section)}</li>`;
-        default: section satisfies never;
-      }
-      return "";
-    }).join("")}
+    ${sections.map((column) => 
+      `<li>${column.cards.map((card) => renderCard(card)).join("")}</li>`
+    ).join("")}
   </ul>
 `;
