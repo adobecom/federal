@@ -197,6 +197,9 @@ var ue=async e=>{let{placeholders:n}=e,{locale:t}=b(),o=`${O()}${t.prefix}/feder
       color: white;
     }
   }
+  .feds-popup .feds-gnav-cards:has(.featured-card) {
+    flex-wrap: wrap;
+  }
 }
 `,Ge=document.createElement("style");Ge.textContent=Rn;document.head.appendChild(Ge);var Ne=({card:e})=>In(e),In=({title:e,subtitle:n,eyeBrow:t,footerCTA:r,bodyLink:o})=>`
   <article class="featured-card">
