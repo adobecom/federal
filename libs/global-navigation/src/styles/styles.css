@@ -569,15 +569,6 @@ body:has(:popover-open) {
     }
   }
 
-  @keyframes color-white-to-black {
-    from {
-      color: #fff;
-    }
-    to {
-      color: #000;
-    }
-  }
-
   header.global-navigation:not(:has(:popover-open)) {
     animation: scroll-transition-main-nav linear forwards;
     animation-timeline: scroll();
