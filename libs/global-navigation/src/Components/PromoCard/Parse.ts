@@ -26,7 +26,7 @@ const Errors = {
   MissingIconAlt: "Promo card icon is missing alt text",
   MissingTitleElement: "Promo card is missing title element",
   MissingTitleText: "Promo card is missing title text",
-  MissingPrimaryCtaAnchor: "Promo card is missing primary CTA anchor",
+  MissingSecondaryCtaAnchor: "Promo card is missing secondary CTA anchor",
 };
 
 export const parsePromoCard = (
@@ -74,9 +74,9 @@ export const parsePromoCard = (
     if (title === "")
       errors.add(new RecoverableError(Errors.MissingTitleText));
 
-    const primaryCtaAnchor = contentSection.querySelector('em > a');
-    if (primaryCtaAnchor === null)
-      errors.add(new RecoverableError(Errors.MissingPrimaryCtaAnchor));
+    const secondaryCtaAnchor = contentSection.querySelector('em > a');
+    if (secondaryCtaAnchor === null)
+      errors.add(new RecoverableError(Errors.MissingSecondaryCtaAnchor));
 
     const [cta, ctaErrors]
       = (() : Parsed<SecondaryCTA | null, RecoverableError> => {
