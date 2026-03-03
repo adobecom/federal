@@ -1,5 +1,6 @@
 .feds-gnav-cards .promo-card {
     position: relative;
+    height: 199px;
 }
 
 .feds-gnav-cards .promo-card__bg {
@@ -65,6 +66,29 @@
     display: none;
 }
 
+.feds-gnav-cards .promo-card__cta {
+    display: block;
+    margin-top: 24px;
+}
+
+.feds-gnav-cards .promo-card__cta .feds-secondary-cta {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 130%;
+    letter-spacing: 0;
+    border: none;
+    background: #fff;
+    color: #000;
+    padding: 3px 24px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.feds-gnav-cards .promo-card__cta .feds-secondary-cta:hover,
+.feds-gnav-cards .promo-card__cta .feds-secondary-cta:focus {
+    background: #000;
+    color: #fff;
+}
+
 @media (min-width: 1024px) {
     .feds-gnav-cards .promo-card {
         height: 100%;
@@ -75,26 +99,7 @@
     }
 
     .feds-gnav-cards .promo-card__cta {
-        display: block;
         margin-top: 16px;
-    }
-
-    .feds-gnav-cards .promo-card__cta .feds-secondary-cta {
-        font-weight: 700;
-        font-size: 14px;
-        line-height: 130%;
-        letter-spacing: 0;
-        border: none;
-        background: #fff;
-        color: #000;
-        padding: 3px 24px;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .feds-gnav-cards .promo-card__cta .feds-secondary-cta:hover,
-    .feds-gnav-cards .promo-card__cta .feds-secondary-cta:focus {
-        background: #000;
-        color: #fff;
     }
 }
 
@@ -112,6 +117,7 @@
         position: absolute;
         bottom: 16px;
         right: 16px;
+        margin-top: 0;
     }
 }
 

@@ -4,7 +4,7 @@
   padding: 12px 24px 24px;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 4px;
   align-items: start;
 }
 
@@ -16,6 +16,7 @@
   .feds-popup .feds-gnav-cards {
     display: flex;
     flex-wrap: nowrap;
+    gap: 8px;
     overflow-x: auto;
     width: 100%;
   }
