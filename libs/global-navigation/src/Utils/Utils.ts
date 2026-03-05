@@ -262,6 +262,43 @@ export const federateUrl = (url = ''): string => {
   return url;
 };
 
+/**
+ * Replaces relative media paths (./media_*) with absolute federated URLs.
+ * @param path - The source path/URL used to resolve relative media references
+ * @param ele - The DOM element containing media elements to process
+ */
+export const replaceDotMedia = (path: string, ele: Element): void => {
+  /* Helper function to update media attributes for a specific element type */
+  const resetAttributeBase = (
+    tag: 'img' | 'source',
+    attr: 'src' | 'srcset'
+  ): void => {
+    const selector = `${tag}[${attr}^="./media_"]`;
+    const elements = tag === 'img' 
+      ? ele.querySelectorAll<HTMLImageElement>(selector)
+      : ele.querySelectorAll<HTMLSourceElement>(selector);
+    
+    elements.forEach((el) => {
+      const attrValue = el.getAttribute(attr);
+      if (!attrValue) return;
+      
+      try {
+        // Construct absolute URL by resolving relative path against source location
+        // Then federate the URL to ensure it points to the correct content source
+        const absoluteUrl = federateUrl(
+          new URL(attrValue, new URL(path, window.location.href)).href
+        );
+        el.setAttribute(attr, absoluteUrl);
+      } catch (error) {
+        // This prevents one malformed URL from breaking all media processing
+        console.warn(`[MediaPathError]: Failed to process relative media path (${attrValue}) for ${tag}`, error);
+      }
+    });
+  };
+  resetAttributeBase('img', 'src');
+  resetAttributeBase('source', 'srcset');
+};
+
 export const inlineNestedFragments = async (
   element: Element | HTMLElement
 ): Promise<Element | HTMLElement | IrrecoverableError> => {

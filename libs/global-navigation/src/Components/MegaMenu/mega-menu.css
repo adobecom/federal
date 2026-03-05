@@ -1,0 +1,43 @@
+/* Mega Menu specific grid structure styles for links-card and promo-card */
+.feds-gnav-cards > li:has(> :nth-child(2)) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+@media (min-width: 900px) {
+    .feds-gnav-cards > li:has(> :nth-child(2)) {
+        gap: 8px;
+    }
+
+    .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) {
+        align-items: stretch;
+    }
+
+    .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) article {
+        height: 100%;
+    }
+
+    .feds-gnav-cards > li:has(.promo-card, .links-card) {
+      width: calc(33.33% - 5.33px);
+    }
+}
+
+@media (min-width: 1280px) {
+    .feds-gnav-cards > li:has(.promo-card, .links-card) {
+      width: calc(25% - 6px);
+    }
+
+    .feds-gnav-cards > li:has(.promo-card) {
+        width: calc(50% - 4px);
+    }
+
+    .feds-gnav-cards > li:has(> :nth-child(2)) {
+        width: calc(50% - 4px);
+        flex-direction: row;
+    }
+
+    .feds-gnav-cards > li:has(> :nth-child(2)) article {
+        width: calc(50% - 4px);
+    }
+}
