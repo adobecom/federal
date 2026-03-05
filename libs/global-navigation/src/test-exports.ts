@@ -26,3 +26,6 @@ export {
 export { getUnavComponents } from './PostRendering/Unav/Unav.config';
 export { loadUnav } from './PostRendering/Unav/Unav.loader';
 export type { Unav } from './PostRendering/Unav/Unav.loader';
+
+// Keyboard navigation
+export { initKeyboardNav } from './PostRendering/Keyboard';

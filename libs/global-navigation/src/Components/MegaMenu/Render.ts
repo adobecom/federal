@@ -8,6 +8,7 @@ export const megaMenu = ({
 }: MegaMenu): HTML => `
   <button type="button"
           aria-controls="${sanitize(title)}"
+          aria-haspopup="true"
           class="mega-menu feds-link"
           popovertarget="${sanitize(title)}"
           ${getAnalyticsAttrs(null, title)}

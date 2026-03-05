@@ -128,38 +128,6 @@ export const parseListAndAccumulateErrors = <
   [[],[]] as Parsed<List<ParsedObj>, ErrorType>
   );
 
-type CleanupFunction = () => void;
-type AddListeners = (gnav: HTMLElement) => CleanupFunction;
-type ListenerSetupFunctions = {
-  mobileEventListeners: AddListeners;
-  desktopEventListeners: AddListeners;
-}
-export const setupMobileDesktopListeners = ({
-  mobileEventListeners,
-  desktopEventListeners
-}: ListenerSetupFunctions) => (gnav: HTMLElement): void => {
-  let cleanup: CleanupFunction;
-  if (isDesktop.matches)
-    cleanup = desktopEventListeners(gnav);
-  else
-    cleanup = mobileEventListeners(gnav);
-
-  isDesktop.addEventListener('change', () => {
-    cleanup?.();
-    cleanup
-      = isDesktop.matches
-      ? desktopEventListeners(gnav)
-      : mobileEventListeners(gnav);
-    // To close the sidebar when it goes back to desktop view
-    const menuPopover = gnav.querySelector<
-      HTMLElement & { hidePopover?: () => void }
-    >('#feds-menu-wrapper');
-    if (menuPopover?.matches(':popover-open') === true) {
-      menuPopover.hidePopover?.();
-    }
-  });
-};
-
 export type PersonalizationConfig = {
   commands: unknown[];
   handleCommands: (
