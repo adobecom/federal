@@ -6,7 +6,7 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -192,6 +192,8 @@ export const postRenderingTasks = async (
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
   initClickListeners(input.mountpoint);
   initKeyboardNav(input.mountpoint);
+  initAriaToggleListeners(input.mountpoint);
+  initPopoverCloseOnResize(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   
   const reloadUnav
@@ -206,6 +208,41 @@ export const postRenderingTasks = async (
     setGnavTopPosition: (_): void => {},
     getGnavTopPosition: (): number => 0,
   };
+};
+
+const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
+  const menuWrapper = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
+  const navToggle = mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
+
+  menuWrapper?.addEventListener('toggle', () => {
+    const isOpen = menuWrapper.matches(':popover-open');
+    navToggle?.setAttribute('aria-expanded', String(isOpen));
+    menuWrapper.setAttribute('aria-hidden', String(!isOpen));
+  });
+
+  const megaMenuPopovers = mountpoint.querySelectorAll<HTMLElement>('.feds-popup[popover]');
+  megaMenuPopovers.forEach(popup => {
+    popup.addEventListener('toggle', () => {
+      const trigger = mountpoint.querySelector<HTMLElement>(
+        `[popovertarget="${popup.id}"]`
+      );
+      trigger?.setAttribute(
+        'aria-expanded',
+        String(popup.matches(':popover-open'))
+      );
+    });
+  });
+};
+
+const initPopoverCloseOnResize = (mountpoint: HTMLElement): void => {
+  isDesktop.addEventListener('change', () => {
+    const menuPopover = mountpoint.querySelector<
+      HTMLElement & { hidePopover?: () => void }
+    >('#feds-menu-wrapper');
+    if (menuPopover?.matches(':popover-open') === true) {
+      menuPopover.hidePopover?.();
+    }
+  });
 };
 
 const closeEverything = (): void => {

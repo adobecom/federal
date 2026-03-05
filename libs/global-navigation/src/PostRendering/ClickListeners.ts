@@ -1,8 +1,6 @@
-import { setupMobileDesktopListeners, zip } from "../Utils/Utils";
-
 type CleanupFunction = () => void
 
-const mobileClickListeners = (
+export const initClickListeners = (
   gnav: HTMLElement
 ): CleanupFunction => {
   const tabButtons = [...gnav.querySelectorAll('.tabs button[role="tab"]')];
@@ -27,12 +25,3 @@ const mobileClickListeners = (
     });
   };
 };
-
-const desktopClickListeners = (
-  gnav: HTMLElement
-): CleanupFunction => {
-  return () => console.log(gnav);
-};
-
-export const initClickListeners = mobileClickListeners
-
