@@ -149,6 +149,10 @@ export const renderGnavString = ({
           aria-controls="feds-menu-wrapper"
           popovertarget="feds-menu-wrapper"
         >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 7" fill="currentColor" aria-hidden="true">
+            <path d="M13.25 5.5H0.75C0.33594 5.5 0 5.83594 0 6.25C0 6.66406 0.33594 7 0.75 7H13.25C13.6641 7 14 6.66406 14 6.25C14 5.83594 13.6641 5.5 13.25 5.5Z"/>
+            <path d="M0.75 1.5H13.25C13.6641 1.5 14 1.16406 14 0.75C14 0.33594 13.6641 0 13.25 0H0.75C0.33594 0 0 0.33594 0 0.75C0 1.16406 0.33594 1.5 0.75 1.5Z"/>
+          </svg>
         </button>
       `.trim();
 
@@ -218,6 +222,13 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
     const isOpen = menuWrapper.matches(':popover-open');
     navToggle?.setAttribute('aria-expanded', String(isOpen));
     menuWrapper.setAttribute('aria-hidden', String(!isOpen));
+    if (isOpen) menuWrapper.classList.add('feds-menu-active');
+  });
+
+  menuWrapper?.addEventListener('transitionend', () => {
+    if (!menuWrapper.matches(':popover-open')) {
+      menuWrapper.classList.remove('feds-menu-active');
+    }
   });
 
   const megaMenuPopovers = mountpoint.querySelectorAll<HTMLElement>('.feds-popup[popover]');
@@ -239,7 +250,9 @@ const initPopoverCloseOnResize = (mountpoint: HTMLElement): void => {
     const menuPopover = mountpoint.querySelector<
       HTMLElement & { hidePopover?: () => void }
     >('#feds-menu-wrapper');
-    if (menuPopover?.matches(':popover-open') === true) {
+    if (!menuPopover) return;
+    menuPopover.classList.remove('feds-menu-active');
+    if (menuPopover.matches(':popover-open') === true) {
       menuPopover.hidePopover?.();
     }
   });
