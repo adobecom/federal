@@ -248,13 +248,13 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
 const initPopoverCloseOnResize = (mountpoint: HTMLElement): void => {
   isDesktop.addEventListener('change', () => {
     const menuPopover = mountpoint.querySelector<
-      HTMLElement & { hidePopover?: () => void }
+      HTMLElement
     >('#feds-menu-wrapper');
     if (!menuPopover) return;
     menuPopover.classList.remove('feds-menu-active');
-    if (menuPopover.matches(':popover-open') === true) {
-      menuPopover.hidePopover?.();
-    }
+    mountpoint.querySelector<
+      HTMLElement & { hidePopover?: () => void }
+    >('.feds-popup:popover-open')?.hidePopover?.();
   });
 };
 
