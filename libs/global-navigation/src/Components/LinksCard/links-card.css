@@ -41,6 +41,7 @@
   color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-regular);
+  display: inline-flex;
 }
 
 /* =========================================

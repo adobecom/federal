@@ -1165,6 +1165,7 @@ ul.tabs .product-links {
   color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-regular);
+  display: inline-flex;
 }
 
 /* =========================================
@@ -1680,6 +1681,7 @@ ul.tabs .product-links {
 .featured-card .feds-link {
   padding: var(--s2a-spacing-md) 0;
   color: var(--s2a-color-gray-1000);
+  display: inline-flex;
 }
 
 .featured-card > div > a.feds-link::after {

@@ -6,12 +6,16 @@ export type PrimaryCTA = {
   type: "PrimaryCTA";
   text: string;
   href: string;
+  ariaLabel?: string;
+  daaLl?: string | null;
 };
 
 export type SecondaryCTA = {
   type: "SecondaryCTA";
   text: string;
   href: string;
+  ariaLabel?: string;
+  daaLl?: string | null;
 };
 
 export type ProductEntryCTA = PrimaryCTA | SecondaryCTA;
@@ -28,12 +32,14 @@ const parseCTA = (
   if (!anchor)
     throw new Error('');
 
-  const [{ text, href }, es] = parseLink(anchor);
+  const [{ text, href, daaLl, ariaLabel }, es] = parseLink(anchor);
   return [
     {
       type: type.type,
       text,
       href,
+      daaLl,
+      ariaLabel
     },
     es
   ]

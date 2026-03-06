@@ -5,6 +5,7 @@ export type Link = {
   text: string;
   href: string;
   daaLl?: string | null;
+  ariaLabel?: string;
 };
 
 const ERRORS = {
@@ -23,7 +24,7 @@ export const parseLink = (
   if (anchor.tagName !== 'A')
     throw new IrrecoverableError(ERRORS.notAnchor);
 
-  const text = anchor?.textContent ?? '';
+  const [text, ariaLabel] = anchor?.textContent?.split('|').map(s => s.trim()) ?? ['', ''];
   if (text === '')
     throw new IrrecoverableError(ERRORS.textContentNotFound)
 
@@ -37,7 +38,8 @@ export const parseLink = (
       type: "Link",
       text,
       href,
-      daaLl
+      daaLl,
+      ariaLabel
     },
     []
   ];

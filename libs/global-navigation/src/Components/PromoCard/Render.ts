@@ -10,7 +10,7 @@ const renderCard = ({
   title,
   cta,
 }: PromoCardData): HTML => `
-  <article class="promo-card">
+  <article class="promo-card" daa-lh="promo-card">
     ${
       bgImageSrc
         ? `<picture class="promo-card__bg">
