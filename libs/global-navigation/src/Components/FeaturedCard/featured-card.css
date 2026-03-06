@@ -3,55 +3,56 @@
    ========================================= */
 
 .feds-popup .featured-card {
-  max-height: 307px;
-  height: 307px;
-  border-radius: 14px;
-  background: #fff;
+  border-radius: 24px;
+  background: var(--s2a-color-gray-25);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: 24px;
+  padding: var(--s2a-spacing-lg);
   justify-content: space-between;
   align-items: center;
-  max-width: 275px;
+  overflow: hidden;
 }
 
 .feds-popup .featured-card .featured-eyebrow {
-  color: #7a7474;
+  /* No token: design uses custom gray; using content-subtle */
+  color: var(--s2a-color-content-subtle);
   font-family: var(--body-font-family);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--s2a-font-size-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
 }
 
 .feds-popup .featured-card h4 {
   margin: 0;
-  font-family: var(--feds-heading-font);
-  font-size: 24px;
+  font-family: var(--s2a-font-family-heading);
+  font-size: var(--s2a-font-size-2xl);
   line-height: 24px;
-  color: #000;
-  padding: 16px 0 8px 0;
-  font-weight: 900;
+  color: var(--s2a-color-gray-1000);
+  padding: var(--s2a-spacing-md) 0 var(--s2a-spacing-xs) 0;
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
 
 .featured-card .featured-subtitle {
-  font-size: 14px;
+  font-size: var(--s2a-font-size-sm);
   line-height: 120%;
+  color: var(--s2a-color-content-subtle);
 }
 
 .featured-card .feds-link {
-  padding: 16px 0;
-  color: #000;
+  padding: var(--s2a-spacing-md) 0;
+  color: var(--s2a-color-gray-1000);
 }
 
 .featured-card > div > a.feds-link::after {
   content: ">";
   margin-left: 6px;
-  font-weight: 700;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
 }
 
 .featured-card a.feds-secondary-cta {
-  background: #000;
-  color: white;
+  background: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
 }
 
 /* =========================================
@@ -67,32 +68,83 @@
   box-sizing: border-box;
 }
 
+.featured-card .footer-container a.feds-secondary-cta:hover {
+  background: var(--s2a-color-gray-1000);
+}
+
 /* =========================================
-   Responsive: Desktop (min-width: 900px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 900px) {
-  .featured-card a.feds-link-group:hover {
-    background: black;
-    color: white;
+@media (min-width: 1024px) {
+  .feds-popup .featured-card {
+    /* No token: 12px radius on desktop */
+    border-radius: 12px;
+  }
+
+  .featured-card a.feds-secondary-cta {
+    background: transparent;
+    color: var(--s2a-color-gray-1000);
+    border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
+  }
+
+  .feds-popup .feds-gnav-cards:has(.featured-card) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    flex-wrap: unset;
+    overflow-x: unset;
+  }
+}
+
+/* =========================================
+   Responsive: Large Desktop (min-width: 1280px)
+   ========================================= */
+
+@media (min-width: 1280px) {
+  .feds-popup .feds-gnav-cards:has(.featured-card) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .feds-popup .featured-card {
+    min-height: 307px;
+  }
+}
+
+/* =========================================
+   Hover: Desktop with pointer device only
+   ========================================= */
+
+@media (min-width: 1024px) and (hover: hover) {
+  .featured-card,
+  .featured-card .featured-eyebrow,
+  .featured-card h4,
+  .featured-card .featured-subtitle,
+  .featured-card .feds-link,
+  .featured-card a.feds-secondary-cta {
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
   .featured-card:hover {
-    background: black;
+    background: var(--s2a-color-gray-1000);
+  }
+
+  .featured-card:hover .featured-eyebrow {
+    /* No token: design uses transparent-white/700 */
+    color: rgba(255, 255, 255, 0.66);
   }
 
   .featured-card:hover h4,
   .featured-card:hover .featured-subtitle,
   .featured-card:hover .feds-link {
-    color: white;
+    color: var(--s2a-color-gray-25);
   }
 
   .featured-card:hover a.feds-secondary-cta {
-    background: white;
-    color: #000;
+    background: var(--s2a-color-gray-25);
+    color: var(--s2a-color-gray-1000);
+    border-color: var(--s2a-color-gray-25);
   }
-
-  .feds-popup .feds-gnav-cards:has(.featured-card) {
-    flex-wrap: wrap;
+  .featured-card .footer-container a.feds-secondary-cta:hover {
+    background: var(--s2a-color-gray-25);
   }
 }

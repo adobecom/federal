@@ -1,7 +1,5 @@
 import { PromoCard, PromoCardData } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
-import "./promo-card.css";
-
 export const promoCard = ({ card }: PromoCard): HTML => renderCard(card);
 
 const renderCard = ({

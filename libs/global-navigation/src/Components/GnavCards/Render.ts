@@ -3,8 +3,6 @@ import { linkscard } from "../LinksCard/Render";
 import { promoCard } from "../PromoCard/Render";
 import { GnavCards, GnavColumn } from "../MegaMenu/Parse";
 
-import "./gnav-cards.css";
-
 const renderCard = (card: GnavColumn["cards"][number]): HTML => {
   switch (card.type) {
     case "FeaturedCard":

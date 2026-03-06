@@ -3,8 +3,6 @@ import { Link } from "../Link/Parse";
 import { link } from "../Link/Render";
 import { Panels, FooterLink, LinkPanel, PanelPosition, Panel, ListWithImagePanel, ImagePanel } from "./Parse";
 
-import './panels.css';
-
 export const panels = ({ layout, panels }: Panels): HTML => {
   const gridCSS = `
     display: grid;

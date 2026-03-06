@@ -11,7 +11,7 @@ li.feds-brand-wrapper {
   display: flex;
   flex-direction: row-reverse;
   justify-content: flex-start;
-  padding-left: 20px;
+  padding-left: var(--s2a-spacing-20);
 }
 
 /* =========================================
@@ -21,10 +21,11 @@ li.feds-brand-wrapper {
 .feds-brand,
 .feds-logo {
   align-items: center;
-  outline-offset: 2px;
-  padding: 0 var(--feds-gutter);
+  outline-offset: var(--s2a-spacing-2xs);
+  padding: 0 var(--s2a-spacing-xs);
   column-gap: 10px;
 }
+
 
 .feds-brand-image picture,
 .feds-brand-image img,
@@ -39,9 +40,9 @@ li.feds-brand-wrapper {
 .feds-brand-label,
 .feds-logo-label {
   flex-shrink: 0;
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--feds-color-adobeBrand);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-font-size-lg);
+  color: var(--s2a-color-brand-adobe-red);
 }
 
 /* =========================================
@@ -49,7 +50,7 @@ li.feds-brand-wrapper {
    ========================================= */
 
 .feds-brand-image svg {
-  color: white;
+  color: var(--s2a-color-gray-25);
 }
 
 .feds-brand-image.desktop-brand {
@@ -61,7 +62,7 @@ li.feds-brand-wrapper {
 }
 
 .feds-brand-image.brand-image-only.mobile-brand svg {
-  height: 16px;
+  height: var(--s2a-spacing-md);
 }
 
 .feds-brand-image.brand-image-only.desktop-brand svg {
@@ -69,10 +70,10 @@ li.feds-brand-wrapper {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 900px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;
@@ -89,7 +90,7 @@ li.feds-brand-wrapper {
   }
 
   header:has(:popover-open) .feds-brand-image svg {
-    color: black;
+    color: var(--s2a-color-gray-1000);
   }
 
   .feds-brand-image.mobile-brand {

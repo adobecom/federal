@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop } from "./Utils/Utils";
-import './styles/styles.css';
+import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";

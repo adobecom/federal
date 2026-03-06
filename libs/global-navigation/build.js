@@ -37,6 +37,7 @@ const buildOptions = {
 };
 
 if (isWatch) {
+
   const context = await esbuild.context({
     ...buildOptions,
     plugins: [
@@ -44,6 +45,8 @@ if (isWatch) {
         name: 'type-check',
         setup(build) {
           build.onStart(() => {
+            // Build CSS bundle (pruned tokens + gnav CSS) before esbuild
+            execSync('node scripts/build-css.js', { stdio: 'inherit' });
             execSync('tsc --noEmit', { stdio: 'inherit' });
           });
         },
@@ -53,6 +56,9 @@ if (isWatch) {
   });
   await context.watch();
 } else {
+  // Build CSS bundle (pruned tokens + gnav CSS) before esbuild
+  execSync('node scripts/build-css.js', { stdio: 'inherit' });
+
   execSync('tsc --noEmit', { stdio: 'inherit' });
   
   await esbuild.build(buildOptions);

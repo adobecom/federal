@@ -4,14 +4,14 @@
 
 .feds-popup .product-list {
   display: grid;
-  grid-template-columns: 283px minmax(0, 1fr);
+  grid-template-columns: 1fr;
   align-items: start;
-  gap: 8px;
-  margin: 0 24px 24px 24px;
-  padding: 24px;
-  background-color: #f6f6f6;
-  border-radius: 16px;
-  width: 96%;
+  gap: 14px;
+  padding: 22px var(--s2a-spacing-md) 28px;
+  /* No token: design #f6f6f6; using gray-75 */
+  background-color: var(--s2a-color-gray-75);
+  border-radius: var(--s2a-border-radius-md);
+  width: 100%;
 }
 
 .product-list .tabs,
@@ -26,28 +26,49 @@
    Tabs
    ========================================= */
 
+.product-list .tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.product-list .tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.product-list .tabs li {
+  list-style: none;
+  flex: 0 0 auto;
+}
+
 .product-list .tabs button.tab {
   display: inline-flex;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 44px;
+  justify-content: center;
+  width: max-content;
+  white-space: nowrap;
+  min-height: 40px;
   border: 0;
+  /* No token: 75px radius */
   border-radius: 75px;
-  padding: 16px 24px;
-  text-align: left;
+  padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
+  text-align: center;
   font-family: var(--body-font-family);
-  font-size: 16px;
-  font-weight: 900;
-  line-height: 24px;
-  color: #2c2c2c;
-  background: #0000000D;
+  font-size: var(--s2a-font-size-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  line-height: 8px;
+  color: var(--s2a-color-content-default);
+  background: var(--s2a-color-transparent-black-08);
   cursor: pointer;
-  margin-bottom: 4px;
 }
 
 .product-list .tabs button.tab[aria-selected="true"] {
-  background: black;
-  color: white;
+  background: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
 }
 
 /* =========================================
@@ -64,8 +85,8 @@
 
 .product-list .tab-content [role="tabpanel"] {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: 1fr;
+  gap: var(--s2a-spacing-xs);
   padding: 0;
   margin: 0;
   list-style: none;
@@ -77,7 +98,15 @@
   justify-content: space-between;
   min-height: 120px;
   height: auto;
-  background-color: white;
+  background-color: var(--s2a-color-gray-25);
+}
+
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover {
+  background: var(--s2a-color-gray-1000);
+}
+
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover .feds-link-group__title {
+  color: var(--s2a-color-gray-25);
 }
 
 /* =========================================
@@ -85,11 +114,49 @@
    ========================================= */
 
 .product-list .product-links a {
-  color: #2c2c2c;
+  color: var(--s2a-color-content-default);
 }
 
-.product-list .product-links .feds-link::after {
-  content: " >";
-  padding-left: 4px;
-  font-size: 16px;
+.product-list .product-links .feds-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.product-list .product-links .feds-link svg {
+  width: 3px;
+  height: 6px;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   Responsive: Desktop (min-width: 1024px)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  .feds-popup .product-list {
+    grid-template-columns: 1fr minmax(0, 3fr);
+    gap: var(--s2a-spacing-xs);
+    padding: var(--s2a-spacing-lg);
+  }
+
+  .product-list .tabs {
+    display: block;
+    overflow: visible;
+  }
+
+  .product-list .tabs li {
+    flex: unset;
+  }
+
+  .product-list .tabs button.tab {
+    width: auto;
+    white-space: normal;
+    min-height: 44px;
+    margin-bottom: var(--s2a-spacing-2xs);
+  }
+
+  .product-list .tab-content [role="tabpanel"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }

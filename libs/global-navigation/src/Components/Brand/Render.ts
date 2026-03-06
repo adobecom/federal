@@ -1,6 +1,4 @@
 import { Brand } from "./Parse";
-import './brand.css';
-
 type ImageData = Extract<Brand['data'], { image: unknown }>['image'];
 
 const renderImage = (image: ImageData, imageOnly: boolean): string => {

@@ -9,8 +9,6 @@ import { LinksCard, parseLinksCard } from "../LinksCard/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
 import { parseFeaturedCard, FeaturedCard } from "../FeaturedCard/Parse";
 import { parsePromoCard, PromoCard } from "../PromoCard/Parse";
-import './mega-menu.css';
-
 
 export type MegaMenu = {
   type: "MegaMenu";

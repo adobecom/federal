@@ -3,23 +3,25 @@
    ========================================= */
 
 .feds-popup .links-card {
-  border-radius: 14px;
-  background: white;
+  border-radius: var(--s2a-border-radius-24); /* Don't have a token */
+  background: var(--s2a-color-gray-25);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px;
+  padding: var(--s2a-spacing-lg);
 }
 
 .feds-popup .links-card .links-card-title {
-  margin: 0 0 16px;
-  font-family: var(--feds-heading-font);
-  font-size: 24px;
+  margin: 0 0 var(--s2a-spacing-md);
+  font-family: var(--s2a-font-family-heading);
+  font-size: var(--s2a-font-size-2xl);
   line-height: 42px;
-  font-weight: 900;
-  color: #000;
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+  color: var(--s2a-color-gray-1000);
 }
+
+
 
 /* =========================================
    Links Card List
@@ -30,15 +32,15 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 16px;
+  gap: var(--s2a-spacing-md);
   line-height: 120%;
 }
 
 .feds-popup .links-card .links-card-links .feds-link {
   padding: 0;
-  color: #000;
-  font-size: 14px;
-  font-weight: 400;
+  color: var(--s2a-color-gray-1000);
+  font-size: var(--s2a-font-size-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-regular);
 }
 
 /* =========================================
@@ -47,11 +49,22 @@
 
 .feds-popup .links-card .links-card-footer {
   width: 100%;
-  margin-top: 20px;
+  margin-top: var(--s2a-spacing-20);
 }
 
 .feds-popup .links-card .links-card-footer .feds-secondary-cta {
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-300);
+}
+
+/* =========================================
+   Responsive: Desktop (min-width: 1024px)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  .feds-popup .links-card {
+    border-radius: var(--s2a-border-radius-16); /* Don't have a token */
+  }
 }

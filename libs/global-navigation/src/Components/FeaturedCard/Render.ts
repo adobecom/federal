@@ -2,8 +2,6 @@ import { link } from "../Link/Render";
 import { Card, FeaturedCard } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
 
-import './featured-card.css';
-
 export const featuredcards = ({
   card
 }: FeaturedCard): HTML => renderCard(card);

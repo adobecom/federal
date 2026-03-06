@@ -14,7 +14,7 @@
 }
 
 .feds-gnav-cards .promo-card__bg-image {
-  border-radius: 24px;
+  border-radius: var(--s2a-border-radius-24);
   display: block;
   height: 100%;
   object-fit: cover;
@@ -32,10 +32,10 @@
 
 .feds-gnav-cards .promo-card__icon {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  width: 24px;
-  height: 24px;
+  top: var(--s2a-spacing-md);
+  left: var(--s2a-spacing-md);
+  width: var(--s2a-spacing-lg);
+  height: var(--s2a-spacing-lg);
 }
 
 .feds-gnav-cards .promo-card__text-content {
@@ -43,26 +43,28 @@
   bottom: 0;
   left: 0;
   display: block;
-  padding: 16px;
+  padding: var(--s2a-spacing-md);
 }
 
 .feds-gnav-cards .promo-card__price,
 .feds-gnav-cards .promo-card__title {
   margin: 0;
-  color: #fff;
+  color: var(--s2a-color-gray-25);
 }
 
 .feds-gnav-cards .promo-card__price {
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 120%;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-font-size-md);
+  line-height: var(--s2a-font-line-height-24);
+  /* No token for percentage */
   letter-spacing: -1%;
 }
 
 .feds-gnav-cards .promo-card__title {
-  font-weight: 900;
-  font-size: 20px;
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+  font-size: var(--s2a-font-size-xl);
   line-height: 100%;
+  /* No token for percentage */
   letter-spacing: -1%;
 }
 
@@ -72,25 +74,25 @@
 
 .feds-gnav-cards .promo-card__cta {
   display: block;
-  margin-top: 24px;
+  margin-top: var(--s2a-spacing-lg);
 }
 
 .feds-gnav-cards .promo-card__cta .feds-secondary-cta {
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-font-size-sm);
   line-height: 130%;
   letter-spacing: 0;
   border: none;
-  background: #fff;
-  color: #000;
-  padding: 3px 24px;
+  background: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  padding: 3px var(--s2a-spacing-lg);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .feds-gnav-cards .promo-card__cta .feds-secondary-cta:hover,
 .feds-gnav-cards .promo-card__cta .feds-secondary-cta:focus {
-  background: #000;
-  color: #fff;
+  background: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
 }
 
 /* =========================================
@@ -103,11 +105,11 @@
   }
 
   .feds-gnav-cards .promo-card__bg-image {
-    border-radius: 16px;
+    border-radius: var(--s2a-border-radius-md);
   }
 
   .feds-gnav-cards .promo-card__cta {
-    margin-top: 16px;
+    margin-top: var(--s2a-spacing-md);
   }
 }
 
@@ -117,7 +119,7 @@
 
 @media (min-width: 1280px) {
   .feds-gnav-cards .promo-card__bg-image {
-    border-radius: 12px;
+    border-radius: var(--s2a-border-radius-12);
   }
 
   .feds-gnav-cards .promo-card__text-content {
@@ -127,8 +129,8 @@
 
   .feds-gnav-cards .promo-card__cta {
     position: absolute;
-    bottom: 16px;
-    right: 16px;
+    bottom: var(--s2a-spacing-md);
+    right: var(--s2a-spacing-md);
     margin-top: 0;
   }
 }
