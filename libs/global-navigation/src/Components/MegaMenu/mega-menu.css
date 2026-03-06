@@ -1,43 +1,56 @@
-/* Mega Menu specific grid structure styles for links-card and promo-card */
+/* Mega Menu grid structure for links-card and promo-card */
+
+/* =========================================
+   Gnav Cards Grid (base)
+   ========================================= */
+
 .feds-gnav-cards > li:has(> :nth-child(2)) {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
+
+/* =========================================
+   Responsive: Desktop (min-width: 900px)
+   ========================================= */
 
 @media (min-width: 900px) {
-    .feds-gnav-cards > li:has(> :nth-child(2)) {
-        gap: 8px;
-    }
+  .feds-gnav-cards > li:has(> :nth-child(2)) {
+    gap: 8px;
+  }
 
-    .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) {
-        align-items: stretch;
-    }
+  .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) {
+    align-items: stretch;
+  }
 
-    .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) article {
-        height: 100%;
-    }
+  .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) article {
+    height: 100%;
+  }
 
-    .feds-gnav-cards > li:has(.promo-card, .links-card) {
-      width: calc(33.33% - 5.33px);
-    }
+  .feds-gnav-cards > li:has(.promo-card, .links-card) {
+    width: calc(33.33% - 5.33px);
+  }
 }
 
+/* =========================================
+   Responsive: Large Desktop (min-width: 1280px)
+   ========================================= */
+
 @media (min-width: 1280px) {
-    .feds-gnav-cards > li:has(.promo-card, .links-card) {
-      width: calc(25% - 6px);
-    }
+  .feds-gnav-cards > li:has(.promo-card, .links-card) {
+    width: calc(25% - 6px);
+  }
 
-    .feds-gnav-cards > li:has(.promo-card) {
-        width: calc(50% - 4px);
-    }
+  .feds-gnav-cards > li:has(.promo-card) {
+    width: calc(50% - 4px);
+  }
 
-    .feds-gnav-cards > li:has(> :nth-child(2)) {
-        width: calc(50% - 4px);
-        flex-direction: row;
-    }
+  .feds-gnav-cards > li:has(> :nth-child(2)) {
+    width: calc(50% - 4px);
+    flex-direction: row;
+  }
 
-    .feds-gnav-cards > li:has(> :nth-child(2)) article {
-        width: calc(50% - 4px);
-    }
+  .feds-gnav-cards > li:has(> :nth-child(2)) article {
+    width: calc(50% - 4px);
+  }
 }

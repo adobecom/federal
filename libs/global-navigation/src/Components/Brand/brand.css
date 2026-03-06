@@ -1,7 +1,52 @@
+/* =========================================
+   Brand Container
+   ========================================= */
+
 .feds-brand-container {
-    display: flex;
-    flex-shrink: 0;
+  display: flex;
+  flex-shrink: 0;
 }
+
+li.feds-brand-wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  padding-left: 20px;
+}
+
+/* =========================================
+   Brand / Logo
+   ========================================= */
+
+.feds-brand,
+.feds-logo {
+  align-items: center;
+  outline-offset: 2px;
+  padding: 0 var(--feds-gutter);
+  column-gap: 10px;
+}
+
+.feds-brand-image picture,
+.feds-brand-image img,
+.feds-brand-image svg,
+.feds-logo-image picture,
+.feds-logo-image img,
+.feds-logo-image svg {
+  width: 100%;
+  display: block;
+}
+
+.feds-brand-label,
+.feds-logo-label {
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--feds-color-adobeBrand);
+}
+
+/* =========================================
+   Brand Image (Mobile / Desktop variants)
+   ========================================= */
 
 .feds-brand-image svg {
   color: white;
@@ -23,56 +68,31 @@
   width: 67px;
 }
 
-li.feds-brand-wrapper {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-start;
-  padding-left: 20px;
-}
-
-.feds-brand,
-.feds-logo {
-    align-items: center;
-    outline-offset: 2px;
-    padding: 0 var(--feds-gutter);
-    column-gap: 10px;
-}
-
-.feds-brand-image picture,
-.feds-brand-image img,
-.feds-brand-image svg,
-.feds-logo-image picture,
-.feds-logo-image img,
-.feds-logo-image svg {
-    width: 100%;
-    display: block;
-}
-
-.feds-brand-label,
-.feds-logo-label {
-    flex-shrink: 0;
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--feds-color-adobeBrand);
-}
+/* =========================================
+   Responsive: Desktop (min-width: 900px)
+   ========================================= */
 
 @media (min-width: 900px) {
-    li.feds-brand-wrapper {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      padding-left: 0;
-    }
-    .feds-brand-image+.feds-brand-label {
-        display: flex;
-    }
-    .feds-brand-image.desktop-brand{
-      display: inherit;
-    }
-    header:has(:popover-open) .feds-brand-image svg {
-      color: black;
-    }
-    .feds-brand-image.mobile-brand {
-      display: none;
-    }
+  li.feds-brand-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding-left: 0;
+  }
+
+  .feds-brand-image + .feds-brand-label {
+    display: flex;
+  }
+
+  .feds-brand-image.desktop-brand {
+    display: inherit;
+  }
+
+  header:has(:popover-open) .feds-brand-image svg {
+    color: black;
+  }
+
+  .feds-brand-image.mobile-brand {
+    display: none;
+  }
 }

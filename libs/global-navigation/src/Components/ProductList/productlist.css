@@ -1,3 +1,7 @@
+/* =========================================
+   Product List Container
+   ========================================= */
+
 .feds-popup .product-list {
   display: grid;
   grid-template-columns: 283px minmax(0, 1fr);
@@ -17,6 +21,10 @@
   padding: 0;
   margin: 0;
 }
+
+/* =========================================
+   Tabs
+   ========================================= */
 
 .product-list .tabs button.tab {
   display: inline-flex;
@@ -41,6 +49,10 @@
   background: black;
   color: white;
 }
+
+/* =========================================
+   Tab Content / Tabpanels
+   ========================================= */
 
 .product-list .tab-content > li {
   list-style: none;
@@ -67,6 +79,10 @@
   height: auto;
   background-color: white;
 }
+
+/* =========================================
+   Product Links
+   ========================================= */
 
 .product-list .product-links a {
   color: #2c2c2c;

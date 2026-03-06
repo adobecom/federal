@@ -4,15 +4,19 @@
  */
 
 :root {
-    --feds-heading-font: 'Adobe Clean Display', adobe-clean-display, adobe-clean, 'Trebuchet MS', sans-serif;
-    --feds-link-color-dark: #000;
-    --feds-link-color-light: #FFFFFF;
-    --feds-link-color: #000;
-    --feds-nav-height: 64px;
-    --feds-gutter: 8px;
+  --feds-heading-font: 'Adobe Clean Display', adobe-clean-display, adobe-clean, 'Trebuchet MS', sans-serif;
+  --feds-link-color-dark: #000;
+  --feds-link-color-light: #FFFFFF;
+  --feds-link-color: #000;
+  --feds-nav-height: 64px;
+  --feds-gutter: 8px;
 }
 
-header.global-navigation { 
+/* =========================================
+   Header Shell
+   ========================================= */
+
+header.global-navigation {
   width: 100%;
 }
 
@@ -25,12 +29,12 @@ header.global-navigation:has(.feds-popup:popover-open) {
 }
 
 .global-navigation.site-pivot {
-    visibility: visible;
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10;
+  visibility: visible;
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
 .global-navigation.site-pivot:has(:popover-open) {
@@ -41,13 +45,14 @@ header.global-navigation:has(.feds-popup:popover-open) {
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
   background-color: white;
 }
+
 .global-navigation.site-pivot:has(:popover-open) .universal-nav-container .profile-signed-out button,
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button:hover {
   color: inherit;
 }
 
 .global-navigation.site-pivot .feds-utilities {
-  margin-left:auto;
+  margin-left: auto;
 }
 
 .global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-brand-container {
@@ -58,6 +63,54 @@ header.global-navigation:has(.feds-popup:popover-open) {
   opacity: 1;
 }
 
+/* =========================================
+   Navigation Bar
+   ========================================= */
+
+.global-navigation.site-pivot nav {
+  display: flex;
+  align-items: center;
+  height: var(--feds-nav-height);
+  justify-content: flex-start;
+}
+
+.global-navigation nav > ul {
+  display: flex;
+  width: 100%;
+  max-width: var(--feds-maxWidth-nav);
+  height: inherit;
+  align-items: center;
+  padding-left: 0;
+  background: inherit;
+}
+
+.global-navigation nav > ul > li {
+  display: flex;
+  align-items: center;
+}
+
+.global-navigation.site-pivot ul {
+  list-style: none;
+  margin: 0;
+}
+
+/* =========================================
+   Nav Links
+   ========================================= */
+
+.feds-link {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--feds-heading-font);
+  display: flex;
+  align-items: center;
+  border: 0;
+  background-color: transparent;
+  padding: 12px;
+  color: var(--feds-link-color-light);
+  opacity: 100%;
+}
+
 .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link {
   color: var(--feds-link-color-dark);
   font-family: var(--feds-heading-font);
@@ -65,130 +118,82 @@ header.global-navigation:has(.feds-popup:popover-open) {
   font-weight: 900;
 }
 
-.global-navigation .feds-gnav-items > li > .feds-link:hover {
+.global-navigation:not(.feds-header-scrolled):not(:has(:popover-open)) .feds-gnav-items > li > .feds-link:hover {
   color: #fff;
 }
-
-/* .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link::after {
-  content: '';
-  position: absolute;
-  width: 9.271px;
-  height: 9.179px;
-  transform: rotate(45deg);
-  border-color: var(--feds-color-black-v2);
-  right: 24px;
-  border-right: 2px solid var(--feds-color-black-v2);
-  border-top: 2px solid var(--feds-color-black-v2);
-} */
 
 .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link:has(~ :popover-open) {
   opacity: 100%;
 }
 
-
-.global-navigation nav > ul {
-    display: flex;
-    width: 100%;
-    height: inherit;
-    align-items: center;
-    background: inherit
-}
-
-
-.feds-link {
-    font-size: 14px;
-    font-weight: 700;
-    font-family: var(--feds-heading-font);
-    display: flex;
-    align-items: center;
-    border: 0;
-    background-color: transparent;
-    padding: 12px;
-    color: var(--feds-link-color-light);
-    opacity: 100%;
-}
-
-.global-navigation.site-pivot nav {
-    display: flex;
-    align-items: center;
-    height: var(--feds-nav-height);
-    justify-content: flex-start;
-}
-
-.global-navigation nav > ul {
-    display: flex;
-    width: 100%;
-    max-width: var(--feds-maxWidth-nav);
-    height: inherit;
-    align-items: center;
-    padding-left: 0;
-}
-
-.global-navigation nav > ul > li {
-    display: flex;
-    align-items: center;
-}
+/* =========================================
+   Menu Wrapper (Mobile Slide-out)
+   ========================================= */
 
 .global-navigation nav > ul > li.feds-menu-wrapper {
-    position: fixed;
-    top: var(--feds-nav-height);
-    left: 0;
-    right: 20px;
-    flex-direction: column;
-    height: calc(100dvh - var(--feds-nav-height));
-    border: 0;
-    width: 100%;
-    translate: -200vw 0;
-    opacity: 0;
-    display: flex;
-    visibility: hidden;
-    color: var(--feds-link-color-dark);
+  position: fixed;
+  top: var(--feds-nav-height);
+  left: 0;
+  right: 20px;
+  flex-direction: column;
+  height: calc(100dvh - var(--feds-nav-height));
+  border: 0;
+  width: 100%;
+  translate: -200vw 0;
+  opacity: 0;
+  display: flex;
+  visibility: hidden;
+  color: var(--feds-link-color-dark);
 }
 
 .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
-    transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0.5s;
+  transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0.5s;
 }
 
 .global-navigation nav > ul > li.feds-menu-wrapper:popover-open {
-    display: flex;
-    translate: 0;
-    opacity: 1;
-    z-index: 2;
-    transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0s;
-    visibility: visible;
-    align-items: flex-start;
-    padding: 0;
+  display: flex;
+  translate: 0;
+  opacity: 1;
+  z-index: 2;
+  transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0s;
+  visibility: visible;
+  align-items: flex-start;
+  padding: 0;
 }
 
 .global-navigation nav > ul > li.feds-menu-wrapper:popover-open .feds-gnav-items {
-    align-items: flex-start;
-    padding: 12px 24px;
-    width: calc(100% - 48px);
+  align-items: flex-start;
+  padding: 12px 24px;
+  width: calc(100% - 48px);
 }
 
+/* =========================================
+   Nav Toggle (Hamburger)
+   ========================================= */
+
 .global-navigation nav .feds-nav-toggle {
-    margin: 0;
-    margin-left: 4px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    box-shadow: none;
-    color: var(--feds-color-hamburger);
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: 300;
+  margin: 0;
+  margin-left: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--feds-color-hamburger);
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 300;
 }
 
 .global-navigation nav .feds-nav-toggle svg {
-    width: 14px;
-    height: 7px;
-    flex-shrink: 0;
-    color: white;
+  width: 14px;
+  height: 7px;
+  flex-shrink: 0;
+  color: white;
 }
 
 .global-navigation.feds-header-scrolled nav .feds-nav-toggle svg {
@@ -196,19 +201,42 @@ header.global-navigation:has(.feds-popup:popover-open) {
 }
 
 .global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-nav-toggle svg {
-    display: none;
+  display: none;
 }
 
 .global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-nav-toggle::before {
-    content: "\2715"; 
-    color: var(--feds-color-black-v2);
-    font-size: 20px;
-    font-weight: 300;
+  content: "\2715";
+  color: var(--feds-color-black-v2);
+  font-size: 20px;
+  font-weight: 300;
 }
 
-.global-navigation.site-pivot ul {
-    list-style: none;
-    margin: 0;
+/* =========================================
+   Utilities (App Switcher, Profile)
+   ========================================= */
+
+.global-navigation .unav-comp-app-switcher.unav-comp-icon svg {
+  fill: white;
+}
+
+.global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg {
+  fill: #000;
+}
+
+.global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button {
+  border: 1px solid #000;
+}
+
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
+  fill: inherit;
+}
+
+/* =========================================
+   Popup (Mega Menu Container)
+   ========================================= */
+
+body:has(:popover-open) {
+  overflow: hidden;
 }
 
 .feds-popup {
@@ -227,26 +255,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
 .feds-popup:popover-open {
   display: block;
   background: #f8f8f8;
-}
-
-.global-navigation .unav-comp-app-switcher.unav-comp-icon svg {
-  fill: white;
-}
-
-.global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg {
-  fill: #000;
-}
-
-.global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button {
-  border: 1px solid #000;
-}
-
-header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
-  fill: inherit;
-}
-
-body:has(:popover-open) {
-  overflow: hidden;
 }
 
 .feds-popup > * {
@@ -286,6 +294,10 @@ body:has(:popover-open) {
   color: #2c2c2c;
 }
 
+/* =========================================
+   Link Groups
+   ========================================= */
+
 .feds-popup .feds-link-group {
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
@@ -300,9 +312,10 @@ body:has(:popover-open) {
 
 .feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover {
   background: #000;
-  .feds-link-group__title {
-    color: #fff;
-  }
+}
+
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover .feds-link-group__title {
+  color: #fff;
 }
 
 .feds-popup .feds-link-group:hover .feds-link-group__title,
@@ -412,6 +425,9 @@ body:has(:popover-open) {
   justify-content: space-between;
 }
 
+/* =========================================
+   Secondary CTAs
+   ========================================= */
 
 .feds-popup .feds-secondary-cta {
   display: inline-flex;
@@ -433,41 +449,45 @@ body:has(:popover-open) {
   background: #f5f5f5;
 }
 
+/* =========================================
+   Responsive: Desktop (min-width: 900px)
+   ========================================= */
+
 @media (min-width: 900px) {
   .global-navigation nav .feds-nav-toggle {
-      display: none;
+    display: none;
   }
 
   .global-navigation nav > ul > li.feds-menu-wrapper {
-      position: static;
-      display: flex;
-      flex-direction: row;
-      flex-grow: 1;
-      width: auto;
-      height: unset;
-      border: 0;
-      outline: 0;
-      box-shadow: none;
-      justify-content: space-between;
-      background-color: transparent;
-      opacity: 1;
-      visibility: visible;
-      translate: unset;
-      transition: unset;
+    position: static;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    width: auto;
+    height: unset;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    justify-content: space-between;
+    background-color: transparent;
+    opacity: 1;
+    visibility: visible;
+    translate: unset;
+    transition: unset;
   }
 
   .global-navigation.site-pivot nav {
-      display: flex;
-      align-items: center;
-      padding-left: 24px;
-      justify-content: flex-start;
+    display: flex;
+    align-items: center;
+    padding-left: 24px;
+    justify-content: flex-start;
   }
 
   .global-navigation nav .feds-gnav-items {
-      align-items: center;
-      padding-left: 0;
-      margin: 0;
-      display: flex;
+    align-items: center;
+    padding-left: 0;
+    margin: 0;
+    display: flex;
   }
 
   .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link {
@@ -503,12 +523,19 @@ body:has(:popover-open) {
   }
 }
 
+/* =========================================
+   Responsive: Tablet (max-width: 1199px)
+   ========================================= */
 
 @media (max-width: 1199px) {
   .product-list .tab-content [role="tabpanel"] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* =========================================
+   Responsive: Mobile (max-width: 899px)
+   ========================================= */
 
 @media (max-width: 899px) {
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
@@ -531,7 +558,6 @@ body:has(:popover-open) {
 
   .feds-popup {
     inset: var(--feds-nav-height) 0 0 0;
-    /* max-height: none; */
   }
 
   .feds-popup .product-list {
@@ -572,10 +598,14 @@ body:has(:popover-open) {
   }
 }
 
+/* =========================================
+   Scroll Animations
+   ========================================= */
+
 @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
   @keyframes scroll-transition-main-nav {
     from {
-      background-color:transparent;
+      background-color: transparent;
       width: 100%;
       border-radius: 0px;
       border: solid 0px rgba(0, 0, 0, 0);
@@ -606,6 +636,7 @@ body:has(:popover-open) {
     animation-timeline: scroll();
     animation-range: 0px 100px;
   }
+
   header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) .feds-brand-image svg,
   header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) .feds-nav-toggle svg {
     animation: color-transition linear forwards;
@@ -623,6 +654,7 @@ body:has(:popover-open) {
     border: solid 1px rgba(0, 0, 0, 0.05);
     backdrop-filter: blur(16.5px);
   }
+
   header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) .feds-brand-image svg,
   header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) .feds-nav-toggle svg {
     color: black;

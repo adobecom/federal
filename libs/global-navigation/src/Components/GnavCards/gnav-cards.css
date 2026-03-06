@@ -1,3 +1,7 @@
+/* =========================================
+   Gnav Cards Container
+   ========================================= */
+
 .feds-popup .feds-gnav-cards {
   list-style: none;
   margin: 0;
@@ -11,6 +15,10 @@
 .feds-popup .feds-gnav-cards > li {
   min-width: 0;
 }
+
+/* =========================================
+   Responsive: Desktop (min-width: 900px)
+   ========================================= */
 
 @media (min-width: 900px) {
   .feds-popup .feds-gnav-cards {
