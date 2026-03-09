@@ -41,6 +41,7 @@
 .featured-card .feds-link {
   padding: var(--s2a-spacing-md) 0;
   color: var(--s2a-color-gray-1000);
+  display: inline-flex;
 }
 
 .featured-card span {
