@@ -31,10 +31,10 @@ export const parseFeaturedCard = (
 const parseCard = (
   element: Element
 ): Parsed<Card, RecoverableError> => {
-  const eyeBrowElement = element.querySelector('h4') || null;
+  const eyeBrowElement = element.querySelector('h5') || null;
   if (!eyeBrowElement)
     throw new RecoverableError("Eye brow element not found");
-  const titleElement = element.querySelector('h3') || null;
+  const titleElement = element.querySelector('h4') || null;
   const subtitleElement = titleElement?.nextElementSibling || null;
   if (!titleElement)
     throw new IrrecoverableError("Expected title");
