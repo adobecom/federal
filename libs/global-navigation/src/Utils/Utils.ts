@@ -285,8 +285,10 @@ export const replaceDotMedia = (path: string, ele: Element): void => {
       if (!attrValue) return;
       
       try {
-        // Construct absolute URL by resolving relative path against source location
-        // Then federate the URL to ensure it points to the correct content source
+        // Construct absolute URL by resolving
+        // relative path against source location
+        // Then federate the URL to ensure it 
+        // points to the correct content source
         const absoluteUrl = federateUrl(
           new URL(attrValue, new URL(path, window.location.href)).href
         );
