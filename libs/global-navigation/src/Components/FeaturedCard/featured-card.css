@@ -43,10 +43,17 @@
   color: var(--s2a-color-gray-1000);
 }
 
-.featured-card > div > a.feds-link::after {
-  content: ">";
-  margin-left: 6px;
-  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+.featured-card span {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+}
+
+.featured-card span svg {
+  margin-top: 2px;
+  color: var(--s2a-color-gray-1000);
 }
 
 .featured-card a.feds-secondary-cta {
@@ -146,5 +153,8 @@
   }
   .featured-card .footer-container a.feds-secondary-cta:hover {
     background: var(--s2a-color-gray-25);
+  }
+  .featured-card:hover span svg {
+    color: var(--s2a-color-gray-25);
   }
 }

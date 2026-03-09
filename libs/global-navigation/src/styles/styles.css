@@ -221,12 +221,20 @@ header.global-navigation:has(.feds-popup:popover-open) {
   fill: var(--s2a-color-gray-1000);
 }
 
+.global-navigation .unav-comp-app-switcher.unav-comp-icon:hover svg {
+  fill: var(--s2a-colo-gray-1000);
+}
+
 .global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button {
   border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
 }
 
 header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
   fill: inherit;
+}
+
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
+  display:none !important;
 }
 
 /* =========================================
@@ -536,7 +544,11 @@ body:has(:popover-open) {
     order: 2;
     margin-left: var(--s2a-spacing-xs);
     flex-shrink: 0;
-    transform: rotate(-90deg);
+    transform: rotate(-90deg) scale(2.5);
+  }
+
+  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
+    stroke-width: 0.5;
   }
 
   .feds-popup {

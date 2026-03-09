@@ -1,6 +1,7 @@
 import { link } from "../Link/Render";
 import { Card, FeaturedCard } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
+import { icons } from "../../Utils/Utils";
 
 export const featuredcards = ({
   card
@@ -19,7 +20,7 @@ const renderCard = ({
       <div class="featured-eyebrow">${eyeBrow}</div>
       <h4>${title}</h4>
       <div class="featured-subtitle">${subtitle}</div>
-      ${link(bodyLink)}
+      <span>${link(bodyLink)}${icons.chevronRight}</span>
     </div>
     <div class="footer-container">
       ${secondaryCTA(footerCTA)}
