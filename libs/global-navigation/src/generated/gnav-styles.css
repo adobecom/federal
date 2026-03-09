@@ -172,7 +172,7 @@ header.global-navigation:has(.feds-popup:popover-open) {
 }
 
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
-  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-25);
 }
 
 .global-navigation.site-pivot:has(:popover-open) .universal-nav-container .profile-signed-out button,
@@ -364,6 +364,7 @@ header.global-navigation:has(.feds-popup:popover-open) {
 }
 
 .global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button {
+  color: var(--s2a-color-gray-1000);
   border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
 }
 
@@ -606,7 +607,7 @@ body:has(:popover-open) {
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .global-navigation nav .feds-nav-toggle {
     display: none;
   }
@@ -743,6 +744,28 @@ body:has(:popover-open) {
     animation-timeline: scroll();
     animation-range: 0px 100px;
   }
+
+  @media (max-width: 766px) {
+    header.global-navigation:has(.unav-comp-app-switcher-open) {
+      animation: none;
+    }
+
+    header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) {
+      animation: none;
+      background-color: rgba(255, 255, 255);
+      border-radius: 6px;
+      width: calc(100% - var(--s2a-spacing-xs));
+      margin: var(--s2a-spacing-2xs) var(--s2a-spacing-2xs) 0;
+      border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
+    }
+
+    header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-brand-image svg,
+    header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-nav-toggle svg {
+      animation: none;
+      color: var(--s2a-color-gray-1000);
+    }
+  }
+
 }
 
 @supports (not ((animation-timeline: scroll()) and (animation-range: 0% 100%))) {
@@ -1662,7 +1685,7 @@ ul.tabs .product-links {
   flex-direction: column;
   padding: var(--s2a-spacing-lg);
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   overflow: hidden;
 }
 
