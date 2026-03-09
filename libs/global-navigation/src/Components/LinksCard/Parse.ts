@@ -35,7 +35,7 @@ export const parseLinksCard = (
 const parseCard = (
   element: Element
 ): Parsed<LinksCardItem, RecoverableError> => {
-  const titleElement = element.querySelector('h1, h2, h3') || null;
+  const titleElement = element.querySelector('h2, h3') || null;
   if (!titleElement) {
     throw new IrrecoverableError("Expected links card title");
   }
