@@ -367,11 +367,11 @@ header.global-navigation:has(.feds-popup:popover-open) {
   border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
 }
 
-header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
+header.global-navigation:has(:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
   fill: inherit;
 }
 
-header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
+header.global-navigation:has(:popover-open) .unav-comp-tooltip {
   display:none !important;
 }
 
