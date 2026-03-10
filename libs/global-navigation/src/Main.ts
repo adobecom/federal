@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers } from "./Utils/Utils";
 import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -199,6 +199,7 @@ export const postRenderingTasks = async (
   initKeyboardNav(input.mountpoint);
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
+  initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   
   // Initialize merch links after DOM is rendered
@@ -255,14 +256,17 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
 
 const initPopoverCloseOnResize = (mountpoint: HTMLElement): void => {
   isDesktop.addEventListener('change', () => {
-    const menuPopover = mountpoint.querySelector<
-      HTMLElement & { hidePopover?: () => void }
-    >('#feds-menu-wrapper');
-    menuPopover?.classList.remove('feds-menu-active');
-    menuPopover?.hidePopover?.();
-    mountpoint.querySelector<
-      HTMLElement & { hidePopover?: () => void }
-    >('.feds-popup:popover-open')?.hidePopover?.();
+    closePopovers(mountpoint);
+  });
+};
+
+const initPopoverCloseOnUnavInteraction = (mountpoint: HTMLElement): void => {
+  [...mountpoint.querySelector('.feds-utilities #universal-nav')?.children ?? []].forEach(child => {
+    child.addEventListener('click', () => closePopovers(mountpoint));
+    child.addEventListener('keydown', (event) => {
+      if ((event as KeyboardEvent).key === 'Enter')
+        closePopovers(mountpoint);
+    });
   });
 };
 

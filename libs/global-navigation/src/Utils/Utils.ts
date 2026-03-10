@@ -901,3 +901,14 @@ export function getMiloLocaleSettings(
     locale: `${language}_${country}`,
   };
 }
+
+export const closePopovers = (mountpoint: HTMLElement): void => {
+  const menuPopover = mountpoint.querySelector<
+    HTMLElement & { hidePopover?: () => void }
+  >('#feds-menu-wrapper');
+  menuPopover?.classList.remove('feds-menu-active');
+  menuPopover?.hidePopover?.();
+  mountpoint.querySelector<
+    HTMLElement & { hidePopover?: () => void }
+  >('.feds-popup:popover-open')?.hidePopover?.();
+};
