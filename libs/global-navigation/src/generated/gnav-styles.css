@@ -541,9 +541,7 @@ body:has(:popover-open) {
 }
 
 .feds-popup .feds-secondary-cta:hover {
-  /* No token: design #f5f5f5; using gray-75 */
   background: var(--s2a-color-gray-75);
-  text-decoration: underline;
 }
 
 /* =========================================
@@ -1421,6 +1419,11 @@ ul.tabs .product-links {
 .product-list .tabs button.tab[aria-selected="true"] {
   background: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
+}
+
+.product-list .tabs button.tab:hover {
+  color: var(--s2a-color-gray-25);
+  background-color: var(--s2a-color-content-subtle);
 }
 
 /* =========================================

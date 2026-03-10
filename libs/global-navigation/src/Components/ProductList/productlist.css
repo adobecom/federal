@@ -71,6 +71,11 @@
   color: var(--s2a-color-gray-25);
 }
 
+.product-list .tabs button.tab:hover {
+  color: var(--s2a-color-gray-25);
+  background-color: var(--s2a-color-content-subtle);
+}
+
 /* =========================================
    Tab Content / Tabpanels
    ========================================= */
