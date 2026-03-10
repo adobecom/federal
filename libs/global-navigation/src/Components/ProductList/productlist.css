@@ -151,7 +151,6 @@
 
   .product-list .tabs button.tab {
     width: auto;
-    white-space: normal;
     min-height: 44px;
     margin-bottom: var(--s2a-spacing-2xs);
   }
