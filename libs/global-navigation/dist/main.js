@@ -1013,6 +1013,13 @@ header.global-navigation.feds-header-scrolled {
     backdrop-filter 0.3s ease;
 }
 
+header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) {
+  backdrop-filter: none;
+  transform: none;
+  transition: none;
+}
+
+
 header.global-navigation.feds-header-scrolled:has(:popover-open) {
   /* Cancel the scroll-driven animation so transition can take over */
   animation: none;
