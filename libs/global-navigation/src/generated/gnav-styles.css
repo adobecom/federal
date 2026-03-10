@@ -404,7 +404,7 @@ body:has(:popover-open) {
   color: var(--s2a-color-content-default);
 }
 
-@media(max-width: 767px) {
+@media(max-width: 1023px) {
 
   .feds-popup .feds-link-group {
     border-radius: var(--s2a-border-radius-24);
@@ -547,10 +547,10 @@ body:has(:popover-open) {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .global-navigation nav .feds-nav-toggle {
     display: none;
   }
@@ -616,10 +616,11 @@ body:has(:popover-open) {
    Responsive: Mobile (max-width: 766px)
    ========================================= */
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
     width: 100%;
     justify-content: space-between;
+    text-align: left;
   }
 
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
@@ -688,7 +689,7 @@ body:has(:popover-open) {
     animation-range: 0px 100px;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     header.global-navigation:has(.unav-comp-app-switcher-open) {
       animation: none;
     }
@@ -972,10 +973,10 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;
@@ -1043,10 +1044,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .feds-gnav-cards > li:has(> :nth-child(2)) {
     gap: var(--s2a-spacing-xs);
   }
@@ -1116,10 +1117,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .feds-popup .feds-gnav-cards {
     display: flex;
     flex-wrap: nowrap;
@@ -1231,10 +1232,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .feds-gnav-cards .promo-card {
     height: 100%;
   }
@@ -1333,10 +1334,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .feds-popup .links-card {
     border-radius: var(--s2a-border-radius-16); /* Don't have a token */
   }
@@ -1474,10 +1475,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .feds-popup .product-list {
     grid-template-columns: 1fr minmax(0, 3fr);
     gap: var(--s2a-spacing-xs);
@@ -1763,7 +1764,7 @@ ul.tabs .product-links {
    Responsive: Mobile (max-width: 1023px)
    ========================================= */
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .panels {
     display: block !important;
     grid-template-columns: none !important;
@@ -1868,10 +1869,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .feds-popup .featured-card {
     /* No token: 12px radius on desktop */
     border-radius: 12px;
@@ -1909,7 +1910,7 @@ ul.tabs .product-links {
    Hover: Desktop with pointer device only
    ========================================= */
 
-@media (min-width: 768px) and (hover: hover) {
+@media (min-width: 1024px) and (hover: hover) {
   .featured-card,
   .featured-card .featured-eyebrow,
   .featured-card h4,

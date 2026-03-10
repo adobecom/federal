@@ -1,5 +1,6 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { parseSecondaryCTA, SecondaryCTA } from "../CTA/Parse";
+import { isMerchLink } from "../../Utils/Utils";
 
 export type PromoCard = {
   type: "PromoCard";
@@ -13,10 +14,12 @@ export type PromoCardData = {
   iconSrc: string;
   title: string;
   cta: SecondaryCTA | null;
-  price: string;
+  priceText: string;
+  priceHref: string;
+  isPriceMerchLink: boolean;
 };
 
-const Errors = {
+const ERRORS = {
   MissingBackgroundImageSection: "Promo card is missing background image section",
   MissingBackgroundImage: "Promo card is missing background image",
   MissingBackgroundImageAlt: "Promo card background image is missing alt text",
@@ -28,6 +31,7 @@ const Errors = {
   MissingTitleElement: "Promo card is missing title element",
   MissingTitleText: "Promo card is missing title text",
   MissingSecondaryCtaAnchor: "Promo card is missing secondary CTA anchor",
+  MissingPriceLink: "Promo card is missing price link",
 };
 
 export const parsePromoCard = (
@@ -36,51 +40,54 @@ export const parsePromoCard = (
     const [bgImageSection, contentSection] = element.querySelectorAll(':scope > div');
     const errors = new Set<RecoverableError>();
     if (bgImageSection === undefined)
-      throw new IrrecoverableError(Errors.MissingBackgroundImageSection);
+      throw new IrrecoverableError(ERRORS.MissingBackgroundImageSection);
 
     const bgImageElement: HTMLImageElement | null = bgImageSection.querySelector(':scope picture:not(:scope p picture) img') ?? null;
     if (bgImageElement === null)
-      errors.add(new RecoverableError(Errors.MissingBackgroundImage));
+      errors.add(new RecoverableError(ERRORS.MissingBackgroundImage));
 
     const bgImageAlt = bgImageElement?.getAttribute('alt') ?? "";
     if (bgImageAlt === "")
-      errors.add(new RecoverableError(Errors.MissingBackgroundImageAlt));
+      errors.add(new RecoverableError(ERRORS.MissingBackgroundImageAlt));
 
     const bgImageSrc = bgImageElement?.getAttribute('src') ?? "";
     if (bgImageSrc === "")
-      errors.add(new RecoverableError(Errors.MissingBackgroundImageSrc));
+      errors.add(new RecoverableError(ERRORS.MissingBackgroundImageSrc));
 
     if (contentSection === undefined)
-      throw new IrrecoverableError(Errors.MissingContentSection);
+      throw new IrrecoverableError(ERRORS.MissingContentSection);
 
     const icon: HTMLAnchorElement | null = contentSection.querySelector('a[href$=".svg"]') ?? null;
     if (icon === null)
-      errors.add(new RecoverableError(Errors.MissingIcon));
+      errors.add(new RecoverableError(ERRORS.MissingIcon));
 
     const [iconSrc, iconAlt] = (icon?.textContent?.split("|") ?? ["", ""]).map(s => s.trim());
     if (iconSrc === "")
-      errors.add(new RecoverableError(Errors.MissingIconSrc));
+      errors.add(new RecoverableError(ERRORS.MissingIconSrc));
 
     if (iconAlt === "")
-      errors.add(new RecoverableError(Errors.MissingIconAlt));
+      errors.add(new RecoverableError(ERRORS.MissingIconAlt));
+
+    const priceLink = contentSection.querySelector('p > a:not([href$=".svg"])') ?? null;
+    const priceText = priceLink?.textContent?.trim() ?? "";
+    const priceHref = priceLink?.getAttribute('href') ?? "";
+    const isPriceMerchLink = priceHref ? isMerchLink(priceHref) : false;
+    
+    if (priceLink === null)
+      errors.add(new RecoverableError(ERRORS.MissingPriceLink));
 
     const titleElement = contentSection.querySelector('p > strong') ?? null;
-
-    // TODO: Price value is currently hardcoded
-
     if (titleElement === null)
-      throw new IrrecoverableError(Errors.MissingTitleElement);
+      throw new IrrecoverableError(ERRORS.MissingTitleElement);
 
     const title = titleElement?.textContent ?? "";
     if (title === "")
-      errors.add(new RecoverableError(Errors.MissingTitleText));
+      errors.add(new RecoverableError(ERRORS.MissingTitleText));
 
     const secondaryCtaAnchor = contentSection.querySelector('em > a');
     if (secondaryCtaAnchor === null)
-      errors.add(new RecoverableError(Errors.MissingSecondaryCtaAnchor));
+      errors.add(new RecoverableError(ERRORS.MissingSecondaryCtaAnchor));
 
-    // Replace with actual price data when available
-    const price = "$29.90/mo"
 
     const [cta, ctaErrors]
       = (() : Parsed<SecondaryCTA | null, RecoverableError> => {
@@ -107,7 +114,9 @@ export const parsePromoCard = (
           iconSrc,
           title,
           cta,
-          price,
+          priceText,
+          priceHref,
+          isPriceMerchLink,
         },
       },
       [...errors]

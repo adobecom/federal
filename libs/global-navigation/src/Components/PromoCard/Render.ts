@@ -1,5 +1,6 @@
 import { PromoCard, PromoCardData } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
+
 export const promoCard = ({ card }: PromoCard): HTML => renderCard(card);
 
 const renderCard = ({
@@ -9,7 +10,9 @@ const renderCard = ({
   iconSrc,
   title,
   cta,
-  price,
+  priceText,
+  priceHref,
+  isPriceMerchLink,
 }: PromoCardData): HTML => `
   <article class="promo-card" daa-lh="promo-card">
     ${
@@ -29,7 +32,9 @@ const renderCard = ({
           : ""
       }
       <div class="promo-card__text-content">
-        <p class="promo-card__price">${price}</p>
+        ${priceHref && isPriceMerchLink ? `<p class="promo-card__price">
+          <a href="${priceHref}" class="merch">${priceText}</a>
+        </p>` : ''}
         <p class="promo-card__title" role="heading" aria-level="2">
           ${title}
         </p>

@@ -4,6 +4,7 @@ import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
+import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop } from "./Utils/Utils";
@@ -199,6 +200,13 @@ export const postRenderingTasks = async (
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
+  
+  // Initialize merch links after DOM is rendered
+  const merchLinkErrors = await initMerchLinks(input.mountpoint);
+  merchLinkErrors.forEach((error: RecoverableError) => {
+    errors.add(error);
+    lanaLog(error.message);
+  });
   
   const reloadUnav
     = unav instanceof RecoverableError

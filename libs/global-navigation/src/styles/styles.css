@@ -266,7 +266,7 @@ body:has(:popover-open) {
   color: var(--s2a-color-content-default);
 }
 
-@media(max-width: 767px) {
+@media(max-width: 1023px) {
 
   .feds-popup .feds-link-group {
     border-radius: var(--s2a-border-radius-24);
@@ -409,10 +409,10 @@ body:has(:popover-open) {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .global-navigation nav .feds-nav-toggle {
     display: none;
   }
@@ -478,10 +478,11 @@ body:has(:popover-open) {
    Responsive: Mobile (max-width: 766px)
    ========================================= */
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
     width: 100%;
     justify-content: space-between;
+    text-align: left;
   }
 
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
@@ -550,7 +551,7 @@ body:has(:popover-open) {
     animation-range: 0px 100px;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     header.global-navigation:has(.unav-comp-app-switcher-open) {
       animation: none;
     }

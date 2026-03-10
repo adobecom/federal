@@ -75,10 +75,10 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 768px)
+   Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;
