@@ -92,7 +92,7 @@
   list-style: none;
 }
 
-.product-list .tab-content [role="tabpanel"] .feds-link-group {
+.product-list .tab-content [role="tabpanel"] .feds-product-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -101,11 +101,11 @@
   background-color: var(--s2a-color-gray-25);
 }
 
-.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover {
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {
   background: var(--s2a-color-gray-1000);
 }
 
-.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover .feds-link-group__title {
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover .feds-product-card__title {
   color: var(--s2a-color-gray-25);
 }
 
