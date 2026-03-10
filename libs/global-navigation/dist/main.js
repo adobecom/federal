@@ -58,7 +58,7 @@ version="1.0" encoding="UTF-8"?>
         ${Ee}
       </span>
     </a>
-  </div>`.trim(),un=n=>{let{data:e}=n;switch(e.type){case"LabelledBrand":return X(e.href,fn(e.image,!1)+`<span class="feds-brand-label">${e.label}</span>`);case"BrandImageOnly":{let r=e.alt?` aria-label="${e.alt}"`:"";return X(e.href,fn(e.image,!0),r)}case"ImageOnlyBrand":{let r=e.alt?` aria-label="${e.alt}"`:"";return X(e.href,fn(e.image,!1),r)}case"BrandLabelOnly":return X(e.href,`<span class="feds-brand-label">${e.label}</span>`);case"NoRender":return"";default:return""}};var mn=["appswitcher","help"],J={cs:["cz"],da:["dk"],de:["at"],en:["africa","au","ca","ie","in","mt","ng","nz","sg","za"],es:["ar","cl","co","cr","ec","gt","la","mx","pe","pr"],et:["ee"],ja:["jp"],ko:["kr"],nb:["no"],pt:["br"],sl:["si"],sv:["se"],uk:["ua"],zh:["cn","tw"]},[j,Rn]=(()=>{let n,e,r,t=new Promise(a=>{e=a,r=setTimeout(()=>{n={},a(n)},5e3)});return[a=>{a&&!n&&(n=a,clearTimeout(r),e?.(n))},()=>t]})();function Y(n,e=!1){let s=(/uc_carts=/.test(document.cookie)?n:n?.filter(c=>c!=="cart"))??[],d=s.length??3;if(e){let c=s.filter(y=>mn.includes(y)).length;return`calc(92px + ${c*32}px + ${c*.25}rem)`}return`calc(${d*32}px + ${(d-1)*.25}rem)`}var Q=n=>{if(!n.prefix||n.prefix==="/")return"en_US";let e=n.prefix.replace("/","");if(e.includes("_")){let[t,a]=e.split("_").reverse();return`${t.toLowerCase()}_${a.toUpperCase()}`}if(e==="uk")return"en_GB";let r=Object.keys(J).find(t=>J[t].includes(e));return r?`${r.toLowerCase()}_${e.toUpperCase()}`:`${e.toLowerCase()}_${e.toUpperCase()}`},Me={Mac:"macOS",Win:"windows",Linux:"linux",CrOS:"chromeOS",Android:"android",iPad:"iPadOS",iPhone:"iOS"},nn=()=>{let n=navigator.userAgent;for(let[e,r]of Object.entries(Me))if(n.includes(e))return r;return"linux"},en=async()=>{let n=window;return n.alloy?await n.alloy("getIdentity").then(e=>e?.identity?.ECID).catch(()=>{}):void 0};var In=()=>{try{return E().signInContext||{}}catch{return{}}},Te=()=>{let n=E();return O("signin-cta-style")==="primary"||n?.unav?.profile?.signInCtaStyle==="primary"?"primary":"secondary"},Se=()=>{let e=E()?.unav?.profile?.messageEventListener;return e||(r=>{let{name:t,payload:a,executeDefaultAction:o}=r.detail;if(!(!t||t!=="System"||!a||typeof o!="function"))switch(a.subType){case"AppInitiated":window.adobeProfile?.getUserProfile().then(i=>{j(i)}).catch(()=>{j({})});break;case"SignOut":o();break;case"ProfileSwitch":Promise.resolve(o()).then(i=>{i&&window.location.reload()});break;default:break}})};function _e(){let{unav:n}=E();return n?.unavHelpChildren||[{type:"Support"},{type:"Community"}]}var q=()=>{let n=E();return{profile:{name:"profile",attributes:{accountMenuContext:{sharedContextConfig:{enableLocalSection:!0,enableProfileSwitcher:!0,miniAppContext:{logger:{trace:()=>{},debug:()=>{},info:()=>{},warn:()=>{},error:()=>{}}},complexConfig:n?.unav?.profile?.complexConfig||null,...n?.unav?.profile?.config},messageEventListener:Se()},signInCtaStyle:Te(),isSignUpRequired:!1,callbacks:{onSignIn:()=>{window.adobeIMS?.signIn(In())},onSignUp:()=>{window.adobeIMS?.signIn(In())}}}},appswitcher:{name:"app-switcher"},notifications:{name:"notifications",attributes:{notificationsConfig:{applicationContext:{appID:n?.unav?.uncAppId||"adobecom",...n?.unav?.uncConfig}}}},help:{name:"help",attributes:{children:_e()}},jarvis:{name:"jarvis",attributes:{appid:n?.jarvis?.id,callbacks:n?.jarvis?.callbacks}},cart:{name:"cart"}}};var Hn=(n,e)=>{n[0]&&"attributes"in n[0]&&n[0].attributes&&typeof n[0].attributes=="object"&&"isSignUpRequired"in n[0].attributes&&(n[0].attributes.isSignUpRequired=e)},rn=async(n,e)=>{try{let r=n.querySelector(".feds-utilities");if(!(r instanceof HTMLElement))return new u('missing ".feds-utilities" container');let t=new Set,a=document.head.querySelector('meta[name="universal-nav"]'),o=a instanceof HTMLMetaElement?a.content??"":"";a instanceof HTMLMetaElement||t.add(new u('metadata "universal-nav" is missing'));let i=o.trim();a instanceof HTMLMetaElement&&i.length===0&&t.add(new u('metadata "universal-nav" has no value'));let s=!window.adobeIMS?.isSignedInUser(),d=i.split(",").map(m=>m.trim()).filter(m=>Object.keys(q()).includes(m)||m==="signup");if(s){let m=Y(d,s);r.style.setProperty("min-width",m)}let c;try{c=E()}catch{throw new Error("MiloConfig not available for UNAV initialization")}let x=Q(c.locale),y=c.env.name==="prod"?"prod":"stage",g=await en(),p=new URLSearchParams(window.location.search).get("unavVersion");/^\d+(\.\d+)?$/.test(p??"")||(p="1.5"),await Promise.all([ln(`https://${y}.adobeccstatic.com/unav/${p}/UniversalNav.js`),sn(`https://${y}.adobeccstatic.com/unav/${p}/UniversalNav.css`,!0)]);let f=()=>{let m=q(),b=[m.profile];return Hn(b,!1),d?.forEach(w=>{if(w==="profile")return;if(w==="signup"){Hn(b,!0);return}let I=m[w];I&&b.push(I)}),b},v=()=>({target:r,env:y,locale:x,countryCode:$n(c?.locale)?.country||"US",imsClientId:window?.adobeid?.client_id,theme:"light",analyticsContext:{consumer:{name:"adobecom",version:"1.0",platform:"Web",device:nn(),os_version:navigator.platform},event:{visitor_guid:g}},children:f(),isSectionDividerRequired:!!c?.unav?.showSectionDivider,showTrayExperience:!N.matches});await window?.UniversalNav?.(v()),s||r?.style.removeProperty("min-width");let h=m=>{window?.UniversalNav?.reload(v())};return N.addEventListener("change",()=>{h()}),{reloadUnav:h,errors:t}}catch(r){let t=r instanceof Error?r.message:"failed to load universal nav";return new u(t)}};function $(n,e){return[...n.querySelectorAll(e)]}function F(n,e,r){$(n,e).forEach(t=>r?t.removeAttribute("tabindex"):t.setAttribute("tabindex","-1"))}var U={ArrowLeft:-1,ArrowRight:1,ArrowUp:-1,ArrowDown:1},zn=new Set(["ArrowLeft","ArrowRight"]),Pe=new Set(["ArrowUp","ArrowDown"]),Ae='.tabs [role="tab"][aria-selected="true"]';function vn(n,e,r){return(n+e+r)%r}function $e(n,e,r,t){let a=U[r];if(zn.has(r)){let p=e+a;return p>=0&&p<n.length?p:null}let o=getComputedStyle(t).gridTemplateColumns.split(" ").length,i=[...t.children],s=p=>{let f=n[p].parentElement;return f?i.indexOf(f):-1},d=s(e)%o,c=Math.floor(s(e)/o)+(r==="ArrowDown"?1:-1),x=Math.floor((i.length-1)/o);if(c<0||c>x)return null;let y=null,g=1/0;for(let p=0;p<n.length;p++){let f=Math.abs(s(p)%o-d);Math.floor(s(p)/o)===c&&f<g&&(g=f,y=p)}return y}function hn(n){F(n,'.tab-content [role="tabpanel"] a',!1);let e=[];$(n,".feds-popup[popover]").forEach(g=>{let p=()=>{g.matches(":popover-open")||F(g,'[role="tabpanel"] a',!1)};g.addEventListener("toggle",p),e.push(()=>g.removeEventListener("toggle",p))});let r=(g,p)=>{g.focus(),p.preventDefault()},t=()=>n.querySelector(".feds-popup:popover-open"),a=g=>g.querySelector(Ae),o=g=>g.querySelector('[role="tabpanel"]:not([hidden])');function i(g){let p=t(),f=n.querySelector("#feds-menu-wrapper");if(!f)return!1;let v=p??(f?.matches(":popover-open")?f:null);if(!v)return!1;v.hidePopover?.();let h=p?`[popovertarget="${v.id}"]`:".feds-nav-toggle";return n.querySelector(h)?.focus(),g.preventDefault(),!0}function s(g,p,f){if(!zn.has(p))return!1;let v=$(n,".feds-gnav-items > li > .feds-link"),h=v.indexOf(g);return h<0?!1:(r(v[vn(h,U[p],v.length)],f),!0)}function d(g,p,f,v){let h=$(p,'.tabs :is([role="tab"], .product-links a)'),m=h.indexOf(g);if(m<0)return!1;if(U[f]){let b=h[vn(m,U[f],h.length)];return b.matches('[role="tab"]')&&b.click(),r(b,v),!0}if(f==="Tab"&&!v.shiftKey&&g.matches('[aria-selected="true"]')){let b=o(p);if(!b)return!1;F(b,"a",!0);let w=b.querySelector("a");return w&&r(w,v),!0}return!1}function c(g,p,f,v){let h=o(p);if(!h)return!1;let m=$(h,"a"),b=m.indexOf(g);if(b<0)return!1;if(U[f]){let w=$e(m,b,f,h);return w!==null?(r(m[w],v),!0):f==="ArrowUp"?(F(h,"a",!1),r(a(p)??m[0],v),!0):!1}if(f==="Tab"&&!v.shiftKey){if(b+1<m.length)r(m[b+1],v);else{let w=$(p,'.tabs [role="tab"]'),I=a(p),W=w[w.indexOf(I)+1]??p.querySelector(".product-links a");if(W)r(W,v);else return!1}return!0}if(f==="Tab"&&v.shiftKey){if(b>0)r(m[b-1],v);else{F(h,"a",!1);let w=a(p)??$(p,'.tabs :is([role="tab"], .product-links a)')[0];w&&r(w,v)}return!0}return!1}function x(g,p,f,v){if(!Pe.has(f))return!1;let h=$(p,".feds-gnav-cards a"),m=h.indexOf(g);return m<0?!1:(r(h[vn(m,U[f],h.length)],v),!0)}function y(g){let p=document.activeElement??g.target;if(g.key==="Escape"){i(g);return}let f=t();f&&(f.matches(":has(.product-list)")&&(d(p,f,g.key,g)||c(p,f,g.key,g))||f.matches(":has(.feds-gnav-cards)")&&x(p,f,g.key,g))||s(p,g.key,g)}return n.addEventListener("keydown",y),e.push(()=>n.removeEventListener("keydown",y)),()=>e.forEach(g=>g())}var Re="feds-milo",L=(n,e="default",r="e")=>{let{locale:t}=E(),a=O("gnav-source")??`${t.contentRoot??""}/gnav`;window.lana||console.warn("lana logging unavailable in the gnav"),window?.lana?.log(`${n} | gnav-source: ${a} | href: ${window.location.href}`,{clientId:Re,sampleRate:1,tags:e,errorType:r})};var l=class n extends Error{constructor(e){super(e),Object.setPrototypeOf(this,n.prototype)}},u=class n extends Error{constructor(e,r="Minor"){super(e),Object.setPrototypeOf(this,n.prototype),r==="Critical"&&L(e)}};var Un=n=>e=>{if(e===null)throw new Error("");let r=e.querySelector(Ie(n));if(!r)throw new Error("");let[{text:t,href:a,daaLl:o,ariaLabel:i},s]=C(r);return[{type:n.type,text:t,href:a,ariaLabel:i,daaLl:typeof o=="string"&&o.trim()!==""?o:t},s]},bn=Un({type:"PrimaryCTA"}),P=Un({type:"SecondaryCTA"}),Gn=n=>D(bn).or(P).eval(n),Ie=({type:n})=>{switch(n){case"PrimaryCTA":return"strong > a";case"SecondaryCTA":return"em > a";default:throw new Error("")}};var yn=({text:n,href:e,daaLl:r,ariaLabel:t})=>`
+  </div>`.trim(),un=n=>{let{data:e}=n;switch(e.type){case"LabelledBrand":return X(e.href,fn(e.image,!1)+`<span class="feds-brand-label">${e.label}</span>`);case"BrandImageOnly":{let r=e.alt?` aria-label="${e.alt}"`:"";return X(e.href,fn(e.image,!0),r)}case"ImageOnlyBrand":{let r=e.alt?` aria-label="${e.alt}"`:"";return X(e.href,fn(e.image,!1),r)}case"BrandLabelOnly":return X(e.href,`<span class="feds-brand-label">${e.label}</span>`);case"NoRender":return"";default:return""}};var mn=["appswitcher","help"],Y={cs:["cz"],da:["dk"],de:["at"],en:["africa","au","ca","ie","in","mt","ng","nz","sg","za"],es:["ar","cl","co","cr","ec","gt","la","mx","pe","pr"],et:["ee"],ja:["jp"],ko:["kr"],nb:["no"],pt:["br"],sl:["si"],sv:["se"],uk:["ua"],zh:["cn","tw"]},[j,Rn]=(()=>{let n,e,r,t=new Promise(a=>{e=a,r=setTimeout(()=>{n={},a(n)},5e3)});return[a=>{a&&!n&&(n=a,clearTimeout(r),e?.(n))},()=>t]})();function J(n,e=!1){let s=(/uc_carts=/.test(document.cookie)?n:n?.filter(c=>c!=="cart"))??[],d=s.length??3;if(e){let c=s.filter(y=>mn.includes(y)).length;return`calc(92px + ${c*32}px + ${c*.25}rem)`}return`calc(${d*32}px + ${(d-1)*.25}rem)`}var Q=n=>{if(!n.prefix||n.prefix==="/")return"en_US";let e=n.prefix.replace("/","");if(e.includes("_")){let[t,a]=e.split("_").reverse();return`${t.toLowerCase()}_${a.toUpperCase()}`}if(e==="uk")return"en_GB";let r=Object.keys(Y).find(t=>Y[t].includes(e));return r?`${r.toLowerCase()}_${e.toUpperCase()}`:`${e.toLowerCase()}_${e.toUpperCase()}`},Me={Mac:"macOS",Win:"windows",Linux:"linux",CrOS:"chromeOS",Android:"android",iPad:"iPadOS",iPhone:"iOS"},nn=()=>{let n=navigator.userAgent;for(let[e,r]of Object.entries(Me))if(n.includes(e))return r;return"linux"},en=async()=>{let n=window;return n.alloy?await n.alloy("getIdentity").then(e=>e?.identity?.ECID).catch(()=>{}):void 0};var In=()=>{try{return E().signInContext||{}}catch{return{}}},Te=()=>{let n=E();return O("signin-cta-style")==="primary"||n?.unav?.profile?.signInCtaStyle==="primary"?"primary":"secondary"},Se=()=>{let e=E()?.unav?.profile?.messageEventListener;return e||(r=>{let{name:t,payload:a,executeDefaultAction:o}=r.detail;if(!(!t||t!=="System"||!a||typeof o!="function"))switch(a.subType){case"AppInitiated":window.adobeProfile?.getUserProfile().then(i=>{j(i)}).catch(()=>{j({})});break;case"SignOut":o();break;case"ProfileSwitch":Promise.resolve(o()).then(i=>{i&&window.location.reload()});break;default:break}})};function _e(){let{unav:n}=E();return n?.unavHelpChildren||[{type:"Support"},{type:"Community"}]}var q=()=>{let n=E();return{profile:{name:"profile",attributes:{accountMenuContext:{sharedContextConfig:{enableLocalSection:!0,enableProfileSwitcher:!0,miniAppContext:{logger:{trace:()=>{},debug:()=>{},info:()=>{},warn:()=>{},error:()=>{}}},complexConfig:n?.unav?.profile?.complexConfig||null,...n?.unav?.profile?.config},messageEventListener:Se()},signInCtaStyle:Te(),isSignUpRequired:!1,callbacks:{onSignIn:()=>{window.adobeIMS?.signIn(In())},onSignUp:()=>{window.adobeIMS?.signIn(In())}}}},appswitcher:{name:"app-switcher"},notifications:{name:"notifications",attributes:{notificationsConfig:{applicationContext:{appID:n?.unav?.uncAppId||"adobecom",...n?.unav?.uncConfig}}}},help:{name:"help",attributes:{children:_e()}},jarvis:{name:"jarvis",attributes:{appid:n?.jarvis?.id,callbacks:n?.jarvis?.callbacks}},cart:{name:"cart"}}};var Hn=(n,e)=>{n[0]&&"attributes"in n[0]&&n[0].attributes&&typeof n[0].attributes=="object"&&"isSignUpRequired"in n[0].attributes&&(n[0].attributes.isSignUpRequired=e)},rn=async(n,e)=>{try{let r=n.querySelector(".feds-utilities");if(!(r instanceof HTMLElement))return new u('missing ".feds-utilities" container');let t=new Set,a=document.head.querySelector('meta[name="universal-nav"]'),o=a instanceof HTMLMetaElement?a.content??"":"";a instanceof HTMLMetaElement||t.add(new u('metadata "universal-nav" is missing'));let i=o.trim();a instanceof HTMLMetaElement&&i.length===0&&t.add(new u('metadata "universal-nav" has no value'));let s=!window.adobeIMS?.isSignedInUser(),d=i.split(",").map(m=>m.trim()).filter(m=>Object.keys(q()).includes(m)||m==="signup");if(s){let m=J(d,s);r.style.setProperty("min-width",m)}let c;try{c=E()}catch{throw new Error("MiloConfig not available for UNAV initialization")}let x=Q(c.locale),y=c.env.name==="prod"?"prod":"stage",g=await en(),p=new URLSearchParams(window.location.search).get("unavVersion");/^\d+(\.\d+)?$/.test(p??"")||(p="1.5"),await Promise.all([ln(`https://${y}.adobeccstatic.com/unav/${p}/UniversalNav.js`),sn(`https://${y}.adobeccstatic.com/unav/${p}/UniversalNav.css`,!0)]);let f=()=>{let m=q(),b=[m.profile];return Hn(b,!1),d?.forEach(w=>{if(w==="profile")return;if(w==="signup"){Hn(b,!0);return}let I=m[w];I&&b.push(I)}),b},v=()=>({target:r,env:y,locale:x,countryCode:$n(c?.locale)?.country||"US",imsClientId:window?.adobeid?.client_id,theme:"light",analyticsContext:{consumer:{name:"adobecom",version:"1.0",platform:"Web",device:nn(),os_version:navigator.platform},event:{visitor_guid:g}},children:f(),isSectionDividerRequired:!!c?.unav?.showSectionDivider,showTrayExperience:!N.matches});await window?.UniversalNav?.(v()),s||r?.style.removeProperty("min-width");let h=m=>{window?.UniversalNav?.reload(v())};return N.addEventListener("change",()=>{h()}),{reloadUnav:h,errors:t}}catch(r){let t=r instanceof Error?r.message:"failed to load universal nav";return new u(t)}};function $(n,e){return[...n.querySelectorAll(e)]}function F(n,e,r){$(n,e).forEach(t=>r?t.removeAttribute("tabindex"):t.setAttribute("tabindex","-1"))}var U={ArrowLeft:-1,ArrowRight:1,ArrowUp:-1,ArrowDown:1},zn=new Set(["ArrowLeft","ArrowRight"]),Pe=new Set(["ArrowUp","ArrowDown"]),Ae='.tabs [role="tab"][aria-selected="true"]';function vn(n,e,r){return(n+e+r)%r}function $e(n,e,r,t){let a=U[r];if(zn.has(r)){let p=e+a;return p>=0&&p<n.length?p:null}let o=getComputedStyle(t).gridTemplateColumns.split(" ").length,i=[...t.children],s=p=>{let f=n[p].parentElement;return f?i.indexOf(f):-1},d=s(e)%o,c=Math.floor(s(e)/o)+(r==="ArrowDown"?1:-1),x=Math.floor((i.length-1)/o);if(c<0||c>x)return null;let y=null,g=1/0;for(let p=0;p<n.length;p++){let f=Math.abs(s(p)%o-d);Math.floor(s(p)/o)===c&&f<g&&(g=f,y=p)}return y}function hn(n){F(n,'.tab-content [role="tabpanel"] a',!1);let e=[];$(n,".feds-popup[popover]").forEach(g=>{let p=()=>{g.matches(":popover-open")||F(g,'[role="tabpanel"] a',!1)};g.addEventListener("toggle",p),e.push(()=>g.removeEventListener("toggle",p))});let r=(g,p)=>{g.focus(),p.preventDefault()},t=()=>n.querySelector(".feds-popup:popover-open"),a=g=>g.querySelector(Ae),o=g=>g.querySelector('[role="tabpanel"]:not([hidden])');function i(g){let p=t(),f=n.querySelector("#feds-menu-wrapper");if(!f)return!1;let v=p??(f?.matches(":popover-open")?f:null);if(!v)return!1;v.hidePopover?.();let h=p?`[popovertarget="${v.id}"]`:".feds-nav-toggle";return n.querySelector(h)?.focus(),g.preventDefault(),!0}function s(g,p,f){if(!zn.has(p))return!1;let v=$(n,".feds-gnav-items > li > .feds-link"),h=v.indexOf(g);return h<0?!1:(r(v[vn(h,U[p],v.length)],f),!0)}function d(g,p,f,v){let h=$(p,'.tabs :is([role="tab"], .product-links a)'),m=h.indexOf(g);if(m<0)return!1;if(U[f]){let b=h[vn(m,U[f],h.length)];return b.matches('[role="tab"]')&&b.click(),r(b,v),!0}if(f==="Tab"&&!v.shiftKey&&g.matches('[aria-selected="true"]')){let b=o(p);if(!b)return!1;F(b,"a",!0);let w=b.querySelector("a");return w&&r(w,v),!0}return!1}function c(g,p,f,v){let h=o(p);if(!h)return!1;let m=$(h,"a"),b=m.indexOf(g);if(b<0)return!1;if(U[f]){let w=$e(m,b,f,h);return w!==null?(r(m[w],v),!0):f==="ArrowUp"?(F(h,"a",!1),r(a(p)??m[0],v),!0):!1}if(f==="Tab"&&!v.shiftKey){if(b+1<m.length)r(m[b+1],v);else{let w=$(p,'.tabs [role="tab"]'),I=a(p),W=w[w.indexOf(I)+1]??p.querySelector(".product-links a");if(W)r(W,v);else return!1}return!0}if(f==="Tab"&&v.shiftKey){if(b>0)r(m[b-1],v);else{F(h,"a",!1);let w=a(p)??$(p,'.tabs :is([role="tab"], .product-links a)')[0];w&&r(w,v)}return!0}return!1}function x(g,p,f,v){if(!Pe.has(f))return!1;let h=$(p,".feds-gnav-cards a"),m=h.indexOf(g);return m<0?!1:(r(h[vn(m,U[f],h.length)],v),!0)}function y(g){let p=document.activeElement??g.target;if(g.key==="Escape"){i(g);return}let f=t();f&&(f.matches(":has(.product-list)")&&(d(p,f,g.key,g)||c(p,f,g.key,g))||f.matches(":has(.feds-gnav-cards)")&&x(p,f,g.key,g))||s(p,g.key,g)}return n.addEventListener("keydown",y),e.push(()=>n.removeEventListener("keydown",y)),()=>e.forEach(g=>g())}var Re="feds-milo",L=(n,e="default",r="e")=>{let{locale:t}=E(),a=O("gnav-source")??`${t.contentRoot??""}/gnav`;window.lana||console.warn("lana logging unavailable in the gnav"),window?.lana?.log(`${n} | gnav-source: ${a} | href: ${window.location.href}`,{clientId:Re,sampleRate:1,tags:e,errorType:r})};var l=class n extends Error{constructor(e){super(e),Object.setPrototypeOf(this,n.prototype)}},u=class n extends Error{constructor(e,r="Minor"){super(e),Object.setPrototypeOf(this,n.prototype),r==="Critical"&&L(e)}};var Un=n=>e=>{if(e===null)throw new Error("");let r=e.querySelector(Ie(n));if(!r)throw new Error("");let[{text:t,href:a,daaLl:o,ariaLabel:i},s]=C(r);return[{type:n.type,text:t,href:a,ariaLabel:i,daaLl:typeof o=="string"&&o.trim()!==""?o:t},s]},bn=Un({type:"PrimaryCTA"}),P=Un({type:"SecondaryCTA"}),Gn=n=>D(bn).or(P).eval(n),Ie=({type:n})=>{switch(n){case"PrimaryCTA":return"strong > a";case"SecondaryCTA":return"em > a";default:throw new Error("")}};var yn=({text:n,href:e,daaLl:r,ariaLabel:t})=>`
 <a href="${e}"
   class="feds-primary-cta"
   ${t?`aria-label="${t}"`:""}
@@ -160,7 +160,7 @@ version="1.0" encoding="UTF-8"?>
             ${n}
           </button>
       </li>
-  `.trim();var Jn=({title:n})=>`
+  `.trim();var Yn=({title:n})=>`
   <button type="button"
           aria-controls="${B(n)}"
           aria-haspopup="true"
@@ -172,7 +172,7 @@ version="1.0" encoding="UTF-8"?>
   </button>
   <div id="${B(n)}" popover class="feds-popup">
   </div>
-`,Yn=(n,e,r)=>{let t=`
+`,Jn=(n,e,r)=>{let t=`
         <button
           type="button"
           class="feds-popup-back-button"
@@ -188,7 +188,7 @@ version="1.0" encoding="UTF-8"?>
       <div class="feds-popup-header-left">${t}</div>
       ${a?`<div class="product-links"><a class="feds-link" href="${a.href}"${k(null,a.daaLl??a.text)}>${a.text}${T.chevronRight}</a></div>`:""}
     </div>
-  `.trim(),i="";switch(n.type){case"ProductList":i=Xn(n);break;case"GnavCards":i=Vn(n);break;default:}return`${o}${i}`};var Qn={elementNull:"Error when parsing text. Element is null",textContentNull:"Error when parsing text. Element has no textContent"},ne=n=>{if(n===null)return[{type:"Text",content:""},[new u(Qn.elementNull,"Minor")]];let e=n.textContent;return e===null?[{type:"Text",content:""},[new u(Qn.textContentNull,"Minor")]]:[{type:"Text",content:e},[]]};var ee=({content:n})=>n;var re=n=>{if(n===null)throw new l(We.elementNull);if(n.querySelector(".gnav-brand")!==null)return gn(n);let r=n.querySelector(".large-menu");return r!==null?Fn(r):n.querySelector("strong")!==null?bn(n):n.querySelector("em")!==null?P(n):n.querySelector("a")===null?ne(n):C(n.querySelector("a"))},xn=n=>{switch(n.type){case"Text":return ee(n);case"Link":return G(n);case"SecondaryCTA":return A(n);case"PrimaryCTA":return yn(n);case"Brand":return un(n);case"MegaMenu":return Jn(n);default:return console.error(`Failed to recognize component: ${n}`),""}},We={elementNull:"Element is null"};var te=(n,e)=>{let[r,t]=M([...document.querySelectorAll(".breadcrumbs ul > li > a")??[]],C),[a,o]=M([...n.children],re),i=n.querySelector(".product-entry-cta"),[s,d]=(()=>{try{return Gn(i)}catch{return[null,[]]}})(),c=!1,x=[t,o,d].flat();return{breadcrumbs:r,components:a,productCTA:s,localnav:c,errors:x,unavEnabled:e}};var ae=n=>{let e=[...n.querySelectorAll('.tabs button[role="tab"]')],r=[...n.querySelectorAll(".tab-content ul")],t=e.map((a,o)=>()=>{e.forEach(i=>{i.setAttribute("aria-selected","false")}),r.forEach(i=>{i.setAttribute("hidden","true")}),r[o]?.removeAttribute("hidden"),a.setAttribute("aria-selected","true")});return e.forEach((a,o)=>{a.addEventListener("click",t[o])}),()=>{e.forEach((a,o)=>{a.removeEventListener("click",t[o])})}};var oe=async({gnavSource:n,asideSource:e})=>{let r=await H(n);if(r instanceof l)return r;let t=await H(e);return{mainNav:r,aside:t}};var Ze=`/**
+  `.trim(),i="";switch(n.type){case"ProductList":i=Xn(n);break;case"GnavCards":i=Vn(n);break;default:}return`${o}${i}`};var Qn={elementNull:"Error when parsing text. Element is null",textContentNull:"Error when parsing text. Element has no textContent"},ne=n=>{if(n===null)return[{type:"Text",content:""},[new u(Qn.elementNull,"Minor")]];let e=n.textContent;return e===null?[{type:"Text",content:""},[new u(Qn.textContentNull,"Minor")]]:[{type:"Text",content:e},[]]};var ee=({content:n})=>n;var re=n=>{if(n===null)throw new l(We.elementNull);if(n.querySelector(".gnav-brand")!==null)return gn(n);let r=n.querySelector(".large-menu");return r!==null?Fn(r):n.querySelector("strong")!==null?bn(n):n.querySelector("em")!==null?P(n):n.querySelector("a")===null?ne(n):C(n.querySelector("a"))},xn=n=>{switch(n.type){case"Text":return ee(n);case"Link":return G(n);case"SecondaryCTA":return A(n);case"PrimaryCTA":return yn(n);case"Brand":return un(n);case"MegaMenu":return Yn(n);default:return console.error(`Failed to recognize component: ${n}`),""}},We={elementNull:"Element is null"};var te=(n,e)=>{let[r,t]=M([...document.querySelectorAll(".breadcrumbs ul > li > a")??[]],C),[a,o]=M([...n.children],re),i=n.querySelector(".product-entry-cta"),[s,d]=(()=>{try{return Gn(i)}catch{return[null,[]]}})(),c=!1,x=[t,o,d].flat();return{breadcrumbs:r,components:a,productCTA:s,localnav:c,errors:x,unavEnabled:e}};var ae=n=>{let e=[...n.querySelectorAll('.tabs button[role="tab"]')],r=[...n.querySelectorAll(".tab-content ul")],t=e.map((a,o)=>()=>{e.forEach(i=>{i.setAttribute("aria-selected","false")}),r.forEach(i=>{i.setAttribute("hidden","true")}),r[o]?.removeAttribute("hidden"),a.setAttribute("aria-selected","true")});return e.forEach((a,o)=>{a.addEventListener("click",t[o])}),()=>{e.forEach((a,o)=>{a.removeEventListener("click",t[o])})}};var oe=async({gnavSource:n,asideSource:e})=>{let r=await H(n);if(r instanceof l)return r;let t=await H(e);return{mainNav:r,aside:t}};var Ze=`/**
  * Generated by scripts/build-css.js - do not edit.
  * Pruned design tokens (used by gnav) + global navigation CSS.
  */
@@ -374,10 +374,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
   margin-left: auto;
 }
 
-.global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-brand-container {
-  display: none;
-}
-
 ::backdrop {
   opacity: 1;
 }
@@ -437,7 +433,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
 
 .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link {
   color: var(--s2a-color-gray-1000);
-  font-family: var(--s2a-font-family-heading);
   font-size: var(--s2a-font-size-3xl);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
@@ -450,46 +445,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
   opacity: 100%;
 }
 
-/* =========================================
-   Menu Wrapper (Mobile Slide-out)
-   ========================================= */
-
-.global-navigation nav > ul > li.feds-menu-wrapper {
-  position: fixed;
-  top: var(--s2a-spacing-64);
-  left: 0;
-  right: var(--s2a-spacing-20);
-  flex-direction: column;
-  height: calc(100dvh - var(--s2a-spacing-64));
-  border: 0;
-  width: 100%;
-  translate: -200vw 0;
-  opacity: 0;
-  display: flex;
-  visibility: hidden;
-  color: var(--s2a-color-gray-1000);
-}
-
-.global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
-  transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0.5s;
-}
-
-.global-navigation nav > ul > li.feds-menu-wrapper:popover-open {
-  display: flex;
-  translate: 0;
-  opacity: 1;
-  z-index: 2;
-  transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0s;
-  visibility: visible;
-  align-items: flex-start;
-  padding: 0;
-}
-
-.global-navigation nav > ul > li.feds-menu-wrapper:popover-open .feds-gnav-items {
-  align-items: flex-start;
-  padding: var(--s2a-spacing-sm) var(--s2a-spacing-lg);
-  width: calc(100% - var(--s2a-spacing-3xl));
-}
 
 /* =========================================
    Nav Toggle (Hamburger)
@@ -523,18 +478,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
 
 .global-navigation.feds-header-scrolled nav .feds-nav-toggle svg {
   color: var(--s2a-color-gray-1000);
-}
-
-.global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-nav-toggle svg {
-  display: none;
-}
-
-.global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-nav-toggle::before {
-  content: "\\2715";
-  color: var(--s2a-color-gray-1000);
-  font-size: var(--s2a-font-size-xl);
-  /* No token: font-weight 300 */
-  font-weight: 300;
 }
 
 /* =========================================
@@ -860,7 +803,7 @@ body:has(:popover-open) {
 }
 
 /* =========================================
-   Responsive: Mobile (max-width: 1023px)
+   Responsive: Mobile (max-width: 766px)
    ========================================= */
 
 @media (max-width: 767px) {
@@ -903,7 +846,7 @@ body:has(:popover-open) {
     to {
       /* No token: 51% white */
       background-color: rgba(255, 255, 255, 0.51);
-      width: calc(100% - var(--s2a-spacing-xs));
+      width: calc(100% - 10px);
       /* No token: 6px radius */
       border-radius: 6px;
       border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
@@ -944,7 +887,8 @@ body:has(:popover-open) {
       animation: none;
       background-color: var(--s2a-color-gray-25);
       border-radius: 6px;
-      width: calc(100% - var(--s2a-spacing-xs));
+      /* We don't have a 10px token */
+      width: calc(100% - 10px);
       margin: var(--s2a-spacing-2xs) var(--s2a-spacing-2xs) 0;
       border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
     }
@@ -978,6 +922,170 @@ body:has(:popover-open) {
 }
 
 /* =========================================
+   Popover Animations
+   ========================================= */
+
+/* Browsers must support @starting-style */
+
+
+.feds-popup:popover-open {
+  opacity: 1;
+  max-height: calc(100dvh - var(--s2a-spacing-64));
+}
+
+.feds-popup {
+  opacity: 0;
+  max-height: 0;
+  transition: all 0.3s allow-discrete;
+}
+
+/* Needs to be after the previous .feds-popup:popover-open rule
+to take effect, as the specificity is the same */
+@starting-style {
+  .feds-popup:popover-open {
+    opacity: 0;
+    max-height: 0;
+  }
+}
+
+@media (min-width:768px) {
+  .feds-popup :not(.feds-popup-header) {
+    transform: translate(-2px, -2px);
+    transition: all 0.3s ease;
+  }
+  .feds-popup:popover-open :not(.feds-popup-header) {
+    transform: translate(0);
+  }
+  @starting-style {
+    .feds-popup:popover-open :not(.feds-popup-header) {
+      transform: translate(-2px, -2px);
+    }
+  }
+}
+@keyframes header-popover-open {
+  from {
+    background-color: rgba(255,255,255,0);
+  }
+  to {
+    background-color: var(--s2a-color-gray-75);
+  }
+}
+
+@keyframes scrolled-header-popover-open {
+  from {
+    /* No token: 51% white */
+    background-color: rgba(255, 255, 255, 0.51);
+    width: calc(100% - 10px);
+    /* No token: 6px radius */
+    border-radius: 6px;
+    border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
+    transform: translate(var(--s2a-spacing-2xs), var(--s2a-spacing-2xs));
+    /* Token 16px; design 16.5px */
+    backdrop-filter: blur(var(--s2a-blur-sm));
+  }
+  to {
+    background-color: var(--s2a-color-gray-75);
+    width: 100%;
+    border-radius: 0px;
+    border: none;
+    transform: translate(0,0);
+    backdrop-filter: none;
+  }
+}
+
+header.global-navigation.feds-header-scrolled {
+  animation: none;
+  background-color: rgba(255, 255, 255, 0.51);
+  width: calc(100% - 10px);
+  border-radius: 6px;
+  border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
+  transform: translate(var(--s2a-spacing-2xs), var(--s2a-spacing-2xs));
+  backdrop-filter: blur(var(--s2a-blur-sm));
+  transition:
+    background-color 0.3s ease,
+    width 0.3s ease,
+    border-radius 0.3s ease,
+    border 0.3s ease,
+    transform 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+header.global-navigation.feds-header-scrolled:has(:popover-open) {
+  /* Cancel the scroll-driven animation so transition can take over */
+  animation: none;
+  background-color: var(--s2a-color-gray-75);
+  width: 100%;
+  border-radius: 0;
+  border: none;
+  transform: translate(0, 0);
+  backdrop-filter: none;
+}
+
+header.global-navigation:has(:popover-open) {
+  animation: header-popover-open 0.3s ease forwards;
+}
+
+/* =========================================
+   Menu Wrapper (Mobile Fade In)
+   ========================================= */
+@media (max-width: 767px) {
+  .global-navigation nav > ul > li.feds-menu-wrapper {
+    position: fixed;
+    top: var(--s2a-spacing-64);
+    left: 0;
+    right: var(--s2a-spacing-20);
+    flex-direction: column;
+    height: calc(100dvh - var(--s2a-spacing-64));
+    border: 0;
+    width: 100%;
+    opacity: 0;
+    display: flex;
+    visibility: hidden;
+    color: var(--s2a-color-gray-1000);
+    background-color: var(--s2a-color-gray-75);
+  }
+  
+  .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
+    transition: opacity 0.4s ease, visibility 0s linear 0.5s;
+  }
+  
+  .global-navigation nav > ul > li.feds-menu-wrapper:popover-open {
+    display: flex;
+    translate: 0;
+    opacity: 1;
+    z-index: 2;
+    transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0s;
+    visibility: visible;
+    align-items: flex-start;
+    padding: 0;
+  }
+  
+  .global-navigation nav > ul > li.feds-menu-wrapper:popover-open .feds-gnav-items {
+    align-items: flex-start;
+    padding: var(--s2a-spacing-sm) var(--s2a-spacing-lg);
+    width: calc(100% - var(--s2a-spacing-3xl));
+  }
+
+  .feds-nav-toggle path {
+    transform-origin: 7px 3.5px;
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  }
+  
+  .global-navigation:has(:popover-open) .feds-nav-toggle svg {
+    height: 11px;
+  }
+  
+  /* open state */
+  .global-navigation:has(:popover-open) .feds-nav-toggle path:first-child {
+    transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
+  }
+  
+  .global-navigation:has(:popover-open) .feds-nav-toggle path:last-child {
+    transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
+  }
+}
+
+/* =========================================
    Brand Container
    ========================================= */
 
@@ -991,6 +1099,11 @@ li.feds-brand-wrapper {
   flex-direction: row-reverse;
   justify-content: flex-start;
   padding-left: var(--s2a-spacing-20);
+}
+
+header.global-navigation:has(:popover-open) nav .feds-brand-image svg,
+header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
+  color: var(--s2a-color-gray-1000);
 }
 
 /* =========================================
@@ -2023,7 +2136,7 @@ ul.tabs .product-links {
     color: var(--s2a-color-gray-25);
   }
 }
-`,ie=document.createElement("style");ie.textContent=Ze;document.head.appendChild(ie);var oo=async n=>{let{gnavSource:e,mountpoint:r,unavEnabled:t,miloConfig:a,personalization:o}=n;if(!(e instanceof URL))throw L(`gnavSource is invalid: ${e}`),new l("gnavSource needs to be a URL object");try{dn(a)}catch(x){throw L(`Failed to initialize MiloConfig: ${x}`),new l(`Failed to initialize MiloConfig: ${x}`)}Mn(o),Cn(wn(n));let i=await oe(n);if(i instanceof l)throw L(i.message),i;let{mainNav:s,aside:d}=i;if(s instanceof l)throw L(s.message),s;let c=te(s,t);if(c instanceof l)throw L(c.message),c;return await Ke(c)(r),Xe(n)},Ke=n=>async e=>{let r=Ve(n);e.innerHTML=r,e.classList.add("site-pivot");let t=[...e.querySelectorAll(".mega-menu ~ .feds-popup")];t.forEach(s=>{s.innerHTML=""});let a=n.components.filter(s=>s.type==="MegaMenu"),o=a.map(s=>s.content),i=await Promise.all(o.map(async(s,d)=>{let[c,x]=await s,y=a[d].title;return t[d].innerHTML=Yn(c,t[d].id,y),x}).flat());return e},Ve=({components:n,productCTA:e,unavEnabled:r})=>`
+`,ie=document.createElement("style");ie.textContent=Ze;document.head.appendChild(ie);var oo=async n=>{let{gnavSource:e,mountpoint:r,unavEnabled:t,miloConfig:a,personalization:o}=n;if(!(e instanceof URL))throw L(`gnavSource is invalid: ${e}`),new l("gnavSource needs to be a URL object");try{dn(a)}catch(x){throw L(`Failed to initialize MiloConfig: ${x}`),new l(`Failed to initialize MiloConfig: ${x}`)}Mn(o),Cn(wn(n));let i=await oe(n);if(i instanceof l)throw L(i.message),i;let{mainNav:s,aside:d}=i;if(s instanceof l)throw L(s.message),s;let c=te(s,t);if(c instanceof l)throw L(c.message),c;return await Ke(c)(r),Xe(n)},Ke=n=>async e=>{let r=Ve(n);e.innerHTML=r,e.classList.add("site-pivot");let t=[...e.querySelectorAll(".mega-menu ~ .feds-popup")];t.forEach(s=>{s.innerHTML=""});let a=n.components.filter(s=>s.type==="MegaMenu"),o=a.map(s=>s.content),i=await Promise.all(o.map(async(s,d)=>{let[c,x]=await s,y=a[d].title;return t[d].innerHTML=Jn(c,t[d].id,y),x}).flat());return e},Ve=({components:n,productCTA:e,unavEnabled:r})=>`
 <nav>
   <ul>
     ${(()=>{let t=n.find(d=>d.type==="Brand")??null,a=n.filter(d=>d.type!=="Brand"),o=`
@@ -2060,5 +2173,5 @@ ul.tabs .product-links {
   ${e===null?"":Nn(e)}
   ${r?'<div class="feds-utilities"></div>':""}
 </nav>
-`,Xe=async n=>{let e=new Set,r=await rn(n.mountpoint);r instanceof u?(e.add(r),L(r.message)):r.errors.forEach(a=>e.add(a)),ae(n.mountpoint),hn(n.mountpoint),Je(n.mountpoint),Ye(n.mountpoint),nr(n.mountpoint);let t=r instanceof u?()=>{}:r.reloadUnav;return{closeEverything:Qe,reloadUnav:t,errors:e,setGnavTopPosition:a=>{},getGnavTopPosition:()=>0}},Je=n=>{let e=n.querySelector("#feds-menu-wrapper"),r=n.querySelector(".feds-nav-toggle");e?.addEventListener("toggle",()=>{let a=e.matches(":popover-open");r?.setAttribute("aria-expanded",String(a)),e.setAttribute("aria-hidden",String(!a)),a&&e.classList.add("feds-menu-active")}),e?.addEventListener("transitionend",()=>{e.matches(":popover-open")||e.classList.remove("feds-menu-active")}),n.querySelectorAll(".feds-popup[popover]").forEach(a=>{a.addEventListener("toggle",()=>{n.querySelector(`[popovertarget="${a.id}"]`)?.setAttribute("aria-expanded",String(a.matches(":popover-open")))})})},Ye=n=>{N.addEventListener("change",()=>{let e=n.querySelector("#feds-menu-wrapper");e?.classList.remove("feds-menu-active"),e?.hidePopover?.(),n.querySelector(".feds-popup:popover-open")?.hidePopover?.()})},Qe=()=>{},nr=n=>{let e=n.closest("header");if(!e)return;let r=n.querySelector("#feds-menu-wrapper"),t=()=>r?.matches(":popover-open")??!1,a=()=>window.scrollY>100,o=()=>{if(t()){e.classList.remove("feds-header-scrolled");return}if(a()){e.classList.add("feds-header-scrolled");return}e.classList.remove("feds-header-scrolled")};o(),window.addEventListener("scroll",o,{passive:!0}),r?.addEventListener("toggle",o)};export{oo as main,Xe as postRenderingTasks,Ke as renderGnav,Ve as renderGnavString};
+`,Xe=async n=>{let e=new Set,r=await rn(n.mountpoint);r instanceof u?(e.add(r),L(r.message)):r.errors.forEach(a=>e.add(a)),ae(n.mountpoint),hn(n.mountpoint),Ye(n.mountpoint),Je(n.mountpoint),nr(n.mountpoint);let t=r instanceof u?()=>{}:r.reloadUnav;return{closeEverything:Qe,reloadUnav:t,errors:e,setGnavTopPosition:a=>{},getGnavTopPosition:()=>0}},Ye=n=>{let e=n.querySelector("#feds-menu-wrapper"),r=n.querySelector(".feds-nav-toggle");e?.addEventListener("toggle",()=>{let a=e.matches(":popover-open");r?.setAttribute("aria-expanded",String(a)),e.setAttribute("aria-hidden",String(!a)),a&&e.classList.add("feds-menu-active")}),e?.addEventListener("transitionend",()=>{e.matches(":popover-open")||e.classList.remove("feds-menu-active")}),n.querySelectorAll(".feds-popup[popover]").forEach(a=>{a.addEventListener("toggle",()=>{n.querySelector(`[popovertarget="${a.id}"]`)?.setAttribute("aria-expanded",String(a.matches(":popover-open")))})})},Je=n=>{N.addEventListener("change",()=>{let e=n.querySelector("#feds-menu-wrapper");e?.classList.remove("feds-menu-active"),e?.hidePopover?.(),n.querySelector(".feds-popup:popover-open")?.hidePopover?.()})},Qe=()=>{},nr=n=>{let e=n.closest("header");if(!e)return;let r=n.querySelector("#feds-menu-wrapper"),t=()=>r?.matches(":popover-open")??!1,a=()=>window.scrollY>100,o=()=>{if(t()){e.classList.remove("feds-header-scrolled");return}if(a()){e.classList.add("feds-header-scrolled");return}e.classList.remove("feds-header-scrolled")};o(),window.addEventListener("scroll",o,{passive:!0}),r?.addEventListener("toggle",o)};export{oo as main,Xe as postRenderingTasks,Ke as renderGnav,Ve as renderGnavString};
 //# sourceMappingURL=main.js.map

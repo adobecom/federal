@@ -14,6 +14,11 @@ li.feds-brand-wrapper {
   padding-left: var(--s2a-spacing-20);
 }
 
+header.global-navigation:has(:popover-open) nav .feds-brand-image svg,
+header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
+  color: var(--s2a-color-gray-1000);
+}
+
 /* =========================================
    Brand / Logo
    ========================================= */

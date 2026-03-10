@@ -46,10 +46,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
   margin-left: auto;
 }
 
-.global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-brand-container {
-  display: none;
-}
-
 ::backdrop {
   opacity: 1;
 }
@@ -109,7 +105,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
 
 .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link {
   color: var(--s2a-color-gray-1000);
-  font-family: var(--s2a-font-family-heading);
   font-size: var(--s2a-font-size-3xl);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
@@ -122,46 +117,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
   opacity: 100%;
 }
 
-/* =========================================
-   Menu Wrapper (Mobile Slide-out)
-   ========================================= */
-
-.global-navigation nav > ul > li.feds-menu-wrapper {
-  position: fixed;
-  top: var(--s2a-spacing-64);
-  left: 0;
-  right: var(--s2a-spacing-20);
-  flex-direction: column;
-  height: calc(100dvh - var(--s2a-spacing-64));
-  border: 0;
-  width: 100%;
-  translate: -200vw 0;
-  opacity: 0;
-  display: flex;
-  visibility: hidden;
-  color: var(--s2a-color-gray-1000);
-}
-
-.global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
-  transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0.5s;
-}
-
-.global-navigation nav > ul > li.feds-menu-wrapper:popover-open {
-  display: flex;
-  translate: 0;
-  opacity: 1;
-  z-index: 2;
-  transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0s;
-  visibility: visible;
-  align-items: flex-start;
-  padding: 0;
-}
-
-.global-navigation nav > ul > li.feds-menu-wrapper:popover-open .feds-gnav-items {
-  align-items: flex-start;
-  padding: var(--s2a-spacing-sm) var(--s2a-spacing-lg);
-  width: calc(100% - var(--s2a-spacing-3xl));
-}
 
 /* =========================================
    Nav Toggle (Hamburger)
@@ -195,18 +150,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
 
 .global-navigation.feds-header-scrolled nav .feds-nav-toggle svg {
   color: var(--s2a-color-gray-1000);
-}
-
-.global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-nav-toggle svg {
-  display: none;
-}
-
-.global-navigation.site-pivot:has(.feds-menu-wrapper:popover-open) .feds-nav-toggle::before {
-  content: "\2715";
-  color: var(--s2a-color-gray-1000);
-  font-size: var(--s2a-font-size-xl);
-  /* No token: font-weight 300 */
-  font-weight: 300;
 }
 
 /* =========================================
@@ -532,7 +475,7 @@ body:has(:popover-open) {
 }
 
 /* =========================================
-   Responsive: Mobile (max-width: 1023px)
+   Responsive: Mobile (max-width: 766px)
    ========================================= */
 
 @media (max-width: 767px) {
@@ -575,7 +518,7 @@ body:has(:popover-open) {
     to {
       /* No token: 51% white */
       background-color: rgba(255, 255, 255, 0.51);
-      width: calc(100% - var(--s2a-spacing-xs));
+      width: calc(100% - 10px);
       /* No token: 6px radius */
       border-radius: 6px;
       border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
@@ -616,7 +559,8 @@ body:has(:popover-open) {
       animation: none;
       background-color: var(--s2a-color-gray-25);
       border-radius: 6px;
-      width: calc(100% - var(--s2a-spacing-xs));
+      /* We don't have a 10px token */
+      width: calc(100% - 10px);
       margin: var(--s2a-spacing-2xs) var(--s2a-spacing-2xs) 0;
       border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
     }
@@ -646,5 +590,169 @@ body:has(:popover-open) {
   header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) .feds-brand-image svg,
   header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) .feds-nav-toggle svg {
     color: var(--s2a-color-gray-1000);
+  }
+}
+
+/* =========================================
+   Popover Animations
+   ========================================= */
+
+/* Browsers must support @starting-style */
+
+
+.feds-popup:popover-open {
+  opacity: 1;
+  max-height: calc(100dvh - var(--s2a-spacing-64));
+}
+
+.feds-popup {
+  opacity: 0;
+  max-height: 0;
+  transition: all 0.3s allow-discrete;
+}
+
+/* Needs to be after the previous .feds-popup:popover-open rule
+to take effect, as the specificity is the same */
+@starting-style {
+  .feds-popup:popover-open {
+    opacity: 0;
+    max-height: 0;
+  }
+}
+
+@media (min-width:768px) {
+  .feds-popup :not(.feds-popup-header) {
+    transform: translate(-2px, -2px);
+    transition: all 0.3s ease;
+  }
+  .feds-popup:popover-open :not(.feds-popup-header) {
+    transform: translate(0);
+  }
+  @starting-style {
+    .feds-popup:popover-open :not(.feds-popup-header) {
+      transform: translate(-2px, -2px);
+    }
+  }
+}
+@keyframes header-popover-open {
+  from {
+    background-color: rgba(255,255,255,0);
+  }
+  to {
+    background-color: var(--s2a-color-gray-75);
+  }
+}
+
+@keyframes scrolled-header-popover-open {
+  from {
+    /* No token: 51% white */
+    background-color: rgba(255, 255, 255, 0.51);
+    width: calc(100% - 10px);
+    /* No token: 6px radius */
+    border-radius: 6px;
+    border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
+    transform: translate(var(--s2a-spacing-2xs), var(--s2a-spacing-2xs));
+    /* Token 16px; design 16.5px */
+    backdrop-filter: blur(var(--s2a-blur-sm));
+  }
+  to {
+    background-color: var(--s2a-color-gray-75);
+    width: 100%;
+    border-radius: 0px;
+    border: none;
+    transform: translate(0,0);
+    backdrop-filter: none;
+  }
+}
+
+header.global-navigation.feds-header-scrolled {
+  animation: none;
+  background-color: rgba(255, 255, 255, 0.51);
+  width: calc(100% - 10px);
+  border-radius: 6px;
+  border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
+  transform: translate(var(--s2a-spacing-2xs), var(--s2a-spacing-2xs));
+  backdrop-filter: blur(var(--s2a-blur-sm));
+  transition:
+    background-color 0.3s ease,
+    width 0.3s ease,
+    border-radius 0.3s ease,
+    border 0.3s ease,
+    transform 0.3s ease,
+    backdrop-filter 0.3s ease;
+}
+
+header.global-navigation.feds-header-scrolled:has(:popover-open) {
+  /* Cancel the scroll-driven animation so transition can take over */
+  animation: none;
+  background-color: var(--s2a-color-gray-75);
+  width: 100%;
+  border-radius: 0;
+  border: none;
+  transform: translate(0, 0);
+  backdrop-filter: none;
+}
+
+header.global-navigation:has(:popover-open) {
+  animation: header-popover-open 0.3s ease forwards;
+}
+
+/* =========================================
+   Menu Wrapper (Mobile Fade In)
+   ========================================= */
+@media (max-width: 767px) {
+  .global-navigation nav > ul > li.feds-menu-wrapper {
+    position: fixed;
+    top: var(--s2a-spacing-64);
+    left: 0;
+    right: var(--s2a-spacing-20);
+    flex-direction: column;
+    height: calc(100dvh - var(--s2a-spacing-64));
+    border: 0;
+    width: 100%;
+    opacity: 0;
+    display: flex;
+    visibility: hidden;
+    color: var(--s2a-color-gray-1000);
+    background-color: var(--s2a-color-gray-75);
+  }
+  
+  .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
+    transition: opacity 0.4s ease, visibility 0s linear 0.5s;
+  }
+  
+  .global-navigation nav > ul > li.feds-menu-wrapper:popover-open {
+    display: flex;
+    translate: 0;
+    opacity: 1;
+    z-index: 2;
+    transition: translate 0.4s ease-out, opacity 0.4s ease, visibility 0s linear 0s;
+    visibility: visible;
+    align-items: flex-start;
+    padding: 0;
+  }
+  
+  .global-navigation nav > ul > li.feds-menu-wrapper:popover-open .feds-gnav-items {
+    align-items: flex-start;
+    padding: var(--s2a-spacing-sm) var(--s2a-spacing-lg);
+    width: calc(100% - var(--s2a-spacing-3xl));
+  }
+
+  .feds-nav-toggle path {
+    transform-origin: 7px 3.5px;
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  }
+  
+  .global-navigation:has(:popover-open) .feds-nav-toggle svg {
+    height: 11px;
+  }
+  
+  /* open state */
+  .global-navigation:has(:popover-open) .feds-nav-toggle path:first-child {
+    transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
+  }
+  
+  .global-navigation:has(:popover-open) .feds-nav-toggle path:last-child {
+    transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
   }
 }
