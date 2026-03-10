@@ -621,7 +621,7 @@ to take effect, as the specificity is the same */
   }
 }
 
-@media (min-width:768px) {
+@media (min-width:1024px) {
   .feds-popup :not(.feds-popup-header) {
     transform: translate(-2px, -2px);
     transition: all 0.3s ease;
@@ -708,7 +708,7 @@ header.global-navigation:has(:popover-open) {
 /* =========================================
    Menu Wrapper (Mobile Fade In)
    ========================================= */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .global-navigation nav > ul > li.feds-menu-wrapper {
     position: fixed;
     top: var(--s2a-spacing-64);
