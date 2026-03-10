@@ -14,6 +14,18 @@ export const icons = {
   chevronDown: '<svg class="chevron-down" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="6" height="3.375" viewBox="0 0 6 3.375" focusable="false"><path d="M.5.5 3 2.875 5.5.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>',
 };
 
+// URL path segments that should receive the `merch` class
+const MERCH_LINK_PATHS = ['/tools/ost?', '/miniplans'];
+
+/**
+ * Checks if a URL should be decorated as a merch link
+ * @param href - The URL to check
+ * @returns true if the URL matches merch link paths
+ */
+export const isMerchLink = (href: string): boolean => {
+  return MERCH_LINK_PATHS.some((path) => href.includes(path));
+};
+
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
 // all arrays.
@@ -632,6 +644,7 @@ type JarvisConfig = {
 
 export type MiloConfig = {
   env: MiloConfigEnv;
+  base: string;
   locale: MiloConfigLocale;
   unav?: UnavConfig;
   jarvis?: JarvisConfig;
