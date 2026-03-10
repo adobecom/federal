@@ -380,6 +380,10 @@ header.global-navigation:has(.feds-popup:popover-open) {
   opacity: 1;
 }
 
+.global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+  cursor: pointer;
+}
+
 /* =========================================
    Navigation Bar
    ========================================= */
