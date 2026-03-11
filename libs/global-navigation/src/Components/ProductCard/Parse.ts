@@ -2,16 +2,16 @@ import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { alternative } from "../../Utils/Utils";
 import { Link, parseLink } from "../Link/Parse";
 
-export type LinkGroupHeader = {
-  type: "LinkGroupHeader";
+export type ProductCardHeader = {
+  type: "ProductCardHeader";
   title: string;
   classes: string[];
   daaLl: string | null;
   daaLh: string | null;
 };
 
-export type LinkGroupLink = {
-  type: "LinkGroupLink";
+export type ProductCardLink = {
+  type: "ProductCardLink";
   iconHref: string | null;
   iconAlt: string | null;
   title: string;
@@ -22,30 +22,37 @@ export type LinkGroupLink = {
   daaLh: string | null;
 }
 
-export type LinkGroupBlue = {
-  type: "LinkGroupBlue";
+export type ProductCardBlue = {
+  type: "ProductCardBlue";
   link: Link;
   daaLl: string | null;
   daaLh: string | null;
 };
 
-export type LinkGroup
-  = LinkGroupHeader
-  | LinkGroupLink
-  | LinkGroupBlue;
+export type ProductCard
+  = ProductCardHeader
+  | ProductCardLink
+  | ProductCardBlue;
 
 
-export const parseLinkGroup = (
+export const parseProductCard = (
   element: Element | null
-): Parsed<LinkGroup, RecoverableError> => 
-  alternative(parseLinkGroupHeader)
-    .or(parseLinkGroupLink)
-    .or(parseLinkGroupBlue)
-    .eval(element);
+): Parsed<ProductCard, RecoverableError> => {
+  if (!element)
+    throw new IrrecoverableError(ERRORS.elementNull);
 
-/* example structure of a link group
+  if (!element.classList.contains('product-card'))
+    throw new IrrecoverableError(ERRORS.notAProductCard);
+
+  return alternative(parseProductCardHeader)
+    .or(parseProductCardLink)
+    .or(parseProductCardBlue)
+    .eval(element);
+}
+
+/* example structure of a product card
 *
-* <div class="link-group">
+* <div class="product-card">
 *   <div>
 *     <div><a href="/federal/assets/svgs/creative-cloud-40.svg">https://main--federal--adobecom.hlx.page/federal/assets/svgs/creative-cloud-40.svg | Adobe Creative Cloud</a></div>
 *     <div>
@@ -56,7 +63,7 @@ export const parseLinkGroup = (
 * </div>
 *  
 * Sometimes it's slightly different
-* <div class="link-group gray-gradient bold header">
+* <div class="product-card gray-gradient bold header">
     <div>
       <div></div>
       <div>
@@ -75,11 +82,12 @@ const ERRORS = {
   noSubtitleP: "Subtitle <p> not found",
   noSubtitle: "Subtitle text not found",
   notAHeader: "Expected a Header class",
+  notAProductCard: "Expected a product-card class",
 };
 
-const parseLinkGroupLink = (
+const parseProductCardLink = (
   element: Element | null
-): Parsed<LinkGroup, RecoverableError> => {
+): Parsed<ProductCard, RecoverableError> => {
   const errors = new Set<RecoverableError>();
   if (!element)
     throw new IrrecoverableError(ERRORS.elementNull);
@@ -126,7 +134,7 @@ const parseLinkGroupLink = (
 
   return [
     {
-      type: "LinkGroupLink",
+      type: "ProductCardLink",
       iconHref,
       iconAlt,
       title,
@@ -140,9 +148,9 @@ const parseLinkGroupLink = (
   ]
 }
 
-const parseLinkGroupHeader = (
+const parseProductCardHeader = (
   element: Element | null
-): Parsed<LinkGroup, RecoverableError> => {
+): Parsed<ProductCard, RecoverableError> => {
   if (!element)
     throw new IrrecoverableError(ERRORS.elementNull);
   
@@ -159,7 +167,7 @@ const parseLinkGroupHeader = (
 
   return [
     {
-      type: "LinkGroupHeader",
+      type: "ProductCardHeader",
       title,
       classes,
       daaLl,
@@ -169,14 +177,14 @@ const parseLinkGroupHeader = (
   ];
 };
 
-const parseLinkGroupBlue = (
+const parseProductCardBlue = (
   element: Element | null
-): Parsed<LinkGroup, RecoverableError> => {
+): Parsed<ProductCard, RecoverableError> => {
   if (!element)
     throw new IrrecoverableError(ERRORS.elementNull);
 
   if (!element.classList.contains('blue'))
-    throw new Error('Not a Blue Link Group');
+    throw new Error('Not a Blue Product Card');
 
   const a = element.querySelector('a');
   const [link, es] = parseLink(a);
@@ -185,7 +193,7 @@ const parseLinkGroupBlue = (
 
   return [
     {
-      type: "LinkGroupBlue",
+      type: "ProductCardBlue",
       link,
       daaLl,
       daaLh,

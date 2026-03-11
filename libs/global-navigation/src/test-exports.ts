@@ -1,9 +1,9 @@
 // Test exports - exports components and utilities for testing
-export { parseLinkGroup } from './Components/LinkGroup/Parse';
-export { linkGroup } from './Components/LinkGroup/Render';
+export { parseProductCard } from './Components/ProductCard/Parse';
+export { productCard } from './Components/ProductCard/Render';
 export { IrrecoverableError, RecoverableError } from './Error/Error';
 export { parseLink } from './Components/Link/Parse';
-export type { LinkGroup, LinkGroupHeader, LinkGroupLink, LinkGroupBlue } from './Components/LinkGroup/Parse';
+export type { ProductCard, ProductCardHeader, ProductCardLink, ProductCardBlue } from './Components/ProductCard/Parse';
 export type { Link } from './Components/Link/Parse';
 export { parseBrand } from './Components/Brand/Parse';
 export { brand } from './Components/Brand/Render';

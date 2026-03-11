@@ -1,4 +1,4 @@
-import { linkGroup } from "../LinkGroup/Render";
+import { productCard } from "../ProductCard/Render";
 import { getAnalyticsAttrs, icons } from "../../Utils/Utils";
 import { ProductCategory, ProductList } from "./Parse";
 
@@ -18,7 +18,7 @@ export const productlist = ({ categories, links }: ProductList): HTML => {
           role="tabpanel"
           ${i === 0 ? '' : 'hidden'}
         >
-          ${links.map(link => `<li>${linkGroup(link)}</li>`).join('')}
+          ${links.map(link => `<li>${productCard(link)}</li>`).join('')}
         </ul>
       </li>
       `.trim()).join('')}

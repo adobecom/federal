@@ -177,6 +177,10 @@ header.feds-header-scrolled .feds-link {
   opacity: 1;
 }
 
+.global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+  cursor: pointer;
+}
+
 /* =========================================
    Navigation Bar
    ========================================= */
@@ -380,7 +384,7 @@ body:has(:popover-open) {
    Link Groups
    ========================================= */
 
-.feds-popup .feds-link-group {
+.feds-popup .feds-product-card {
   display: grid;
   grid-template-columns: var(--s2a-spacing-xl) minmax(0, 1fr);
   gap: var(--s2a-spacing-sm);
@@ -394,36 +398,36 @@ body:has(:popover-open) {
 
 @media(max-width: 1023px) {
 
-  .feds-popup .feds-link-group {
+  .feds-popup .feds-product-card {
     border-radius: var(--s2a-border-radius-24);
   }
 }
 
-.feds-popup .feds-link-group:hover .feds-link-group__title,
-.feds-popup .feds-link-group:hover .feds-link-group__subtitle {
+.feds-popup .feds-product-card:hover .feds-product-card__title,
+.feds-popup .feds-product-card:hover .feds-product-card__subtitle {
   color: var(--s2a-color-gray-25);
 }
 
-.feds-popup .feds-link-group__icon {
+.feds-popup .feds-product-card__icon {
   display: block;
   width: var(--s2a-spacing-lg);
   height: var(--s2a-spacing-lg);
   margin-top: var(--s2a-spacing-2xs);
 }
 
-.feds-popup .feds-link-group__icon-img {
+.feds-popup .feds-product-card__icon-img {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.feds-popup .feds-link-group__title {
+.feds-popup .feds-product-card__title {
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: var(--s2a-font-line-height-20);
 }
 
-.feds-popup .feds-link-group__badges {
+.feds-popup .feds-product-card__badges {
   display: inline-flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -431,7 +435,7 @@ body:has(:popover-open) {
   margin-bottom: var(--s2a-spacing-xs);
 }
 
-.feds-popup .feds-link-group__badge {
+.feds-popup .feds-product-card__badge {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -444,13 +448,13 @@ body:has(:popover-open) {
   color: var(--s2a-color-content-default);
 }
 
-.feds-popup .feds-link-group__badge--filled {
+.feds-popup .feds-product-card__badge--filled {
   border-color: var(--s2a-color-gray-1000);
   background: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
 }
 
-.feds-popup .feds-link-group__subtitle {
+.feds-popup .feds-product-card__subtitle {
   margin-top: var(--s2a-spacing-2xs);
   font-size: var(--s2a-font-size-xs);
   font-weight: var(--s2a-font-weight-adobe-clean-regular);
@@ -459,14 +463,14 @@ body:has(:popover-open) {
   color: var(--s2a-color-content-subtle);
 }
 
-.feds-popup .feds-link-group__price {
+.feds-popup .feds-product-card__price {
   display: flex;
   align-items: baseline;
   gap: 6px;
   margin-top: var(--s2a-spacing-sm);
 }
 
-.feds-popup .feds-link-group__old-price {
+.feds-popup .feds-product-card__old-price {
   font-size: var(--s2a-font-size-xs);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 1;
@@ -475,34 +479,34 @@ body:has(:popover-open) {
   color: var(--s2a-color-content-subtle);
 }
 
-.feds-popup .feds-link-group__new-price {
+.feds-popup .feds-product-card__new-price {
   font-size: var(--s2a-font-size-xs);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 1;
   color: var(--s2a-color-gray-1000);
 }
 
-.feds-popup .feds-link-group--blue {
+.feds-popup .feds-product-card--blue {
   background: var(--s2a-color-blue-100);
 }
 
-.feds-popup .feds-link-group--blue:hover {
+.feds-popup .feds-product-card--blue:hover {
   background: var(--s2a-color-blue-200);
 }
 
-.feds-popup .feds-link-group:hover .feds-link-group__old-price,
-.feds-popup .feds-link-group:hover .feds-link-group__new-price,
-.feds-popup .feds-link-group:hover .feds-link-group__badge {
+.feds-popup .feds-product-card:hover .feds-product-card__old-price,
+.feds-popup .feds-product-card:hover .feds-product-card__new-price,
+.feds-popup .feds-product-card:hover .feds-product-card__badge {
   color: var(--s2a-color-gray-25);
   border-color: var(--s2a-color-gray-25);
 }
 
-.feds-popup .feds-link-group:hover .feds-link-group__badge--filled {
+.feds-popup .feds-product-card:hover .feds-product-card__badge--filled {
   background: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);
 }
 
-.feds-link-group .feds-link-header {
+.feds-product-card .feds-product-card-header {
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -529,9 +533,7 @@ body:has(:popover-open) {
 }
 
 .feds-popup .feds-secondary-cta:hover {
-  /* No token: design #f5f5f5; using gray-75 */
   background: var(--s2a-color-gray-75);
-  text-decoration: underline;
 }
 
 /* =========================================
@@ -805,6 +807,7 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
     visibility: visible;
     align-items: flex-start;
     padding: 0;
+    margin-top: 0;
   }
   
   .global-navigation nav > ul > li.feds-menu-wrapper:popover-open .feds-gnav-items {
@@ -1352,6 +1355,11 @@ ul.tabs .product-links {
   color: var(--s2a-color-gray-25);
 }
 
+.product-list .tabs button.tab:hover {
+  color: var(--s2a-color-gray-25);
+  background-color: var(--s2a-color-content-subtle);
+}
+
 /* =========================================
    Tab Content / Tabpanels
    ========================================= */
@@ -1373,7 +1381,7 @@ ul.tabs .product-links {
   list-style: none;
 }
 
-.product-list .tab-content [role="tabpanel"] .feds-link-group {
+.product-list .tab-content [role="tabpanel"] .feds-product-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1382,11 +1390,11 @@ ul.tabs .product-links {
   background-color: var(--s2a-color-gray-25);
 }
 
-.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover {
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {
   background: var(--s2a-color-gray-1000);
 }
 
-.feds-popup .product-list .tab-content [role="tabpanel"] .feds-link-group:hover .feds-link-group__title {
+.feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover .feds-product-card__title {
   color: var(--s2a-color-gray-25);
 }
 

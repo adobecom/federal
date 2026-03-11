@@ -1,6 +1,6 @@
 import { IrrecoverableError, RecoverableError } from "../../test-exports";
 import { getNextSiblings, parseListAndAccumulateErrors } from "../../Utils/Utils";
-import { LinkGroup, parseLinkGroup } from "../LinkGroup/Parse";
+import { ProductCard, parseProductCard } from "../ProductCard/Parse";
 import { Link, parseLink } from "../Link/Parse";
 
 export type ProductList = {
@@ -13,7 +13,7 @@ export type ProductCategory = {
   type: "ProductCategory";
   name: string;
   daaLh: string | null;
-  links: List<LinkGroup>;
+  links: List<ProductCard>;
 }
 
 export const parseProductList = (
@@ -52,7 +52,7 @@ const parseProductCategory = (
   const [
     links,
     errors
-  ] = parseListAndAccumulateErrors(linkGroups, parseLinkGroup);
+  ] = parseListAndAccumulateErrors(linkGroups, parseProductCard);
   return [
     {
       type: "ProductCategory",
