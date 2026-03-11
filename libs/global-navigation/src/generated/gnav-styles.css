@@ -147,17 +147,7 @@
 
 header.global-navigation {
   width: 100%;
-}
-
-header.feds-header-scrolled .feds-link {
-  color: var(--s2a-color-gray-1000);
-}
-
-header.global-navigation:has(.feds-popup:popover-open) {
-  background-color: var(--s2a-color-gray-75);
-}
-
-.global-navigation.site-pivot {
+  background: transparent;
   visibility: visible;
   display: block;
   position: fixed;
@@ -166,9 +156,8 @@ header.global-navigation:has(.feds-popup:popover-open) {
   z-index: 10;
 }
 
-.global-navigation.site-pivot:has(:popover-open) {
-  background: var(--s2a-color-gray-25);
-  opacity: 1;
+header.feds-header-scrolled .feds-link {
+  color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
@@ -206,7 +195,6 @@ header.global-navigation:has(.feds-popup:popover-open) {
   height: inherit;
   align-items: center;
   padding-left: 0;
-  background: inherit;
 }
 
 .global-navigation nav > ul > li {
@@ -576,7 +564,6 @@ body:has(:popover-open) {
   .global-navigation.site-pivot nav {
     display: flex;
     align-items: center;
-    padding-left: var(--s2a-spacing-lg);
     justify-content: flex-start;
   }
 
@@ -644,25 +631,30 @@ body:has(:popover-open) {
    Scroll Animations
    ========================================= */
 
+header.global-navigation nav {
+  padding: 0 0 0 var(--s2a-spacing-md);
+  margin: var(--s2a-spacing-xs) var(--s2a-spacing-xs) 0 var(--s2a-spacing-xs);
+  border-radius: var(--s2a-border-radius-16);
+  transition: all 0.3s ease;
+}
+
+header.global-navigation:has(:popover-open) nav {
+  border-radius: 0;
+  margin: 0;
+  padding: var(--s2a-spacing-xs) var(--s2a-spacing-xs) 0 calc(var(--s2a-spacing-md) + var(--s2a-spacing-xs));
+  backdrop-filter: blur(0);
+  background-color: var(--s2a-color-gray-75);
+}
+
 @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
   @keyframes scroll-transition-main-nav {
     from {
-      background-color: transparent;
-      width: 100%;
-      border-radius: 0px;
-      border: solid 0px rgba(0, 0, 0, 0);
-      transform: translate(0, 0);
+      background-color: rgba(255,255,255, 0);
       backdrop-filter: blur(0px);
     }
     to {
       /* No token: 51% white */
       background-color: rgba(255, 255, 255, 0.51);
-      width: calc(100% - 10px);
-      /* No token: 6px radius */
-      border-radius: 6px;
-      border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
-      transform: translate(var(--s2a-spacing-2xs), var(--s2a-spacing-2xs));
-      /* Token 16px; design 16.5px */
       backdrop-filter: blur(var(--s2a-blur-sm));
     }
   }
@@ -676,7 +668,7 @@ body:has(:popover-open) {
     }
   }
 
-  header.global-navigation:not(:has(:popover-open)) {
+  header.global-navigation:not(:has(:popover-open)) nav {
     animation: scroll-transition-main-nav linear forwards;
     animation-timeline: scroll();
     animation-range: 0px 100px;
@@ -690,18 +682,8 @@ body:has(:popover-open) {
   }
 
   @media (max-width: 1023px) {
-    header.global-navigation:has(.unav-comp-app-switcher-open) {
+    header.global-navigation:has(.unav-comp-app-switcher-open) nav {
       animation: none;
-    }
-
-    header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) {
-      animation: none;
-      background-color: var(--s2a-color-gray-25);
-      border-radius: 6px;
-      /* We don't have a 10px token */
-      width: calc(100% - 10px);
-      margin: var(--s2a-spacing-2xs) var(--s2a-spacing-2xs) 0;
-      border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
     }
 
     header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-brand-image svg,
@@ -782,65 +764,12 @@ to take effect, as the specificity is the same */
   }
 }
 
-@keyframes scrolled-header-popover-open {
-  from {
-    /* No token: 51% white */
-    background-color: rgba(255, 255, 255, 0.51);
-    width: calc(100% - 10px);
-    /* No token: 6px radius */
-    border-radius: 6px;
-    border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
-    transform: translate(var(--s2a-spacing-2xs), var(--s2a-spacing-2xs));
-    /* Token 16px; design 16.5px */
-    backdrop-filter: blur(var(--s2a-blur-sm));
-  }
-  to {
-    background-color: var(--s2a-color-gray-75);
-    width: 100%;
-    border-radius: 0px;
-    border: none;
-    transform: translate(0,0);
-    backdrop-filter: none;
-  }
-}
 
-header.global-navigation.feds-header-scrolled {
-  animation: none;
-  background-color: rgba(255, 255, 255, 0.51);
-  width: calc(100% - 10px);
-  border-radius: 6px;
-  border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
-  transform: translate(var(--s2a-spacing-2xs), var(--s2a-spacing-2xs));
-  backdrop-filter: blur(var(--s2a-blur-sm));
-  transition:
-    background-color 0.3s ease,
-    width 0.3s ease,
-    border-radius 0.3s ease,
-    border 0.3s ease,
-    transform 0.3s ease,
-    backdrop-filter 0.3s ease;
-}
-
-header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) {
+header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
   backdrop-filter: none;
   transform: none;
   transition: none;
-}
-
-
-header.global-navigation.feds-header-scrolled:has(:popover-open) {
-  /* Cancel the scroll-driven animation so transition can take over */
-  animation: none;
-  background-color: var(--s2a-color-gray-75);
-  width: 100%;
-  border-radius: 0;
-  border: none;
-  transform: translate(0, 0);
-  backdrop-filter: none;
-}
-
-header.global-navigation:has(:popover-open) {
-  animation: header-popover-open 0.3s ease forwards;
+  background: var(--s2a-color-gray-75);
 }
 
 /* =========================================
