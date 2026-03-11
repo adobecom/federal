@@ -505,10 +505,6 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
    Popup (Mega Menu Container)
    ========================================= */
 
-body:has(:popover-open) {
-  overflow: hidden;
-}
-
 .feds-popup {
   position: fixed;
   inset: var(--s2a-spacing-64) 0 auto 0;
@@ -584,13 +580,6 @@ body:has(:popover-open) {
   padding: var(--s2a-spacing-md);
   text-decoration: none;
   color: var(--s2a-color-content-default);
-}
-
-@media(max-width: 1023px) {
-
-  .feds-popup .feds-product-card {
-    border-radius: var(--s2a-border-radius-24);
-  }
 }
 
 .feds-popup .feds-product-card:hover .feds-product-card__title,
@@ -817,6 +806,13 @@ body:has(:popover-open) {
     inset: var(--s2a-spacing-64) 0 0 0;
   }
 
+  .feds-popup .feds-product-card {
+    border-radius: var(--s2a-border-radius-24);
+  }
+
+  body:has(:popover-open) {
+    overflow: hidden;
+  }
 }
 
 /* =========================================
