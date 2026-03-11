@@ -1038,7 +1038,7 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
 
 li.feds-brand-wrapper {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   justify-content: flex-start;
   padding-left: var(--s2a-spacing-20);
 }
@@ -2102,8 +2102,8 @@ ul.tabs .product-links {
         </button>
       `.trim(),i=t?wn(t):"",s=An(a,wn);return`
         <li class="feds-brand-wrapper">
-          ${o}
           ${i}
+          ${o}
         </li>
         <li
           id="feds-menu-wrapper"
