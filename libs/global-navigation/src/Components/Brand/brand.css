@@ -11,7 +11,6 @@ li.feds-brand-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  padding-left: var(--s2a-spacing-20);
 }
 
 header.global-navigation:has(:popover-open) nav .feds-brand-image svg,
@@ -27,7 +26,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 .feds-logo {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-xs);
+  padding: 0 var(--s2a-spacing-lg) 0 0;
   column-gap: 10px;
 }
 
@@ -75,10 +74,41 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 }
 
 /* =========================================
+   Animations
+   ========================================= */
+
+@media (max-width: 1023px) {
+  @keyframes brand-fade {
+    from {
+      opacity: 1
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  header.global-navigation:has(:popover-open) .feds-brand {
+    animation: brand-fade 0.3s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  header.global-navigation .feds-nav-toggle {
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+  }
+  header.global-navigation:has(:popover-open) .feds-nav-toggle {
+    transform: translateX(-47px);
+  }
+}
+
+/* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
 @media (min-width: 1024px) {
+  .feds-brand,
+  .feds-logo {
+    padding: 0 var(--s2a-spacing-xs);
+  }
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;

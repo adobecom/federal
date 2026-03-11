@@ -98,7 +98,6 @@ header.feds-header-scrolled .feds-link {
 .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link {
   color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-font-size-3xl);
-  font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
 
 .global-navigation:not(.feds-header-scrolled):not(:has(:popover-open)) .feds-gnav-items > li > .feds-link:hover {
@@ -560,15 +559,9 @@ header.global-navigation:has(:popover-open) nav {
 }
 
 @supports (not ((animation-timeline: scroll()) and (animation-range: 0% 100%))) {
-  header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) {
+  header.global-navigation:not(:has(:popover-open)) nav {
     /* No token: 51% white */
     background-color: rgba(255, 255, 255, 0.51);
-    /* No token: 6px radius */
-    border-radius: 6px;
-    width: calc(100% - var(--s2a-spacing-xs));
-    margin: var(--s2a-spacing-2xs) var(--s2a-spacing-2xs) 0;
-    border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
-    /* Token 16px; design 16.5px */
     backdrop-filter: blur(var(--s2a-blur-sm));
   }
 
@@ -629,10 +622,14 @@ to take effect, as the specificity is the same */
 }
 
 
-header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
+header.global-navigation:has(.unav-comp-app-switcher-open) nav {
   backdrop-filter: none;
   transform: none;
   transition: none;
+  background: transparent;
+}
+
+header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
   background: var(--s2a-color-gray-75);
 }
 

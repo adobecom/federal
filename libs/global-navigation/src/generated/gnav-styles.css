@@ -18,7 +18,6 @@
   --s2a-color-blue-900: #3b63fb;
   --s2a-color-red-900: #d73220;
   --s2a-color-transparent-black-64: rgb(0 0 0 / 64%);
-  --s2a-color-transparent-black-04: rgb(0 0 0 / 4%);
   --s2a-color-transparent-black-08: rgb(0 0 0 / 8%);
   --s2a-color-brand-adobe-red: #eb1000;
   --s2a-border-radius-0: 0;
@@ -236,7 +235,6 @@ header.feds-header-scrolled .feds-link {
 .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link {
   color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-font-size-3xl);
-  font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
 
 .global-navigation:not(.feds-header-scrolled):not(:has(:popover-open)) .feds-gnav-items > li > .feds-link:hover {
@@ -698,15 +696,9 @@ header.global-navigation:has(:popover-open) nav {
 }
 
 @supports (not ((animation-timeline: scroll()) and (animation-range: 0% 100%))) {
-  header.global-navigation.feds-header-scrolled:not(:has(:popover-open)) {
+  header.global-navigation:not(:has(:popover-open)) nav {
     /* No token: 51% white */
     background-color: rgba(255, 255, 255, 0.51);
-    /* No token: 6px radius */
-    border-radius: 6px;
-    width: calc(100% - var(--s2a-spacing-xs));
-    margin: var(--s2a-spacing-2xs) var(--s2a-spacing-2xs) 0;
-    border: solid var(--s2a-border-width-sm) var(--s2a-color-transparent-black-04);
-    /* Token 16px; design 16.5px */
     backdrop-filter: blur(var(--s2a-blur-sm));
   }
 
@@ -767,10 +759,14 @@ to take effect, as the specificity is the same */
 }
 
 
-header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
+header.global-navigation:has(.unav-comp-app-switcher-open) nav {
   backdrop-filter: none;
   transform: none;
   transition: none;
+  background: transparent;
+}
+
+header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
   background: var(--s2a-color-gray-75);
 }
 
@@ -848,7 +844,6 @@ li.feds-brand-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  padding-left: var(--s2a-spacing-20);
 }
 
 header.global-navigation:has(:popover-open) nav .feds-brand-image svg,
@@ -864,7 +859,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 .feds-logo {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-xs);
+  padding: 0 var(--s2a-spacing-lg) 0 0;
   column-gap: 10px;
 }
 
@@ -912,10 +907,41 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 }
 
 /* =========================================
+   Animations
+   ========================================= */
+
+@media (max-width: 1023px) {
+  @keyframes brand-fade {
+    from {
+      opacity: 1
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  header.global-navigation:has(:popover-open) .feds-brand {
+    animation: brand-fade 0.3s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  header.global-navigation .feds-nav-toggle {
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+  }
+  header.global-navigation:has(:popover-open) .feds-nav-toggle {
+    transform: translateX(-47px);
+  }
+}
+
+/* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
 @media (min-width: 1024px) {
+  .feds-brand,
+  .feds-logo {
+    padding: 0 var(--s2a-spacing-xs);
+  }
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;
