@@ -288,6 +288,10 @@ header.feds-header-scrolled .feds-link {
   fill: var(--s2a-color-gray-25);
 }
 
+.global-navigation .unav-comp-app-switcher.unav-comp-icon.unav-comp-app-switcher-open svg {
+  fill: var(--s2a-color-gray-1000);
+}
+
 .global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg {
   fill: var(--s2a-color-gray-1000);
 }
