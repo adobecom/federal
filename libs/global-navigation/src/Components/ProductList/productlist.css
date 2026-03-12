@@ -71,7 +71,7 @@
   color: var(--s2a-color-gray-25);
 }
 
-.product-list .tabs button.tab:hover {
+.product-list .tabs button.tab:hover:not([aria-selected="true"]) {
   color: var(--s2a-color-gray-25);
   background-color: var(--s2a-color-content-subtle);
 }
