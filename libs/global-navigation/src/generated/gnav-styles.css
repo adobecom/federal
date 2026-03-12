@@ -153,6 +153,9 @@ header.global-navigation {
   top: 0;
   left: 0;
   z-index: 10;
+  /* right: 0;
+  max-width: var(--grid-max-width-default);
+  margin: auto; */
 }
 
 header.feds-header-scrolled .feds-link {
@@ -1470,7 +1473,7 @@ ul.tabs .product-links {
   color: var(--s2a-color-gray-25);
 }
 
-.product-list .tabs button.tab:hover {
+.product-list .tabs button.tab:hover:not([aria-selected="true"]) {
   color: var(--s2a-color-gray-25);
   background-color: var(--s2a-color-content-subtle);
 }

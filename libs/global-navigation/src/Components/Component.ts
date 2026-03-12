@@ -45,7 +45,8 @@ export const parseComponent = (
 };
 
 export const component = (
-  c: Component
+  c: Component,
+  index?: number
 ): HTML => {
   switch (c.type) {
     case "Text": return text(c);
@@ -53,7 +54,7 @@ export const component = (
     case "SecondaryCTA": return secondaryCTA(c);
     case "PrimaryCTA": return primaryCTA(c);
     case "Brand": return brand(c);
-    case "MegaMenu": return megaMenu(c);
+    case "MegaMenu": return megaMenu(c, index);
     default: {
       const exhaustive : never = c;
       console.error(`Failed to recognize component: ${exhaustive}`);

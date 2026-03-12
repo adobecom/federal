@@ -17,7 +17,10 @@ export type ProductCardLink = {
   title: string;
   href: string;
   subtitle: string;
-  badges?: string[];
+  badges?: {
+    text: string;
+    isFilled: boolean;
+  }[];
   daaLl: string | null;
   daaLh: string | null;
 }
@@ -116,15 +119,14 @@ const parseProductCardLink = (
   if (subtitle === '')
     errors.add(new RecoverableError(ERRORS.noSubtitle));
 
-  // TO change this after we know where do we get the price values from
-  const badges = [];
- 
-  if (element.classList.contains('new')) {
-    badges.push('New');
-  }
-  if (element.classList.contains('show-offer')) {
-    badges.push('Save 20%');
-  }
+  const badgePs = element.querySelectorAll(':scope > div:nth-child(2) > :first-child p') ?? [];
+  const badges = Array.from(badgePs).map((p) => {
+    const isFilled = p.querySelector('strong') !== null;
+    return {
+      text: p?.textContent?.trim() ?? '',
+      isFilled,
+    };
+  });
 
   const [iconHref, iconAlt = null] = (element
     .firstElementChild

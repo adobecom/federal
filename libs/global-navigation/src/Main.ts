@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers, animateInSequence } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
 import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -27,6 +27,7 @@ export type Input = {
   gnavSource: URL;
   asideSource: URL | null;
   gnavTop?: number;
+  mepMartech?: string;
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
@@ -146,6 +147,7 @@ export const renderGnavString = ({
           class="feds-nav-toggle"
           type="button"
           aria-label="Navigation menu"
+          daa-ll="hamburgermenu|open"
           aria-expanded="false"
           aria-controls="feds-menu-wrapper"
           popovertarget="feds-menu-wrapper"
@@ -202,6 +204,7 @@ export const postRenderingTasks = async (
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initStaggeredAnimations(input.mountpoint);
+  initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   
   // Initialize merch links after DOM is rendered
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
@@ -231,6 +234,10 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
   menuWrapper?.addEventListener('toggle', () => {
     const isOpen = menuWrapper.matches(':popover-open');
     navToggle?.setAttribute('aria-expanded', String(isOpen));
+    navToggle?.setAttribute(
+      'daa-ll',
+      isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
+    );
     menuWrapper.setAttribute('aria-hidden', String(!isOpen));
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
   });
@@ -247,10 +254,12 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       const trigger = mountpoint.querySelector<HTMLElement>(
         `[popovertarget="${popup.id}"]`
       );
+      const isOpen = popup.matches(':popover-open');
       trigger?.setAttribute(
         'aria-expanded',
-        String(popup.matches(':popover-open'))
-      )
+        String(isOpen)
+      );
+      trigger?.setAttribute('daa-ll', isOpen ? 'header|Close' : 'header|Open');
     });
   });
 };
@@ -318,5 +327,11 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   updateHeaderState();
   window.addEventListener("scroll", updateHeaderState, { passive: true });
   menuWrapper?.addEventListener("toggle", updateHeaderState);
+};
+
+const initHeaderAnalytics = (mountpoint: HTMLElement, mepMartech: string): void => {
+  const header = mountpoint.closest("header");
+  if (header === null) return;
+  header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
 

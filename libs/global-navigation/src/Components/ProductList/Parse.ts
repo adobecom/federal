@@ -12,7 +12,7 @@ export type ProductList = {
 export type ProductCategory = {
   type: "ProductCategory";
   name: string;
-  daaLh: string | null;
+  daaLl: string | null;
   links: List<ProductCard>;
 }
 
@@ -47,7 +47,7 @@ const parseProductCategory = (
     throw new IrrecoverableError("Expected H2");
 
   const name = h2.textContent ?? '';
-  const daaLh = h2.textContent ?? '';
+  const daaLl = h2.textContent ?? '';
   const linkGroups = getNextSiblings(h2);
   const [
     links,
@@ -57,7 +57,7 @@ const parseProductCategory = (
     {
       type: "ProductCategory",
       name,
-      daaLh,
+      daaLl,
       links,
     },
     errors

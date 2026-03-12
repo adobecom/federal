@@ -59,9 +59,9 @@ const productCardLink = ({
     ? ""
     : `
       <div class="feds-product-card__badges">
-        ${badges.map((badge, index) => `
-          <span class="feds-product-card__badge${index > 0 ? " feds-product-card__badge--filled" : ""}">
-            ${badge}
+        ${badges.map(({ text, isFilled }) => `
+          <span class="feds-product-card__badge${isFilled ? " feds-product-card__badge--filled" : ""}">
+            ${text}
           </span>
         `).join("")}
       </div>

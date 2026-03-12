@@ -16,6 +16,9 @@ header.global-navigation {
   top: 0;
   left: 0;
   z-index: 10;
+  /* right: 0;
+  max-width: var(--grid-max-width-default);
+  margin: auto; */
 }
 
 header.feds-header-scrolled .feds-link {

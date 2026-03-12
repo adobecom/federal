@@ -95,7 +95,8 @@ const parseGnavCards = (
   
   // Parse each column div and its child cards
   const [sections, errors]
-    = parseListAndAccumulateErrors(columnDivs, (columnDiv) => parseGnavColumn(columnDiv));
+    = parseListAndAccumulateErrors(columnDivs, 
+      (columnDiv) => parseGnavColumn(columnDiv));
   if (sections.length === 0) {
     throw new IrrecoverableError("Failed to parse gnav cards sections");
   }
@@ -120,7 +121,8 @@ const parseGnavColumn = (
   }
   
   const [cards, errors]
-    = parseListAndAccumulateErrors(cardElements, (card) => parseGnavCardSection(card));
+    = parseListAndAccumulateErrors(cardElements,
+      (card) => parseGnavCardSection(card));
   if (cards.length === 0) {
     throw new IrrecoverableError("Failed to parse cards in column");
   }

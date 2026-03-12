@@ -1,6 +1,7 @@
 import { secondaryCTA } from "../CTA/Render";
 import { link } from "../Link/Render";
 import { LinksCard, LinksCardItem } from "./Parse";
+import { getAnalyticsAttrs } from "../../Utils/Utils";
 
 export const linkscard = ({
   card
@@ -11,7 +12,7 @@ const renderCard = ({
   links,
   footerCTA
 }: LinksCardItem): HTML => `
-  <article class="links-card">
+  <article class="links-card" ${getAnalyticsAttrs(title, '')}>
     <div>
       <h4 class="links-card-title">${title}</h4>
       <ul class="links-card-links">

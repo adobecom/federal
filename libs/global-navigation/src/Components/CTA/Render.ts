@@ -9,7 +9,7 @@ export const primaryCTA = ({
 }: PrimaryCTA): HTML => `
 <a href="${href}"
   class="feds-primary-cta"
-  ${ariaLabel ? `aria-label="${ariaLabel}"` : ''}
+  ${ariaLabel !== null && ariaLabel !== '' ? `aria-label="${ariaLabel}"` : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
 >
   ${text}
@@ -24,7 +24,7 @@ export const secondaryCTA = ({
 }: SecondaryCTA): HTML => `
 <a href="${href}" 
   class="feds-secondary-cta" 
-  ${ariaLabel ? `aria-label="${ariaLabel}"` : ''}
+  ${ariaLabel !== null && ariaLabel !== '' ? `aria-label="${ariaLabel}"` : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
 >
   ${text}

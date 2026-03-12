@@ -1,7 +1,7 @@
 import { link } from "../Link/Render";
 import { Card, FeaturedCard } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
-import { icons } from "../../Utils/Utils";
+import { icons, getAnalyticsAttrs } from "../../Utils/Utils";
 
 export const featuredcards = ({
   card
@@ -15,7 +15,7 @@ const renderCard = ({
   footerCTA,
   bodyLink,
 }: Card): HTML => `
-  <article class="featured-card">
+  <article class="featured-card" ${getAnalyticsAttrs(eyeBrow, '')}>
     <div>
       <div class="featured-eyebrow">${eyeBrow}</div>
       <h4>${title}</h4>
