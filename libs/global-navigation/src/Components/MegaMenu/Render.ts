@@ -31,6 +31,7 @@ export const popup = (
           popovertarget="${sanitize(popupId)}"
           popovertargetaction="hide"
           aria-label="Back"
+          daa-ll="${title}|Back"
         >
           ${icons.chevronLeft}
         </button>

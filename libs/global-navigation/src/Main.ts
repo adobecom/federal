@@ -147,6 +147,7 @@ export const renderGnavString = ({
           class="feds-nav-toggle"
           type="button"
           aria-label="Navigation menu"
+          daa-ll="hamburgermenu|open"
           aria-expanded="false"
           aria-controls="feds-menu-wrapper"
           popovertarget="feds-menu-wrapper"
@@ -232,6 +233,10 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
   menuWrapper?.addEventListener('toggle', () => {
     const isOpen = menuWrapper.matches(':popover-open');
     navToggle?.setAttribute('aria-expanded', String(isOpen));
+    navToggle?.setAttribute(
+      'daa-ll',
+      isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
+    );
     menuWrapper.setAttribute('aria-hidden', String(!isOpen));
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
   });
