@@ -36,7 +36,7 @@ export const productlist = ({ categories, links }: ProductList): HTML => {
 const renderTab = (
   {
     name,
-    daaLh,
+    daaLl,
   }: ProductCategory,
   i: number
 ): string => `
@@ -46,7 +46,7 @@ const renderTab = (
           class="tab"
           aria-selected="${(i === 0).toString()}"
           aria-controls="${i}"
-          ${getAnalyticsAttrs(daaLh, '')}
+          ${getAnalyticsAttrs('', daaLl)}
           >
             ${name}
           </button>

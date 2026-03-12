@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -27,6 +27,7 @@ export type Input = {
   gnavSource: URL;
   asideSource: URL | null;
   gnavTop?: number;
+  mepMartech?: string;
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
@@ -201,6 +202,7 @@ export const postRenderingTasks = async (
   initPopoverCloseOnResize(input.mountpoint);
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
+  initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   
   // Initialize merch links after DOM is rendered
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
@@ -246,10 +248,12 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       const trigger = mountpoint.querySelector<HTMLElement>(
         `[popovertarget="${popup.id}"]`
       );
+      const isOpen = popup.matches(':popover-open');
       trigger?.setAttribute(
         'aria-expanded',
-        String(popup.matches(':popover-open'))
+        String(isOpen)
       );
+      trigger?.setAttribute('daa-ll', isOpen ? 'header|Close' : 'header|Open');
     });
   });
 };
@@ -301,5 +305,11 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   updateHeaderState();
   window.addEventListener("scroll", updateHeaderState, { passive: true });
   menuWrapper?.addEventListener("toggle", updateHeaderState);
+};
+
+const initHeaderAnalytics = (mountpoint: HTMLElement, mepMartech: string): void => {
+  const header = mountpoint.closest("header");
+  if (header === null) return;
+  header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
 

@@ -294,7 +294,7 @@ export const replaceDotMedia = (path: string, ele: Element): void => {
     
     elements.forEach((el) => {
       const attrValue = el.getAttribute(attr);
-      if (!attrValue) return;
+      if (attrValue === null || attrValue === "") return;
       
       try {
         // Construct absolute URL by resolving
@@ -356,9 +356,9 @@ export const inlineNestedFragments = async (
 
 export const renderListItems = <T>(
   items: T[],
-  renderFn: (item: T) => string
+  renderFn: (item: T, index: number) => string
 ): string => {
-  return items.map(item => `<li>${renderFn(item)}</li>`).join('');
+  return items.map((item, index) => `<li>${renderFn(item, index)}</li>`).join('');
 };
 
 export const sanitize = (str: string): string => {
@@ -912,3 +912,17 @@ export const closePopovers = (mountpoint: HTMLElement): void => {
     HTMLElement & { hidePopover?: () => void }
   >('.feds-popup:popover-open')?.hidePopover?.();
 };
+
+export function getExperienceName(): string {
+  const explicitExperience = getMetadata('gnav-source')
+    ?.split('#')[0]
+    ?.split('/')
+    .pop()
+    ?.trim();
+  if (explicitExperience !== undefined && explicitExperience !== '' && explicitExperience !== 'gnav')
+    return explicitExperience;
+  const imsClientId = (window as Window & {
+    adobeid?: { client_id?: string };
+  }).adobeid?.client_id;
+  return typeof imsClientId === 'string' && imsClientId !== '' ? imsClientId : '';
+}
