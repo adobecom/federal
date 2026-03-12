@@ -87,7 +87,7 @@ header.feds-header-scrolled .feds-link {
   background-color: transparent;
   padding: var(--s2a-spacing-sm);
   color: var(--s2a-color-gray-25);
-  opacity: 100%;
+  opacity: 1;
   text-decoration: none;
 }
 
@@ -100,13 +100,16 @@ header.feds-header-scrolled .feds-link {
   font-size: var(--s2a-font-size-3xl);
 }
 
-.global-navigation:not(.feds-header-scrolled):not(:has(:popover-open)) .feds-gnav-items > li > .feds-link:hover {
+.global-navigation .feds-gnav-items > li > .feds-link:hover {
+  text-decoration: none;
+  opacity: 1;
   color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link:has(~ :popover-open) {
-  opacity: 100%;
+.global-navigation.feds-header-scrolled .feds-gnav-items > li > .feds-link:hover {
+  color: var(--s2a-color-gray-1000);
 }
+
 
 
 /* =========================================
@@ -182,7 +185,7 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
 
 .feds-popup {
   position: fixed;
-  inset: var(--s2a-spacing-64) 0 auto 0;
+  inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 auto 0;
   width: 100%;
   max-width: none;
   max-height: calc(100dvh - var(--s2a-spacing-64));
@@ -196,6 +199,9 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
 .feds-popup:popover-open {
   display: block;
   background: var(--s2a-color-gray-75);
+  /* No token for 18px */
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
 }
 
 .feds-popup > * {
@@ -435,6 +441,16 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
     font-size: var(--s2a-font-size-sm);
   }
 
+  .global-navigation .feds-gnav-items > li > .feds-link {
+    opacity: 0.65;
+  }
+
+
+  .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link[aria-expanded="true"],
+  .global-navigation.site-pivot:has(:popover-open) .feds-gnav-items > li > .feds-link:hover {
+    opacity: 1;
+  }
+
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
     position: relative;
   }
@@ -466,6 +482,11 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
     text-align: left;
   }
 
+  .global-navigation.site-pivot .feds-gnav-items > li > .feds-link {
+    font-family: var(--s2a-font-family-adobe-clean-display);
+    font-weight: var(--s2a-font-weight-adobe-clean-black);
+  }
+
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
     order: 2;
     margin-left: var(--s2a-spacing-xs);
@@ -478,7 +499,7 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
   }
 
   .feds-popup {
-    inset: var(--s2a-spacing-64) 0 0 0;
+    inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 0 0;
   }
 
   .feds-popup .feds-product-card {
@@ -498,7 +519,7 @@ header.global-navigation nav {
   padding: 0 0 0 var(--s2a-spacing-md);
   margin: var(--s2a-spacing-xs) var(--s2a-spacing-xs) 0 var(--s2a-spacing-xs);
   border-radius: var(--s2a-border-radius-16);
-  transition: all 0.3s ease;
+  transition: all 0.48s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 header.global-navigation:has(:popover-open) nav {
@@ -577,50 +598,118 @@ header.global-navigation:has(:popover-open) nav {
 
 /* Browsers must support @starting-style */
 
-
-.feds-popup:popover-open {
-  opacity: 1;
-  max-height: calc(100dvh - var(--s2a-spacing-64));
-}
-
 .feds-popup {
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  background-color: rgba(255,255,255,0.51);
   opacity: 0;
   max-height: 0;
-  transition: all 0.3s allow-discrete;
+  overflow: hidden;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 100%, 8px 100%);
+  transition: 
+    display 0.48s allow-discrete,
+    overlay 0.48s allow-discrete,
+    opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+    max-height 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+    clip-path 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.22s ease 0.18s;
 }
 
-/* Needs to be after the previous .feds-popup:popover-open rule
-to take effect, as the specificity is the same */
+.feds-popup:popover-open {
+  background-color: var(--s2a-color-gray-75);
+  opacity: 1;
+  max-height: calc(100dvh - var(--s2a-spacing-64));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  transition-delay: 0s;
+}
+
 @starting-style {
   .feds-popup:popover-open {
+    background-color: rgba(255,255,255,0.51);
     opacity: 0;
     max-height: 0;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 100%, 8px 100%);
+
   }
 }
 
-@media (min-width:1024px) {
-  .feds-popup :not(.feds-popup-header) {
-    transform: translate(-2px, -2px);
-    transition: all 0.3s ease;
+/* Dim overlay (must come AFTER .feds-popup rules) */
+.feds-popup::backdrop {
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8)) 0 0 0;
+  transition: 
+    opacity 0.3s ease,
+    background-color 0.3s ease,
+    backdrop-filter 0.3s ease,
+}
+
+.feds-popup:popover-open::backdrop {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(32px);
+}
+
+@starting-style {
+  .feds-popup::backdrop {
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
   }
-  .feds-popup:popover-open :not(.feds-popup-header) {
-    transform: translate(0);
+}
+
+
+
+/* =========================================
+   Content Entrance Animations (Desktop Only)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  :root {
+    /* Animation Variables */
+    --feds-anim-duration: 0.35s;
+    --feds-anim-panel-delay: 0.18s;
+    --feds-anim-stagger-interval: 25ms;
+    --feds-anim-stagger-start: 0.20s;
   }
-  @starting-style {
-    .feds-popup:popover-open :not(.feds-popup-header) {
-      transform: translate(-2px, -2px);
+
+  /* 1. Pane Content (Base Slide & Fade) */
+  .feds-popup:popover-open > div {
+    transform: translateY(6px);
+    animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
+    animation-delay: var(--feds-anim-panel-delay);
+  }
+
+  /* 2. Filters and Cards (Staggered) */
+  .feds-popup:popover-open .feds-gnav-cards > li,
+  .feds-popup:popover-open .product-list ul.tabs > li {
+    transform: translateY(6px);
+    animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
+  }
+
+  /* 3. Tab Switching Logic (Reset Delay for Switching) */
+  /* This class would be applied via JS on tab switch, but CSS structure is ready */
+  .feds-popup:popover-open .product-list ul[role="tabpanel"] > li {
+    transform: translateY(6px);
+    animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
+  }
+
+  .feds-popup:popover-open:has(.product-list) {
+  }
+
+  /* Keyframe Definition */
+  @keyframes feds-slide-up {
+    from {
+      transform: translateY(6px);
+    }
+    to {
+      transform: translateY(0);
     }
   }
 }
-@keyframes header-popover-open {
-  from {
-    background-color: rgba(255,255,255,0);
-  }
-  to {
-    background-color: var(--s2a-color-gray-75);
-  }
-}
-
+/* =========================================
+   Helper Logic (Automatic Staggering)
+   ========================================= */
 
 header.global-navigation:has(.unav-comp-app-switcher-open) nav {
   backdrop-filter: none;

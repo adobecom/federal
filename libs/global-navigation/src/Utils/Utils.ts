@@ -912,3 +912,9 @@ export const closePopovers = (mountpoint: HTMLElement): void => {
     HTMLElement & { hidePopover?: () => void }
   >('.feds-popup:popover-open')?.hidePopover?.();
 };
+
+export const animateInSequence = (xs: HTMLElement[], gap: number): void => {
+  for (let i = 0; i < xs.length; i += 1) {
+    xs[i].style.animationDelay = `${(i + 1) * gap}s`;
+  }
+};

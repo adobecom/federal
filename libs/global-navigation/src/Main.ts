@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers, animateInSequence } from "./Utils/Utils";
 import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -201,6 +201,7 @@ export const postRenderingTasks = async (
   initPopoverCloseOnResize(input.mountpoint);
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
+  initStaggeredAnimations(input.mountpoint);
   
   // Initialize merch links after DOM is rendered
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
@@ -249,7 +250,7 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       trigger?.setAttribute(
         'aria-expanded',
         String(popup.matches(':popover-open'))
-      );
+      )
     });
   });
 };
@@ -269,6 +270,22 @@ const initPopoverCloseOnUnavInteraction = (mountpoint: HTMLElement): void => {
     });
   });
 };
+
+const initStaggeredAnimations = (mountpoint: HTMLElement): void => {
+  const tabs = [...mountpoint.querySelectorAll('.product-list ul.tabs > li')] as HTMLElement[];
+  animateInSequence(tabs, 0.025);
+  const popovers = [...mountpoint.querySelectorAll('.feds-popup[popover]')];
+  popovers.forEach(pop => {
+    if (pop.querySelector('.product-list')) {
+      [...pop.querySelectorAll('ul[role="tabpanel"]')].forEach(tabpanel => {
+        animateInSequence([...tabpanel.querySelectorAll('li')] as HTMLElement[], 0.025);
+      });
+    } else {
+      animateInSequence([...pop.querySelectorAll('.feds-gnav-cards > li')] as HTMLElement[], 0.025);
+    }
+  });
+
+}
 
 const closeEverything = (): void => {
 };
