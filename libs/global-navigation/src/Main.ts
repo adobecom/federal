@@ -203,7 +203,7 @@ export const postRenderingTasks = async (
   initPopoverCloseOnResize(input.mountpoint);
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
-  initStaggeredAnimations(input.mountpoint);
+  // initStaggeredAnimations(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   
   // Initialize merch links after DOM is rendered
@@ -280,7 +280,7 @@ const initPopoverCloseOnUnavInteraction = (mountpoint: HTMLElement): void => {
   });
 };
 
-const initStaggeredAnimations = (mountpoint: HTMLElement): void => {
+const _initStaggeredAnimations = (mountpoint: HTMLElement): void => {
   const tabs = [...mountpoint.querySelectorAll('.product-list ul.tabs > li')] as HTMLElement[];
   animateInSequence(tabs, 0.025);
   const popovers = [...mountpoint.querySelectorAll('.feds-popup[popover]')];

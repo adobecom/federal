@@ -33,15 +33,46 @@ export const initClickListeners = (
         iterations: 1,
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
       });
-
     }
   );
+
   tabButtons.forEach((button, i) => {
     button.addEventListener('click', tabButtonClickCallbacks[i]);
   });
+
+  animations(gnav);
+
   return () => {
     tabButtons.forEach((button, i) => {
       button.removeEventListener('click', tabButtonClickCallbacks[i]);
     });
   };
 };
+
+
+const animations = (gnav: HTMLElement): void => {
+  const mainMenuButtons = [...gnav.querySelectorAll('.feds-gnav-items > li > button')];
+  const fedsGnavItems = gnav.querySelector('.feds-gnav-items');
+  mainMenuButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (isDesktop.matches) return;
+      if (!fedsGnavItems) return;
+      const popup = button.nextElementSibling;
+      if (!popup) return;
+      fedsGnavItems.classList.remove('subscreen-closing');
+      fedsGnavItems.classList.add('subscreen-opening');
+      popup.querySelector('.feds-popup-back-button')?.addEventListener('click', () => {
+        fedsGnavItems.classList.remove('subscreen-opening');
+        fedsGnavItems.classList.add('subscreen-closing');
+      });
+    });
+  });
+  isDesktop.addEventListener('change', () => {
+    fedsGnavItems?.classList.remove('subscreen-opening');
+    fedsGnavItems?.classList.remove('subscreen-closing');
+  });
+  gnav.querySelector('.feds-nav-toggle')?.addEventListener('click', () => {
+    fedsGnavItems?.classList.remove('subscreen-opening');
+    fedsGnavItems?.classList.remove('subscreen-closing');
+  });
+}
