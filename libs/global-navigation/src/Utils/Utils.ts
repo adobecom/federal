@@ -150,6 +150,8 @@ export type PersonalizationConfig = {
   ) => unknown;
 };
 
+export type LocalizeLink = (link: string) => string;
+
 type PersonalizationStateFunctions = [
   (config: PersonalizationConfig) => void,
   () => PersonalizationConfig
@@ -180,13 +182,32 @@ export const [setPersonalizationConfig, getPersonalizationConfig] =
     ];
   })();
 
+type LocalizeLinkStateFunctions = [
+  (localizeLink: LocalizeLink) => void,
+  () => LocalizeLink
+];
+
+export const [setLocalizeLink, getLocalizeLink] =
+  ((): LocalizeLinkStateFunctions => {
+    let localizeLink: LocalizeLink = (link: string): string => link;
+
+    return [
+      (nextLocalizeLink: LocalizeLink): void => {
+        localizeLink = nextLocalizeLink;
+      },
+      (): LocalizeLink => localizeLink,
+    ];
+  })();
+
 export const fetchAndProcessPlainHTML = async (
   source: URL | null
 ): Promise<HTMLElement | IrrecoverableError> => {
   try {
     if (source === null)
       return new IrrecoverableError('URL is null');
-    const modifiedSource = federateUrl(`${source.origin}${source.pathname.replace(/(\.html$|$)/, '.plain.html')}${source.hash}`);
+    const plainHtmlSource = `${source.origin}${source.pathname.replace(/(\.html$|$)/, '.plain.html')}${source.hash}`;
+    const localizedSource = getLocalizeLink()(plainHtmlSource);
+    const modifiedSource = federateUrl(localizedSource);
     const response = await fetch(modifiedSource);
     if (!response.ok) {
       lanaLog(`Request for ${modifiedSource} failed`);
@@ -362,17 +383,19 @@ export const renderListItems = <T>(
 };
 
 export const sanitize = (str: string): string => {
-  return str
-    .toLowerCase()
+  const sanitized = str
+    .normalize('NFKC')
+    .toLocaleLowerCase()
     .trim()
-    // Replace spaces and non-alphanumeric characters with hyphens
-    .replace(/[^a-z0-9]/g, '-')
-    // Remove multiple consecutive hyphens
-    .replace(/-+/g, '-')
-    // Remove leading/trailing hyphens
-    .replace(/^-+|-+$/g, '')
-    // Ensure it starts with a letter (prepend 'id-' if it starts with a number)
-    .replace(/^(\d)/, 'id-$1')
+    // Replace any run of non-letter/number characters with a single hyphen.
+    .replace(/[^\p{L}\p{N}\p{M}]+/gu, '-')
+    // Remove leading/trailing hyphens.
+    .replace(/^-+|-+$/g, '');
+
+  if (sanitized === '') return 'id';
+
+  // Ensure IDs do not start with a number in any script.
+  return /^\p{N}/u.test(sanitized) ? `id-${sanitized}` : sanitized;
 };
 
 export const getAnalyticsAttrs = (

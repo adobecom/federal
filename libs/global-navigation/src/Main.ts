@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
 import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -46,6 +46,7 @@ export type Input = {
   // So we'll keep it at this for now and re-evaluate at a
   // later date.
   personalization: PersonalizationConfig;
+  localizeLink?: LocalizeLink;
 };
 
 export const main = async (
@@ -75,6 +76,7 @@ export const main = async (
   }
   
   setPersonalizationConfig(personalization);
+  setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
   
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
