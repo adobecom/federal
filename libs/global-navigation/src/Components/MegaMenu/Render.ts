@@ -21,21 +21,20 @@ export const megaMenu = ({
 
 export const popup = (
   data: MegaMenuContent,
-  popupId: string,
+  _popupId: string,
   title: string,
 ): HTML => {
   const headerContent = `
         <button
           type="button"
           class="feds-popup-back-button"
-          popovertarget="${sanitize(popupId)}"
-          popovertargetaction="hide"
+          ${/* popovertarget="${sanitize(popupId)}" popovertargetaction="hide" */ ''}
           aria-label="Back"
           daa-ll="${title}|Back"
         >
           ${icons.chevronLeft}
+          <span class="feds-popup-title">${title}</span>
         </button>
-        <span class="feds-popup-title">${title}</span>
   `
   const productLink = data.type === "ProductList" && data.links.length > 0
     ? data.links[data.links.length - 1]

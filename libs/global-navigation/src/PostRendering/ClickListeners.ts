@@ -64,6 +64,7 @@ const animations = (gnav: HTMLElement): void => {
       popup.querySelector('.feds-popup-back-button')?.addEventListener('click', () => {
         fedsGnavItems.classList.remove('subscreen-opening');
         fedsGnavItems.classList.add('subscreen-closing');
+        setTimeout(() => (popup as HTMLElement).hidePopover(), 240);
       });
     });
   });
