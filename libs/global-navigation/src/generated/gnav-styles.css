@@ -302,7 +302,7 @@ header.feds-header-scrolled .feds-link {
 }
 
 .global-navigation .unav-comp-app-switcher.unav-comp-icon:hover svg {
-  fill: var(--s2a-colo-gray-1000);
+  fill: var(--s2a-color-gray-1000);
 }
 
 .global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button {
@@ -368,22 +368,21 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
   color: var(--s2a-color-content-default);
   cursor: pointer;
 }
 
 .feds-popup .feds-popup-back-button svg {
-  width: 100%;
-  height: 100%;
+  width: var(--s2a-spacing-20);
+  height: var(--s2a-spacing-20);
 }
 
-.feds-popup .feds-popup-title {
+.feds-popup .feds-popup-back-button .feds-popup-title {
   font-size: var(--s2a-font-size-3xl);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-family: var(--s2a-font-family-heading);
   color: var(--s2a-color-content-default);
+  margin-left: 10px; /* replace with token if we find one later */
 }
 
 /* =========================================
@@ -737,80 +736,98 @@ header.global-navigation:has(:popover-open) nav {
 
 /* Browsers must support @starting-style */
 
-.feds-popup {
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 18px;
-  background-color: rgba(255,255,255,0.51);
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
-  clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 100%, 8px 100%);
-  transition: 
-    display 0.48s allow-discrete,
-    overlay 0.48s allow-discrete,
-    opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1),
-    max-height 0.48s cubic-bezier(0.4, 0, 0.2, 1),
-    clip-path 0.48s cubic-bezier(0.4, 0, 0.2, 1),
-    background-color 0.22s ease 0.18s;
-}
-
-.feds-popup:popover-open {
-  background-color: var(--s2a-color-gray-75);
-  opacity: 1;
-  max-height: calc(100dvh - var(--s2a-spacing-64));
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  transition-delay: 0s;
-}
-
-@starting-style {
-  .feds-popup:popover-open {
+@media (min-width:1024px) {
+  .feds-popup {
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
     background-color: rgba(255,255,255,0.51);
     opacity: 0;
     max-height: 0;
+    overflow: hidden;
     clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 100%, 8px 100%);
-
+    transition: 
+      display 0.48s allow-discrete,
+      overlay 0.48s allow-discrete,
+      opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+      max-height 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+      clip-path 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.22s ease 0.18s;
   }
-}
-
-/* Dim overlay (must come AFTER .feds-popup rules) */
-.feds-popup::backdrop {
-  background-color: rgba(0, 0, 0, 0);
-  backdrop-filter: blur(0px);
-  inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8)) 0 0 0;
-  transition: 
-    opacity 0.3s ease,
-    background-color 0.3s ease,
-    backdrop-filter 0.3s ease,
-}
-
-.feds-popup:popover-open::backdrop {
-  opacity: 1;
-  background-color: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(32px);
-}
-
-@starting-style {
+  
+  .feds-popup:popover-open {
+    background-color: var(--s2a-color-gray-75);
+    opacity: 1;
+    max-height: calc(100dvh - var(--s2a-spacing-64));
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    transition-delay: 0s;
+  }
+  
+  @starting-style {
+    .feds-popup:popover-open {
+      background-color: rgba(255,255,255,0.51);
+      opacity: 0;
+      max-height: 0;
+      clip-path: polygon(8px 0, calc(100% - 8px) 0, calc(100% - 8px) 100%, 8px 100%);
+  
+    }
+  }
+  
+  /* Dim overlay (must come AFTER .feds-popup rules) */
   .feds-popup::backdrop {
-    opacity: 0;
     background-color: rgba(0, 0, 0, 0);
     backdrop-filter: blur(0px);
+    inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8)) 0 0 0;
+    transition: 
+      opacity 0.3s ease,
+      background-color 0.3s ease,
+      backdrop-filter 0.3s ease;
+  }
+  
+  .feds-popup:popover-open::backdrop {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(32px);
+  }
+  
+  @starting-style {
+    .feds-popup::backdrop {
+      opacity: 0;
+      background-color: rgba(0, 0, 0, 0);
+      backdrop-filter: blur(0px);
+    }
   }
 }
-
 
 
 /* =========================================
    Content Entrance Animations (Desktop Only)
    ========================================= */
 
-@media (min-width: 1024px) {
-  :root {
-    /* Animation Variables */
-    --feds-anim-duration: 0.35s;
-    --feds-anim-panel-delay: 0.18s;
-    --feds-anim-stagger-interval: 25ms;
-    --feds-anim-stagger-start: 0.20s;
+@keyframes feds-slide-up {
+  from {
+    transform: translateY(6px);
   }
+  to {
+    transform: translateY(0);
+  }
+}
+.feds-popup:popover-open {
+  /* Animation Variables */
+  --feds-anim-duration: 0.35s;
+  --feds-anim-panel-delay: 0.18s;
+  --feds-anim-stagger-interval: 25ms;
+  --feds-anim-stagger-start: 0.20s;
+}
+.feds-popup:popover-open .product-list ul[role="tabpanel"] > li {
+  transform: translateY(6px);
+  animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
+}
+.feds-popup:popover-open .product-list ul[role="tabpanel"] > li {
+  transform: translateY(6px);
+  animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
+}
+
+@media (min-width: 1024px) {
 
   /* 1. Pane Content (Base Slide & Fade) */
   .feds-popup:popover-open > div {
@@ -826,28 +843,9 @@ header.global-navigation:has(:popover-open) nav {
     animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
   }
 
-  /* 3. Tab Switching Logic (Reset Delay for Switching) */
-  /* This class would be applied via JS on tab switch, but CSS structure is ready */
-  .feds-popup:popover-open .product-list ul[role="tabpanel"] > li {
-    transform: translateY(6px);
-    animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
-  }
-
-  .feds-popup:popover-open:has(.product-list) {
-  }
-
-  /* Keyframe Definition */
-  @keyframes feds-slide-up {
-    from {
-      transform: translateY(6px);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
 }
 /* =========================================
-   Helper Logic (Automatic Staggering)
+   Unav App Switcher Fix
    ========================================= */
 
 header.global-navigation:has(.unav-comp-app-switcher-open) nav {
@@ -861,9 +859,76 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
   background: var(--s2a-color-gray-75);
 }
 
+
+
 /* =========================================
    Menu Wrapper (Mobile Fade In)
    ========================================= */
+
+@keyframes mobile-main-menu-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  } to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes main-menu-items-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+@keyframes sub-menu-items-enter {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes sub-menu-items-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+}
+
+@keyframes main-menu-items-re-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; display: none; }
+  to   { opacity: 1; display: block; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; display: block; }
+  to   { opacity: 0; display: none; }
+}
+
 @media (max-width: 1023px) {
   .global-navigation nav > ul > li.feds-menu-wrapper {
     position: fixed;
@@ -882,7 +947,7 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
   }
   
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
-    transition: opacity 0.4s ease, visibility 0s linear 0.5s;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
   }
   
   .global-navigation nav > ul > li.feds-menu-wrapper:popover-open {
@@ -903,6 +968,25 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
     width: calc(100% - var(--s2a-spacing-3xl));
   }
 
+  .global-navigation nav > ul > li.feds-menu-wrapper:popover-open {
+    & .feds-gnav-items > li {
+      opacity: 0;
+      transform: translateX(18px);
+      animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
+    }
+  
+    & .feds-gnav-items > li:nth-child(1) { animation-delay: 0.18s; }
+    & .feds-gnav-items > li:nth-child(2) { animation-delay: 0.24s; }
+    & .feds-gnav-items > li:nth-child(3) { animation-delay: 0.30s; }
+    & .feds-gnav-items > li:nth-child(4) { animation-delay: 0.36s; }
+    & .feds-gnav-items > li:nth-child(5) { animation-delay: 0.42s; }
+    & .feds-gnav-items > li:nth-child(6) { animation-delay: 0.48s; }
+    & .feds-gnav-items > li:nth-child(7) { animation-delay: 0.54s; }
+    & .feds-gnav-items > li:nth-child(8) { animation-delay: 0.60s; }
+    & .feds-gnav-items > li:nth-child(9) { animation-delay: 0.66s; }
+    & .feds-gnav-items > li:nth-child(10) { animation-delay: 0.72s; }
+  }
+
   .feds-nav-toggle path {
     transform-origin: 7px 3.5px;
     transition: transform 0.35s cubic-bezier(.4,0,.2,1);
@@ -912,15 +996,109 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
     height: 11px;
   }
   
-  /* open state */
   .global-navigation:has(:popover-open) .feds-nav-toggle path:first-child {
     transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
   }
-  
   .global-navigation:has(:popover-open) .feds-nav-toggle path:last-child {
     transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
   }
+  
+  header.global-navigation > nav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+    /* open subscreen */
+    &.subscreen-opening {
+      & > li {
+        opacity: 1;
+        transform: translateX(0);
+        animation: main-menu-items-exit 0.5s cubic-bezier(0.42, 0, 0, 1) forwards;
+      }
+      & > li:nth-child(1) { animation-delay: 0s; }
+      & > li:nth-child(2) { animation-delay: 0.025s; }
+      & > li:nth-child(3) { animation-delay: 0.05s; }
+      & > li:nth-child(4) { animation-delay: 0.075s; }
+      & > li:nth-child(5) { animation-delay: 0.1s; }
+  
+      /* target the popover descendant when it is open */
+      & .feds-popup:popover-open {
+        opacity: 0;
+        animation: fade-in 0s linear 0.3s forwards; /* zero-duration instant jump after delay */
+  
+        & .feds-popup-header {
+          opacity: 0;
+          transform: translateX(18px);
+          animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1) 0.3s;
+        }
+  
+        & .tabs {
+          opacity: 0;
+          transform: translateX(18px);
+          animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+          animation-delay: 0.36s;
+        }
+  
+        & .feds-gnav-cards > li {
+          opacity: 0;
+          transform: translateX(18px);
+          animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+        }
+        & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.36s; }
+        & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.42s; }
+      }
+    }
+    /* close subscreen */
+    &.subscreen-closing {
+      & > li {
+        opacity: 0;
+        transform: translateX(-18px);
+        animation: main-menu-items-re-enter 0.26s ease forwards 0.24s;
+      }
+      & > li:nth-child(1) { animation-delay: 0.24s; }
+      & > li:nth-child(2) { animation-delay: 0.27s; }
+      & > li:nth-child(3) { animation-delay: 0.30s; }
+      & > li:nth-child(4) { animation-delay: 0.33s; }
+      & > li:nth-child(5) { animation-delay: 0.36s; }
+  
+      /* target the popover descendant when it is open */
+      & .feds-popup:popover-open {
+        & .feds-popup-header {
+          opacity: 1;
+          transform: translateX(0px);
+          animation: sub-menu-items-exit 0.2s forwards ease;
+        }
+  
+        & .tabs {
+          opacity: 1;
+          transform: translateX(0px);
+          animation: sub-menu-items-exit 0.2s forwards ease;
+        }
+  
+        & .feds-gnav-cards > li {
+          opacity: 1;
+          transform: translateX(0px);
+          animation: sub-menu-items-exit 0.2s forwards ease;
+        }
+        & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.04s; }
+        & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.08s; }
+      }
+    }
+  }
 }
+
+ul.feds-gnav-cards,
+ul[role="tabpanel"],
+.product-list ul.tabs {
+  & > li:nth-child(1) { animation-delay: 0.025s; }
+  & > li:nth-child(2) { animation-delay: 0.05s; }
+  & > li:nth-child(3) { animation-delay: 0.075s; }
+  & > li:nth-child(4) { animation-delay: 0.1s; }
+  & > li:nth-child(5) { animation-delay: 0.125s; }
+  & > li:nth-child(6) { animation-delay: 0.15s; }
+  & > li:nth-child(7) { animation-delay: 0.175s; }
+  & > li:nth-child(8) { animation-delay: 0.2s; }
+  & > li:nth-child(9) { animation-delay: 0.225s; }
+  & > li:nth-child(10) { animation-delay: 0.25s; }
+}
+
+
 
 /* =========================================
    Brand Container
@@ -976,6 +1154,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 
 .feds-brand-image.mobile-brand svg {
   height: var(--s2a-spacing-md);
+  width: 18px; /* no token for 18px */
 }
 
 .feds-brand-image.desktop-brand svg {
