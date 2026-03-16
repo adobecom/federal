@@ -1,4 +1,4 @@
-import { getAnalyticsAttrs } from "../../Utils/Utils";
+import { getAnalyticsAttrs, localizeHref } from "../../Utils/Utils";
 import { PrimaryCTA, ProductEntryCTA, SecondaryCTA } from "./Parse";
 
 export const primaryCTA = ({
@@ -7,7 +7,7 @@ export const primaryCTA = ({
   daaLl,
   ariaLabel,
 }: PrimaryCTA): HTML => `
-<a href="${href}"
+<a href="${localizeHref(href)}"
   class="feds-primary-cta"
   ${ariaLabel !== null && ariaLabel !== '' ? `aria-label="${ariaLabel}"` : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
@@ -22,7 +22,7 @@ export const secondaryCTA = ({
   daaLl,
   ariaLabel,
 }: SecondaryCTA): HTML => `
-<a href="${href}" 
+<a href="${localizeHref(href)}" 
   class="feds-secondary-cta" 
   ${ariaLabel !== null && ariaLabel !== '' ? `aria-label="${ariaLabel}"` : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}

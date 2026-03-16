@@ -1,5 +1,5 @@
 import { ProductCard, ProductCardBlue, ProductCardHeader, ProductCardLink } from "./Parse";
-import { getAnalyticsAttrs } from "../../Utils/Utils";
+import { getAnalyticsAttrs, localizeHref } from "../../Utils/Utils";
 
 export const productCard = (card: ProductCard): HTML => {
   switch (card.type) {
@@ -71,7 +71,7 @@ const productCardLink = ({
     : `<div class="feds-product-card__subtitle">${subtitle}</div>`;
 
   return `
-    <a class="feds-product-card" href="${href}"${analyticsAttrs}>
+    <a class="feds-product-card" href="${localizeHref(href)}"${analyticsAttrs}>
       <div class="feds-product-card-header">
         ${icon}
         ${badgesMarkup}
@@ -92,7 +92,7 @@ const productCardBlue = ({
 }: ProductCardBlue): HTML => {
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? link.text);
   return `
-  <a href="${link.href}" class="feds-product-card feds-product-card--blue"${analyticsAttrs}>
+  <a href="${localizeHref(link.href)}" class="feds-product-card feds-product-card--blue"${analyticsAttrs}>
     <div class="feds-product-card__content">
         <div class="feds-product-card__title">${link.text}</div>
       </div>

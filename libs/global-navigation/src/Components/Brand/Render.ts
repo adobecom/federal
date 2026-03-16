@@ -1,4 +1,5 @@
 import { Brand } from "./Parse";
+import { localizeHref } from "../../Utils/Utils";
 type ImageData = Extract<Brand['data'], { image: unknown }>['image'];
 
 const renderImage = (image: ImageData, imageOnly: boolean): string => {
@@ -32,7 +33,7 @@ const MOBILE_SVG = `
 
 const renderBrand = (href: string, _content: string, ariaLabel = ''): HTML =>
   `<div class="feds-brand-container">
-    <a href="${href}" class="feds-brand" daa-ll="Brand"${ariaLabel}>
+    <a href="${localizeHref(href)}" class="feds-brand" daa-ll="Brand"${ariaLabel}>
       <span class="feds-brand-image brand-image-only desktop-brand">
         ${DESKTOP_SVG}
       </span>

@@ -199,6 +199,14 @@ export const [setLocalizeLink, getLocalizeLink] =
     ];
   })();
 
+export const localizeHref = (href: string): string => {
+  try {
+    return getLocalizeLink()(href);
+  } catch {
+    return href;
+  }
+};
+
 export const fetchAndProcessPlainHTML = async (
   source: URL | null
 ): Promise<HTMLElement | IrrecoverableError> => {

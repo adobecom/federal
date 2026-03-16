@@ -1,4 +1,4 @@
-import { getAnalyticsAttrs, sanitize, icons } from "../../Utils/Utils";
+import { getAnalyticsAttrs, sanitize, icons, localizeHref } from "../../Utils/Utils";
 import { gnavCards } from "../GnavCards/Render";
 import { productlist } from "../ProductList/Render";
 import { MegaMenu, MegaMenuContent } from "./Parse";
@@ -43,7 +43,7 @@ export const popup = (
     <div class="feds-popup-header">
       <div class="feds-popup-header-left">${headerContent}</div>
       ${productLink
-          ? `<div class="product-links"><a class="feds-link" href="${productLink.href}"${getAnalyticsAttrs(null, productLink.daaLl ?? productLink.text)}>${productLink.text}${icons.chevronRight}</a></div>`
+          ? `<div class="product-links"><a class="feds-link" href="${localizeHref(productLink.href)}"${getAnalyticsAttrs(null, productLink.daaLl ?? productLink.text)}>${productLink.text}${icons.chevronRight}</a></div>`
           : ''}
     </div>
   `.trim();
