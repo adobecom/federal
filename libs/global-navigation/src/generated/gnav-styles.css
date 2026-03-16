@@ -906,7 +906,7 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
   }
   to {
     opacity: 1;
-    transform: translateX(18px);
+    transform: translateX(0);
   }
 }
 
@@ -998,6 +998,8 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
     /* open subscreen */
     &.subscreen-opening {
       & > li {
+        opacity: 1;
+        transform: translateX(0);
         animation: main-menu-items-exit 0.5s cubic-bezier(0.42, 0, 0, 1) forwards;
       }
       & > li:nth-child(1) { animation-delay: 0s; }
