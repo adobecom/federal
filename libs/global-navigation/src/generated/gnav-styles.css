@@ -1170,6 +1170,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 
 .feds-brand-image.brand-image-only.mobile-brand svg {
   height: var(--s2a-spacing-md);
+  width: 18px; /* no token for 18px */
 }
 
 .feds-brand-image.brand-image-only.desktop-brand svg {
