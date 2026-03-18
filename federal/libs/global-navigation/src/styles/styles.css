@@ -663,7 +663,7 @@ header.global-navigation.feds-header-scrolled nav:not(:has(.feds-popup:popover-o
   nav::backdrop {
     background-color: rgba(0, 0, 0, 0);
     backdrop-filter: blur(0px);
-    inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8)) 0 0 0;
+    inset: 0 0 0 0;
     transition:
       opacity 0.3s ease,
       background-color 0.3s ease,
