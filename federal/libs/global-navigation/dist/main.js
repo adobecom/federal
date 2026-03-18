@@ -407,7 +407,6 @@ header.global-navigation nav {
   overflow: visible;
   border-radius: var(--s2a-border-radius-16);
 
-  transition: backdrop-filter 0.48s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: transparent;
 }
 
@@ -420,13 +419,14 @@ header.global-navigation nav::after {
   height: 100%;
   padding: 0;
   background-color: transparent;
+  backdrop-filter: blur(0px);
   border-radius: var(--s2a-border-radius-16);
   z-index: -1;
   transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1);
 }
 
-header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) {
-  backdrop-filter: blur(0px);
+header.global-navigation.feds-header-scrolled nav::after {
+  backdrop-filter: blur(var(--s2a-blur-sm));
 }
 
 header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open)::after {
@@ -435,6 +435,7 @@ header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:po
   background-color: var(--s2a-color-gray-75);
   left: calc(0px - var(--s2a-spacing-xs));
   top: calc(0px - var(--s2a-spacing-xs) * 2);
+  backdrop-filter: blur(0px);
 }
 
 @media (max-width: 1023px) {
@@ -593,12 +594,10 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   border: 0;
   padding: 0;
   overflow: auto;
-  background: var(--s2a-color-gray-25);
 }
 
 .feds-popup:popover-open {
   display: block;
-  background: var(--s2a-color-gray-75);
   /* No token for 18px */
   border-bottom-left-radius: 18px;
   border-bottom-right-radius: 18px;
@@ -938,14 +937,6 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
    Scroll Animations
    ========================================= */
 
-header.global-navigation nav:not(:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open)) {
-  transition: backdrop-filter 0.35s ease;
-}
-
-header.global-navigation.feds-header-scrolled nav:not(:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open)) {
-  backdrop-filter: blur(var(--s2a-blur-sm));
-}
-
 @media (min-width: 1920px) {
   header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open)::after {
     left: calc(0px - var(--s2a-spacing-xs) - (100vw - 1920px) / 2);
@@ -964,7 +955,7 @@ header.global-navigation.feds-header-scrolled nav:not(:has(.feds-popup:popover-o
   .feds-popup {
     border-bottom-left-radius: 18px;
     border-bottom-right-radius: 18px;
-    background-color: rgba(255,255,255,0.51);
+    background-color: transparent;
     opacity: 0;
     max-height: calc(100dvh - var(--s2a-spacing-64));
     overflow: hidden;
@@ -995,7 +986,7 @@ header.global-navigation.feds-header-scrolled nav:not(:has(.feds-popup:popover-o
   nav::backdrop {
     background-color: rgba(0, 0, 0, 0);
     backdrop-filter: blur(0px);
-    inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8)) 0 0 0;
+    inset: 0 0 0 0;
     transition:
       opacity 0.3s ease,
       background-color 0.3s ease,
