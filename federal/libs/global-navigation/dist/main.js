@@ -967,7 +967,6 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     background-color: transparent;
     opacity: 0;
     max-height: calc(100dvh - var(--s2a-spacing-64));
-    overflow: hidden;
     clip-path: polygon(0 0, 100% 0, 100% 0%, 0 0%);
     transition:
       display 0.48s allow-discrete,
