@@ -77,6 +77,9 @@ const animations = (gnav: HTMLElement): void => {
     popup.addEventListener('toggle', (event: ToggleEvent) => {
       if (event.newState !== 'open' && !gnav.querySelector('.feds-popup:popover-open')) {
         (popoverBackgroundRule as CSSStyleRule).style.height = '100%';
+      } else {
+        // in case the resize observer fails
+        (popoverBackgroundRule as CSSStyleRule).style.height = `${popup.clientHeight + 72}px`;
       }
     });
   });
