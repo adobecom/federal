@@ -594,6 +594,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   border: 0;
   padding: 0;
   overflow: auto;
+  background-color:transparent;
 }
 
 .feds-popup:popover-open {
