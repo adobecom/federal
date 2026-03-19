@@ -205,6 +205,17 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   // initStaggeredAnimations(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
+
+  //Todo: Fix this after the modal has changed to dialog
+  window.addEventListener('milo:modal:loaded', () => {
+    document.querySelector('nav[popover]')?.removeAttribute('popover');
+  });
+
+  window.addEventListener('milo:modal:closed', () => {
+    const nav = document.querySelector<HTMLElement & { showPopover?: () => void }>('nav');
+    nav?.setAttribute('popover', 'manual');
+    nav?.showPopover?.();
+  });
   
   // Initialize merch links after DOM is rendered
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
