@@ -1233,7 +1233,7 @@ header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popove
     transition: transform 0.3s ease;
   }
   header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-nav-toggle {
-    transform: translateX(-34px);
+    transform: translateX(-30px);
   }
 }
 
