@@ -185,7 +185,6 @@ header.global-navigation.feds-header-scrolled nav::after {
 
 .global-navigation nav .feds-nav-toggle {
   margin: 0;
-  margin-left: var(--s2a-spacing-2xs);
   padding: 0;
   border: none;
   background: transparent;

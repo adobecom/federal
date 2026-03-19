@@ -25,7 +25,7 @@ header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popove
 .feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
+  padding: 0 var(--s2a-spacing-sm) 0 var(--s2a-spacing-md);
   column-gap: 10px;
 }
 
@@ -104,7 +104,7 @@ header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popove
     transition: transform 0.3s ease;
   }
   header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-nav-toggle {
-    transform: translateX(-46px);
+    transform: translateX(-34px);
   }
 }
 
