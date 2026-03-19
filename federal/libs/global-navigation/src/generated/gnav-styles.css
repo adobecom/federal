@@ -757,6 +757,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
    Popover Animations
    ========================================= */
 
+
 @media (min-width: 1024px) {
   .feds-popup {
     border-bottom-left-radius: 18px;
@@ -769,8 +770,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     transition:
       display 0.48s allow-discrete,
       overlay 0.48s allow-discrete,
-      opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1),
-      clip-path 0.48s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1);
     transition-delay: 0s;
   }
 
@@ -1233,7 +1233,7 @@ header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popove
     transform: translateX(0);
     transition: transform 0.3s ease;
   }
-  header.global-navigation:has(:popover-open) .feds-nav-toggle {
+  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-nav-toggle {
     transform: translateX(-34px);
   }
 }
