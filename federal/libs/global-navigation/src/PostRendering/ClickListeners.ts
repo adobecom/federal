@@ -52,6 +52,7 @@ export const initClickListeners = (
 
 const animations = (gnav: HTMLElement): void => {
   const mainMenuButtons = [...gnav.querySelectorAll('.feds-gnav-items > li > button')];
+  const fedsGnavItems = gnav.querySelector('.feds-gnav-items');
 
   // popover height animations
   const popoverBackgroundRule =
@@ -71,6 +72,10 @@ const animations = (gnav: HTMLElement): void => {
         (popoverBackgroundRule as CSSStyleRule).style.height = `${newHeight + 72}px`;
       } else {
         (popoverBackgroundRule as CSSStyleRule).style.height = '100%';
+        // Bandaid for using escape for closing the popup in mobile
+        if (isDesktop.matches) return;
+        fedsGnavItems?.classList.remove('subscreen-opening');
+        fedsGnavItems?.classList.add('subscreen-closing');
       }
     });
   });
@@ -84,7 +89,6 @@ const animations = (gnav: HTMLElement): void => {
 
   // Mobile subscreen animations
 
-  const fedsGnavItems = gnav.querySelector('.feds-gnav-items');
   mainMenuButtons.forEach(button => {
     button.addEventListener('click', () => {
       if (isDesktop.matches) return;
