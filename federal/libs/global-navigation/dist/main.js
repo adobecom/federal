@@ -687,6 +687,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   font-size: var(--s2a-typography-font-size-title-4);
   line-height: var(--s2a-typography-line-height-title-4);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  font-family: var(--s2a-font-family-heading);
 }
 
 .feds-popup .feds-product-card__badges {
@@ -784,7 +785,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   justify-content: center;
   width: fit-content;
   padding: 11px 14px 10px;
-  border: var(--s2a-border-width-sm) solid var(--s2a-color-content-default);
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
   border-radius: var(--s2a-border-radius-round);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   font-size: var(--s2a-typography-font-size-body-sm);
@@ -1428,8 +1429,8 @@ header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popove
     transform: translateX(0);
     transition: transform 0.3s ease;
   }
-  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-nav-toggle {
-    transform: translateX(-47px);
+  header.global-navigation:has(:popover-open) .feds-nav-toggle {
+    transform: translateX(-34px);
   }
 }
 
@@ -1564,7 +1565,7 @@ ul.tabs .product-links {
 .feds-popup .feds-gnav-cards {
   list-style: none;
   margin: 0;
-  padding: 0 var(--s2a-spacing-lg) var(--s2a-spacing-lg);
+  padding: var(--s2a-spacing-lg);
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--s2a-spacing-2xs);
@@ -1586,6 +1587,7 @@ ul.tabs .product-links {
     gap: var(--s2a-spacing-xs);
     overflow-x: auto;
     width: 100%;
+    padding-top: 0;
   }
 
   .feds-popup .feds-gnav-cards > li {
