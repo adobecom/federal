@@ -11,7 +11,7 @@ jobs:
     if: github.ref == 'refs/heads/stage'
     uses: ./.github/workflows/clear-cache.yml
     with:
-      cpCode: 1684057
+      cpCode: 1570741
       network: production
       command: delete
     secrets: inherit
@@ -20,7 +20,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/clear-cache.yml
     with:
-      cpCode: 1585265
+      cpCode: 1579504
       network: production
       command: delete
 
