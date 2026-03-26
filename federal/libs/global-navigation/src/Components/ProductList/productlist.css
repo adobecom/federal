@@ -62,7 +62,7 @@
   border-radius: 75px;
   padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
   text-align: center;
-  font-family: var(--body-font-family);
+  font-family: var(--s2a-font-family-adobe-clean);
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 8px;
@@ -108,6 +108,7 @@
   min-height: 120px;
   height: auto;
   background-color: var(--s2a-color-gray-25);
+  justify-content: space-between;
 }
 
 .feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {

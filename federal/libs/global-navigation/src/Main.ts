@@ -112,6 +112,7 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
+  mountpoint.querySelector('nav')?.showPopover();
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
   ]
@@ -135,7 +136,7 @@ export const renderGnavString = ({
   unavEnabled,
 }: GlobalNavigationData
 ): string => `
-<nav>
+<nav popover="manual" data-lenis-prevent>
   <ul>
     ${((): string => {
       const brandComponent = components.find((c) =>
@@ -205,18 +206,26 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   // initStaggeredAnimations(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-
-  //Todo: Fix this after the modal has changed to dialog
-  window.addEventListener('milo:modal:loaded', () => {
+  const handleModalLoaded = (): void => {
     document.querySelector('nav[popover]')?.removeAttribute('popover');
-  });
+    closePopovers(input.mountpoint);
+  };
+  if (document.querySelector('.dialog-modal')) {
+    handleModalLoaded();
+  }
 
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('a[href*="#openPrivacy"]')) {
+      handleModalLoaded();
+    }
+  });
+  //Todo: Fix this after the modal has changed to dialog
+  window.addEventListener('milo:modal:loaded', handleModalLoaded);
   window.addEventListener('milo:modal:closed', () => {
     const nav = document.querySelector<HTMLElement & { showPopover?: () => void }>('nav');
     nav?.setAttribute('popover', 'manual');
     nav?.showPopover?.();
   });
-  
   // Initialize merch links after DOM is rendered
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
