@@ -191,3 +191,7 @@
     margin-right: var(--s2a-spacing-4xl);
   }
 }
+
+.product-hint {
+  display: none;
+}

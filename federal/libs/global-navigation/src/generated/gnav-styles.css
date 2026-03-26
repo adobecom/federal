@@ -15,6 +15,7 @@
   --s2a-color-gray-1000: #000;
   --s2a-color-blue-100: #f5f9ff;
   --s2a-color-blue-200: #e5f0fe;
+  --s2a-color-blue-800: #4b75ff;
   --s2a-color-blue-900: #3b63fb;
   --s2a-color-red-900: #d73220;
   --s2a-color-transparent-black-64: rgb(0 0 0 / 64%);
@@ -139,6 +140,27 @@
  * Global Navigation Styles
  * Styles for the federal global navigation component
  */
+
+/* =========================================
+   Skip to Main Content Link
+   ========================================= */
+
+.feds-skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.feds-skip-link:focus {
+  outline: 2px solid var(--s2a-color-blue-800);
+  outline-offset: 1px;
+}
 
 /* =========================================
    Header Shell
@@ -1878,6 +1900,10 @@ ul.tabs .product-links {
   }
 }
 
+.product-hint {
+  display: none;
+}
+
 /* =========================================
    Panels Container
    ========================================= */
@@ -2162,6 +2188,10 @@ ul.tabs .product-links {
 /* =========================================
    Featured Card
    ========================================= */
+
+.featured-card .feature-card-hint {
+  display: none;
+}
 
 .feds-popup .featured-card {
   border-radius: 24px;
