@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       cpCode:
-        description: 'CP Code: Prod - 1585265 / Stage - 1684057'
+        description: 'CP Code: Prod - 1585265 / Stage - 1570741'
         type: string
         required: true
         default: '1585265'
