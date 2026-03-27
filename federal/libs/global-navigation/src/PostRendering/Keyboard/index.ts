@@ -244,6 +244,15 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     handleTopBar(el, event.key, event);
   }
 
+  const trapLink = gnav.querySelector<HTMLAnchorElement>('.trap-focus-gnav');
+  const onTrapFocus = (e: FocusEvent): void => {
+    if (!gnav.querySelector('.feds-menu-active')) return;
+    e.preventDefault();
+    gnav.querySelector<HTMLElement>('.feds-nav-toggle')?.focus();
+  };
+  trapLink?.addEventListener('focus', onTrapFocus);
+  cleanups.push(() => trapLink?.removeEventListener('focus', onTrapFocus));
+
   gnav.addEventListener('keydown', onKeydown);
   cleanups.push(() => gnav.removeEventListener('keydown', onKeydown));
   return () => cleanups.forEach((fn) => fn());

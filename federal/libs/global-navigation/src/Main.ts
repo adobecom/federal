@@ -190,6 +190,7 @@ export const renderGnavString = ({
   </ul>
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  <a href="#" class="trap-focus-gnav">.</a>
 </nav>
 `;
 };
@@ -212,7 +213,6 @@ export const postRenderingTasks = async (
   initPopoverCloseOnResize(input.mountpoint);
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
-  initSkipToMainContent(input.mountpoint);
   // initStaggeredAnimations(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   const handleModalLoaded = (): void => {
@@ -366,26 +366,4 @@ const initHeaderAnalytics = (
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
 
-const initSkipToMainContent = (mountpoint: HTMLElement): void => {
-  const skipLink = mountpoint.querySelector<HTMLAnchorElement>('.feds-skip-link');
-  
-  skipLink?.addEventListener('click', (e) => {
-    const mainContent = document.querySelector('#main-content');
-    
-    if (mainContent instanceof HTMLElement) {
-      e.preventDefault();
-      
-      // Set tabindex to ensure it can receive focus if it doesn't have one
-      if (!mainContent.hasAttribute('tabindex')) {
-        mainContent.setAttribute('tabindex', '-1');
-      }
-      
-      // Focus the main content after a short delay to ensure navigation completes
-      setTimeout(() => {
-        mainContent.focus();
-        // Scroll to the main content smoothly
-        mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  });
-};
+
