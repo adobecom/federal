@@ -22,8 +22,8 @@ export const megaMenu = ({
 export const popup = (
   data: MegaMenuContent,
   _popupId: string,
-  title: string
 ): HTML => {
+  const { megaMenuTitle: title } = data;
   const headerContent = `
         <button
           type="button"
@@ -54,7 +54,7 @@ export const popup = (
       popupContent = productlist(data);
       break;
     case "GnavCards":
-      popupContent = gnavCards(data, title);
+      popupContent = gnavCards(data);
       break;
     default: data satisfies never;
   }

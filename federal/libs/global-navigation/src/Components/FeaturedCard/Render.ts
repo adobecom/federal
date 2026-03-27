@@ -5,7 +5,7 @@ import { icons, getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
 
 export const featuredcards = ({
   card
-}: FeaturedCard, menuTitle: string): HTML => renderCard(card, menuTitle);
+}: FeaturedCard, megaMenuTitle: string): HTML => renderCard(card, megaMenuTitle);
 
 
 const renderCard = ({
@@ -14,11 +14,11 @@ const renderCard = ({
   eyeBrow,
   footerCTA,
   bodyLink,
-}: Card, menuTitle: string): HTML => {
+}: Card, megaMenuTitle: string): HTML => {
   const eyeBrowId = `featured-eyebrow-${sanitize(eyeBrow)}`;
   
   return `
-  <div class="featured-card" tabindex="0" aria-label="${eyeBrow} ${menuTitle}" ${getAnalyticsAttrs(eyeBrow, '')} role="group">
+  <div class="featured-card" tabindex="0" aria-label="${eyeBrow} ${megaMenuTitle}" ${getAnalyticsAttrs(eyeBrow, '')} role="group">
     <div>
       <div id="${eyeBrowId}" class="featured-eyebrow">${eyeBrow}</div>
       <h4>${title}</h4>

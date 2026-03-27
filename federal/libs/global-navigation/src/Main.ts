@@ -124,8 +124,7 @@ mountpoint: HTMLElement
   const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
     try {
       const [content, errors] = await mmPromise;
-      const title = megaMenuComponents[idx].title;
-      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, title);
+      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id);
       return errors;
     } catch (error) {
       return [error];
