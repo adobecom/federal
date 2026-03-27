@@ -15,7 +15,7 @@ const renderCard = ({
   <article class="links-card" ${getAnalyticsAttrs(title, '')}>
     <div>
       <p id="links-card-${sanitize(title)}" class="links-card-title" role="heading" aria-level="2">${title}</p>
-      <ul class="links-card-links">
+      <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
         ${links.map(item => `<li>${link(item)}</li>`).join("")}
       </ul>
     </div>
