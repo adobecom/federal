@@ -1,12 +1,12 @@
 import { productCard } from "../ProductCard/Render";
 import { getAnalyticsAttrs, icons, localizeHref } from "../../Utils/Utils";
-import { getPlaceholders } from "../../Utils/Placeholders";
+import { getPlaceholdersSync } from "../../Utils/Placeholders";
 import { ProductCategory, ProductList } from "./Parse";
 
-export const productlist = async (
+export const productlist = (
   { categories, links }: ProductList
-): Promise<HTML> => {
-  const placeholders = await getPlaceholders();
+): HTML => {
+  const placeholders = getPlaceholdersSync();
   const tabs = `
     <ul class="tabs" role="tablist" aria-orientation="vertical">
       ${categories.map(renderTab).join('')}

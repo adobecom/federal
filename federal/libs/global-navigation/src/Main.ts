@@ -9,7 +9,7 @@ import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
 import './generated/gnav-styles.css';
-import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
+import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholdersSync } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
  
@@ -97,7 +97,6 @@ export const main = async (
   }
   
   // TODO: Implement Aside
-  
   await renderGnav(gnavData)(mountpoint);
 
   return postRenderingTasks(input);
@@ -109,7 +108,7 @@ export const renderGnav = (
 ) => async (
 mountpoint: HTMLElement
 ): Promise<HTMLElement> => {
-  const navHTML = await renderGnavString(data);
+  const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
@@ -126,7 +125,7 @@ mountpoint: HTMLElement
     try {
       const [content, errors] = await mmPromise;
       const title = megaMenuComponents[idx].title;
-      megaMenus[idx].innerHTML = await popup(content, megaMenus[idx].id, title);
+      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, title);
       return errors;
     } catch (error) {
       return [error];
@@ -135,13 +134,13 @@ mountpoint: HTMLElement
   return mountpoint;
 };
 
-export const renderGnavString = async ({
+export const renderGnavString = ({
   components,
   productCTA,
   unavEnabled,
 }: GlobalNavigationData
-): Promise<string> => {
-  const placeholders = await getPlaceholders();
+): string => {
+  const placeholders = getPlaceholdersSync()!;
   return `
 <nav popover="manual" data-lenis-prevent>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>

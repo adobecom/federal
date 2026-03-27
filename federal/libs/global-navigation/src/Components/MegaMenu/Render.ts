@@ -19,11 +19,11 @@ export const megaMenu = ({
   </div>
 `;
 
-export const popup = async (
+export const popup = (
   data: MegaMenuContent,
   _popupId: string,
   title: string
-): Promise<HTML> => {
+): HTML => {
   const headerContent = `
         <button
           type="button"
@@ -51,7 +51,7 @@ export const popup = async (
   let popupContent: HTML = '';
   switch (data.type) {
     case "ProductList":
-      popupContent = await productlist(data);
+      popupContent = productlist(data);
       break;
     case "GnavCards":
       popupContent = gnavCards(data, title);
