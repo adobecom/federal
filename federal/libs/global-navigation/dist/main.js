@@ -4,12 +4,11 @@ var wn=async n=>{let{placeholders:e}=n,{locale:a}=L(),t=`${J()}${a.prefix}/feder
         <div class="feds-product-card__title">${n}</div>
       </div>
     </div>
-  `},Ee=({iconHref:n,iconAlt:e,title:a,href:r,subtitle:t,badges:i=[],daaLl:o,daaLh:s})=>{let l=e!==null&&n!==null,d=C(s,o??a),v=l?`
+  `},Ee=({iconHref:n,iconAlt:e,title:a,href:r,subtitle:t,badges:i=[],daaLl:o,daaLh:s})=>{let l=n!==null,d=C(s,o??a),v=l?`
       <picture class="feds-product-card__icon">
         <img
           loading="lazy"
           src="${n}"
-          alt="${e}"
           class="feds-product-card__icon-img"
         >
       </picture>
@@ -150,8 +149,8 @@ version="1.0" encoding="UTF-8"?>
     </ul>
   `.trim();return`
     <div class="product-list">
-      ${r}
-      ${t}
+      <div>${r}</div>
+      <div>${t}</div>
     </div>
   `.trim()},Ke=({name:n,daaLl:e},a)=>`
       <li>
