@@ -38,7 +38,7 @@ export const productlist = (
 
   return `
     <div class="product-list">
-      <div>${tabs}</div>
+      ${tabs}
       <div>${tabcontent}</div>
     </div>
   `.trim();

@@ -149,7 +149,7 @@ version="1.0" encoding="UTF-8"?>
     </ul>
   `.trim();return`
     <div class="product-list">
-      <div>${r}</div>
+      ${r}
       <div>${t}</div>
     </div>
   `.trim()},Ke=({name:n,daaLl:e},a)=>`
