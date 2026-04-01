@@ -4,12 +4,11 @@ var wn=async n=>{let{placeholders:e}=n,{locale:a}=L(),t=`${J()}${a.prefix}/feder
         <div class="feds-product-card__title">${n}</div>
       </div>
     </div>
-  `},Le=({iconHref:n,iconAlt:e,title:a,href:r,subtitle:t,badges:i=[],daaLl:o,daaLh:s})=>{let l=e!==null&&n!==null,d=C(s,o??a),v=l?`
+  `},Le=({iconHref:n,iconAlt:e,title:a,href:r,subtitle:t,badges:i=[],daaLl:o,daaLh:s})=>{let l=n!==null,d=C(s,o??a),v=l?`
       <picture class="feds-product-card__icon">
         <img
           loading="lazy"
           src="${n}"
-          alt="${e}"
           class="feds-product-card__icon-img"
         >
       </picture>
@@ -80,7 +79,7 @@ version="1.0" encoding="UTF-8"?>
   <div class="featured-card" tabindex="0" aria-label="${a} ${i}" ${C(a,"")} role="group">
     <div>
       <div id="${o}" class="featured-eyebrow">${a}</div>
-      <h4>${n}</h4>
+      <h2>${n}</h2>
       <div class="featured-subtitle">${e}</div>
       <span>${F({...t,ariaAttrs:{"aria-describedby":o},svgIcon:H.chevronRight})}</span>
     </div>
@@ -91,7 +90,7 @@ version="1.0" encoding="UTF-8"?>
 `.trim()};var Kn=({card:n})=>Fe(n),Fe=({title:n,links:e,footerCTA:a})=>`
   <article class="links-card" ${C(n,"")}>
     <div>
-      <p id="links-card-${S(n)}" class="links-card-title" role="heading" aria-level="2">${n}</p>
+      <h2 id="links-card-${S(n)}" class="links-card-title" role="heading" aria-level="2">${n}</h2>
       <ul class="links-card-links" aria-labelledby="links-card-${S(n)}">
         ${e.map(r=>`<li>${F(r)}</li>`).join("")}
       </ul>
@@ -115,9 +114,9 @@ version="1.0" encoding="UTF-8"?>
         ${s&&l?`<p id="price-${S(t)}" class="promo-card__price">
           <a href="${T(s)}" class="merch">${o}</a>
         </p>`:""}
-        <p id="title-${S(t)}" class="promo-card__title" role="heading" aria-level="2">
+        <h2 id="title-${S(t)}" class="promo-card__title" role="heading" aria-level="2">
           ${t}
-        </p>
+        </h2>
         ${i===null?"":`<div class="promo-card__cta">
                  ${R({...i,ariaAttrs:{"aria-describedby":`title-${S(t)}${l?` price-${S(t)}`:""}`}})}
                </div>`}
@@ -151,7 +150,7 @@ version="1.0" encoding="UTF-8"?>
   `.trim();return`
     <div class="product-list">
       ${r}
-      ${t}
+      <div>${t}</div>
     </div>
   `.trim()},Ze=({name:n,daaLl:e},a)=>`
       <li>
@@ -381,6 +380,7 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
 :root {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
   --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
+  --s2a-typography-line-height-title-4-temp: 1;
 }
 
 
@@ -401,6 +401,11 @@ header.global-navigation {
 
 header.feds-header-scrolled .feds-link {
   color: var(--s2a-color-gray-1000);
+}
+
+header.feds-header-scrolled nav {
+  color: var(--s2a-color-gray-1000);
+  box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
 }
 
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
@@ -742,7 +747,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 .feds-popup .feds-product-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-family: var(--feds-heading-font-family);
 }
@@ -1155,20 +1160,9 @@ header.global-navigation:has(.unav-comp-app-switcher-open) nav {
   background: transparent;
 }
 
-header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
-  background: var(--s2a-color-gray-75);
-}
-
-/* Todo: Discuss with Raghav why he added this */
-/* header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-app-switcher-tray {
-  bottom: calc(var(--s2a-spacing-xs) + var(--s2a-spacing-64) - 100vh);
-} */
-
 header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-overlay {
   height: 100vh;
   width: 100vw;
-  top: calc(0px - var(--s2a-spacing-xs));
-  left: calc(0px - var(--s2a-spacing-xs));
 }
 
 /* =========================================
@@ -1506,16 +1500,20 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 @media (max-width: 1023px) {
   @keyframes brand-fade {
     from {
-      opacity: 1
+      opacity: 1;
+      visibility: visible;
     }
     to {
       opacity: 0;
+      visibility: hidden;
     }
   }
-  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand {
+  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand,
+  header.global-navigation:has(.feds-menu-active) .feds-brand {
     animation: brand-fade 0.3s;
     opacity: 0;
     pointer-events: none;
+    visibility: hidden;
   }
   header.global-navigation .feds-nav-toggle {
     transform: translateX(0);
@@ -1770,8 +1768,9 @@ ul.tabs .product-links {
 .feds-gnav-cards .promo-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  font-family: var(--feds-heading-font-family);
 }
 
 /* =========================================
@@ -1871,7 +1870,7 @@ ul.tabs .product-links {
 .feds-popup .links-card .links-card-title {
   margin: 0 0 var(--s2a-spacing-sm);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);
@@ -2461,11 +2460,11 @@ ul.tabs .product-links {
   line-height: var(--s2a-typography-line-height-label);
 }
 
-.feds-popup .featured-card h4 {
+.feds-popup .featured-card h2 {
   margin: 0;
   font-family: var(--feds-heading-font-family);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   color: var(--s2a-color-content-default);
   padding: var(--s2a-spacing-md) 0 var(--s2a-spacing-xs) 0;
@@ -2528,7 +2527,6 @@ ul.tabs .product-links {
 
 @media (min-width: 1024px) {
   .feds-popup .featured-card {
-    /* No token: 12px radius on desktop */
     border-radius: 12px;
   }
 

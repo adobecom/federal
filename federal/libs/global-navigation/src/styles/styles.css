@@ -47,6 +47,7 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
 :root {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
   --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
+  --s2a-typography-line-height-title-4-temp: 1;
 }
 
 
@@ -67,6 +68,11 @@ header.global-navigation {
 
 header.feds-header-scrolled .feds-link {
   color: var(--s2a-color-gray-1000);
+}
+
+header.feds-header-scrolled nav {
+  color: var(--s2a-color-gray-1000);
+  box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
 }
 
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
@@ -408,7 +414,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 .feds-popup .feds-product-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-family: var(--feds-heading-font-family);
 }
@@ -821,20 +827,9 @@ header.global-navigation:has(.unav-comp-app-switcher-open) nav {
   background: transparent;
 }
 
-header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
-  background: var(--s2a-color-gray-75);
-}
-
-/* Todo: Discuss with Raghav why he added this */
-/* header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-app-switcher-tray {
-  bottom: calc(var(--s2a-spacing-xs) + var(--s2a-spacing-64) - 100vh);
-} */
-
 header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-overlay {
   height: 100vh;
   width: 100vw;
-  top: calc(0px - var(--s2a-spacing-xs));
-  left: calc(0px - var(--s2a-spacing-xs));
 }
 
 /* =========================================
