@@ -2509,10 +2509,6 @@ ul.tabs .product-links {
   color: var(--s2a-color-gray-25);
 }
 
-.featured-card .featured-card-hint {
-  display: none;
-}
-
 /* =========================================
    Featured Card Footer
    ========================================= */
