@@ -997,3 +997,19 @@ export function getExperienceName(): string {
   }).adobeid?.client_id;
   return typeof imsClientId === 'string' && imsClientId !== '' ? imsClientId : '';
 }
+
+export const tempFixJarvis = (gnav: HTMLElement): void => {
+  const jarvisLinks = gnav.querySelectorAll('[href*="#open-jarvis-chat"]');
+  jarvisLinks.forEach(link => link.addEventListener('click', () => {
+    const adobeMsgClientWrapper = document.querySelector('.adbMsgClientWrapper');
+    if (!adobeMsgClientWrapper) return;
+    if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
+      adobeMsgClientWrapper.setAttribute('popover', 'manual');
+      (adobeMsgClientWrapper as HTMLElement).style.padding = '0'; // override default popover styling
+    }
+    // show and then hide to make sure the chat window container
+    // is the topmost popover.
+    (adobeMsgClientWrapper as HTMLElement)?.hidePopover();
+    (adobeMsgClientWrapper as HTMLElement)?.showPopover();
+  }));
+}

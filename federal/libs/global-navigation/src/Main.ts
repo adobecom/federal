@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence, tempFixJarvis } from "./Utils/Utils";
 import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholdersSync } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -227,6 +227,7 @@ export const postRenderingTasks = async (
       handleModalLoaded();
     }
   });
+  tempFixJarvis(input.mountpoint);
   //Todo: Fix this after the modal has changed to dialog
   window.addEventListener('milo:modal:loaded', handleModalLoaded);
   window.addEventListener('milo:modal:closed', () => {
