@@ -999,11 +999,9 @@ export function getExperienceName(): string {
 }
 
 export const tempFixJarvis = (gnav: HTMLElement): void => {
-  const bringJarvisToTop = (event: Event | ToggleEvent): void => {
-    const jarvisLink = (event.target as HTMLElement).closest('[href*="#open-jarvis-chat"]');
-    if (!jarvisLink && (event as ToggleEvent).newState !== 'open') return;
+  const bringToTop = (): boolean => {
     const adobeMsgClientWrapper = document.querySelector('.adbMsgClientWrapper');
-    if (!adobeMsgClientWrapper) return;
+    if (!adobeMsgClientWrapper) return false;
     if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
       adobeMsgClientWrapper.setAttribute('popover', 'manual');
       (adobeMsgClientWrapper as HTMLElement).style.padding = '0'; // override default popover styling
@@ -1012,8 +1010,17 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
     // is the topmost popover.
     (adobeMsgClientWrapper as HTMLElement)?.hidePopover();
     (adobeMsgClientWrapper as HTMLElement)?.showPopover();
+    return true;
+  }
+  const bringJarvisToTop = (event: Event | ToggleEvent): void => {
+    const jarvisLink = (event.target as HTMLElement).closest('[href*="#open-jarvis-chat"]');
+    if (!jarvisLink && (event as ToggleEvent).newState !== 'open') return;
+    bringToTop();
   }
   const popovers = gnav.querySelectorAll('[popover]');
   document.addEventListener('click', bringJarvisToTop);
   popovers.forEach(popover => popover.addEventListener('toggle', bringJarvisToTop));
+  const intervalId = setInterval(() => {
+    if (bringToTop()) clearInterval(intervalId);
+  }, 150);
 }
