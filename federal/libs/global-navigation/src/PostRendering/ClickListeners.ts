@@ -49,9 +49,10 @@ export const initClickListeners = (
 
   const tabButtonFocusCallbacks = tabButtons.map((button) => (): void => {
     if (isDesktop.matches) return;
+    if (!button.matches(':focus-visible')) return;
     const firstTabOffsetLeft = tabButtons[0]?.offsetLeft ?? 0;
     requestAnimationFrame(() => {
-      const container = button.closest<HTMLElement>('.tabs') as HTMLElement;
+      const container = button.closest<HTMLElement>('.tabs');
       if (container) {
         container.scrollLeft = button.offsetLeft - firstTabOffsetLeft;
       }
