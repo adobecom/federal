@@ -114,6 +114,15 @@ const animations = (gnav: HTMLElement): void => {
       } else {
         // in case the resize observer fails
         (popoverBackgroundRule as CSSStyleRule).style.height = `${popup.clientHeight + 72}px`;
+        // On mobile (horizontal tabs), scroll active tab to the left edge
+        if (!isDesktop.matches) {
+          const tabsList = (popup as HTMLElement).querySelector<HTMLElement>('.tabs');
+          const activeTab = (popup as HTMLElement).querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
+          const firstTab = tabsList?.querySelector<HTMLElement>('button[role="tab"]');
+          if (tabsList && activeTab && firstTab) {
+            tabsList.scrollLeft = activeTab.offsetLeft - tabsList.offsetLeft - firstTab.offsetLeft;
+          }
+        }
       }
     });
   });
