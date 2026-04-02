@@ -999,8 +999,7 @@ export function getExperienceName(): string {
 }
 
 export const tempFixJarvis = (gnav: HTMLElement): void => {
-  const jarvisLinks = gnav.querySelectorAll('[href*="#open-jarvis-chat"]');
-  jarvisLinks.forEach(link => link.addEventListener('click', () => {
+  const bringJarvisToTop = (): void => {
     const adobeMsgClientWrapper = document.querySelector('.adbMsgClientWrapper');
     if (!adobeMsgClientWrapper) return;
     if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
@@ -1011,5 +1010,9 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
     // is the topmost popover.
     (adobeMsgClientWrapper as HTMLElement)?.hidePopover();
     (adobeMsgClientWrapper as HTMLElement)?.showPopover();
-  }));
+  }
+  const popovers = gnav.querySelectorAll('[popover]');
+  const jarvisLinks = document.querySelectorAll('[href*="#open-jarvis-chat"]');
+  jarvisLinks.forEach(link => link.addEventListener('click', bringJarvisToTop));
+  popovers.forEach(popover => popover.addEventListener('toggle', bringJarvisToTop));
 }
