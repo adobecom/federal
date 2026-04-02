@@ -5,8 +5,8 @@ import { icons, getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
 
 export const featuredcards = ({
   card
-}: FeaturedCard, megaMenuTitle: string): HTML => renderCard(card, megaMenuTitle);
-
+}: FeaturedCard, megaMenuTitle: string): HTML =>
+  renderCard(card, megaMenuTitle);
 
 const renderCard = ({
   title,
@@ -18,16 +18,18 @@ const renderCard = ({
   const eyeBrowId = `featured-eyebrow-${sanitize(eyeBrow)}`;
   
   return `
-  <div class="featured-card" tabindex="0" aria-label="${eyeBrow} ${megaMenuTitle}" ${getAnalyticsAttrs(eyeBrow, '')} role="group">
+  <article class="featured-card" ${getAnalyticsAttrs(eyeBrow, '')}>
     <div>
-      <div id="${eyeBrowId}" class="featured-eyebrow">${eyeBrow}</div>
-      <h4>${title}</h4>
+      <div class="featured-eyebrow" aria-label="${eyeBrow} ${megaMenuTitle}">
+        <span id="${eyeBrowId}" aria-hidden="true">${eyeBrow}</span>
+      </div>
+      <h2>${title}</h2>
       <div class="featured-subtitle">${subtitle}</div>
       <span>${link({ ...bodyLink, ariaAttrs: { 'aria-describedby': eyeBrowId }, svgIcon: icons.chevronRight })}</span>
     </div>
     <div class="footer-container">
       ${secondaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': eyeBrowId } })}
     </div>
-  </div>
+  </article>
 `.trim();
 };
