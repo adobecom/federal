@@ -335,7 +335,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const menuWrapper = mountpoint.querySelector("#feds-menu-wrapper");
   const isMenuOpen = (): boolean =>
     menuWrapper?.matches(":popover-open") ?? false;
-  const hasScrolledPastThreshold = (): boolean => window.scrollY > 100;
+  const hasScrolledPastThreshold = (): boolean => window.scrollY > 20;
 
   const updateHeaderState = (): void => {
     if (isMenuOpen()) {
