@@ -21,7 +21,7 @@ export const initClickListeners = (
   };
   skipLink?.addEventListener('click', onSkipLinkClick);
 
-  const tabButtons = [...gnav.querySelectorAll('.tabs button[role="tab"]')];
+  const tabButtons = [...gnav.querySelectorAll<HTMLButtonElement>('.tabs button[role="tab"]')];
   const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
 
@@ -47,8 +47,20 @@ export const initClickListeners = (
     }
   );
 
+  const tabButtonFocusCallbacks = tabButtons.map((button) => (): void => {
+    if (isDesktop.matches) return;
+    const firstTabOffsetLeft = tabButtons[0]?.offsetLeft ?? 0;
+    requestAnimationFrame(() => {
+      const container = button.closest<HTMLElement>('.tabs') as HTMLElement;
+      if (container) {
+        container.scrollLeft = button.offsetLeft - firstTabOffsetLeft;
+      }
+    });
+  });
+
   tabButtons.forEach((button, i) => {
     button.addEventListener('click', tabButtonClickCallbacks[i]);
+    button.addEventListener('focus', tabButtonFocusCallbacks[i]);
   });
 
   const tabList = gnav.querySelector<HTMLElement>('.tabs[role="tablist"]');
@@ -69,6 +81,7 @@ export const initClickListeners = (
     skipLink?.removeEventListener('click', onSkipLinkClick);
     tabButtons.forEach((button, i) => {
       button.removeEventListener('click', tabButtonClickCallbacks[i]);
+      button.removeEventListener('focus', tabButtonFocusCallbacks[i]);
     });
     isDesktop.removeEventListener('change', updateTablistOrientation);
   };
