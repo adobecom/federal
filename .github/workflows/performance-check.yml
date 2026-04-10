@@ -1,0 +1,30 @@
+name: Performance Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - edited
+  workflow_dispatch:
+    inputs:
+      test_url:
+        description: Optional URL override for a manual run
+        required: false
+        type: string
+      throttle:
+        description: Optional throttle preset override
+        required: false
+        type: string
+
+jobs:
+  performance-check:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    uses: adobecom/perf-metrics/.github/workflows/performance-check.yaml@main
+    with:
+      test_url: ${{ github.event.inputs.test_url || '' }}
+      throttle: ${{ github.event.inputs.throttle || '' }}
+      baseline_path: caller/.github/performance/baseline.json
+    secrets: inherit
