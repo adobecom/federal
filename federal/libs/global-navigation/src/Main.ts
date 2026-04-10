@@ -50,9 +50,6 @@ export type Input = {
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
-  // TODO: implement a function that verifies that Input
-  // is the correct type up front.
-
   const {
     gnavSource,
     mountpoint,
