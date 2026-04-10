@@ -25,7 +25,16 @@
     }
   },
   "testUrls": [
-    "/"
+    {
+      "name": "Homepage",
+      "url": "https://main--homepage--adobecom.aem.live/homepage/index-loggedout",
+      "type": "cloud"
+    },
+    {
+      "name": "CC UK",
+      "url": "https://main--cc--adobecom.aem.live/uk/creativecloud",
+      "type": "cloud"
+    }
   ],
   "baseBranch": "test",
   "runs": 3,
