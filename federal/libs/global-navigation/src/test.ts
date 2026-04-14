@@ -1,5 +1,5 @@
 import { IrrecoverableError } from "./Error/Error";
-import { Input, renderGnavString, renderGnav } from "./Main";
+import { Input, renderGnav } from "./Main";
 import { parseNavigation } from "./Parse/Parse";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 
