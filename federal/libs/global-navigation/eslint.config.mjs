@@ -10,17 +10,8 @@ export default tseslint.config(
       "dist/**",
       "coverage/**",
       "consonant/**",
-      "scripts/**",
-      "test/**",
-      "**/test/**",
       "eslint.config.mjs",
-      "src/test.ts",
-      "**/*.test.js",
-      "**/*.test.ts",
-      "*.js",
       "**/*.js",
-      "*.d.ts",
-      "**/*.d.ts"
     ]
   },
   eslint.configs.recommended,

@@ -26,7 +26,5 @@ const input = {
   if (gnavData instanceof IrrecoverableError)
     throw gnavData;
   
-  console.log(gnavData)
-
   renderGnav(gnavData)(mountpoint);
 })(); 
