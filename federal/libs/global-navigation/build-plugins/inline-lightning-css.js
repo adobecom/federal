@@ -126,7 +126,8 @@ const closure = (roots, graph) => {
  */
 const collectDeclaredRootProps = (css) => {
   const set = new Set();
-  //:root { /* content being got */ } in capture group 1
+  //:root { /* content being got */ }
+  // content shows up in capture group 1
   const blockRe = /:\s*root(?:\[[^\]]+\])?\s*\{([^}]+)\}/g;
   let m;
   while ((m = blockRe.exec(css)) !== null) {
