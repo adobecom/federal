@@ -349,9 +349,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   };
 
   // A 20px sentinel placed at the top of the document body. When it scrolls
-  // out of the viewport the page has passed the threshold. IntersectionObserver
-  // is paint-cycle-safe and avoids the forced style recalculations caused by
-  // reading window.scrollY on every scroll event.
+  // out of the viewport the page has passed the threshold.
   const sentinel = document.createElement("div");
   sentinel.style.cssText = "position:absolute;top:20px;height:1px;width:1px;pointer-events:none;visibility:hidden;";
   sentinel.setAttribute("aria-hidden", "true");
