@@ -1,4 +1,4 @@
-import { isDesktop } from "../../Utils/Utils";
+import { isDesktop, closePanel } from "../../Utils/Utils";
 
 function $$(root: Element, selector: string): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(selector)];
@@ -54,12 +54,14 @@ function gridNextIndex(
 export function initKeyboardNav(gnav: HTMLElement): () => void {
   setTabindex(gnav, '.tab-content [role="tabpanel"] a', false);
   const cleanups: (() => void)[] = [];
-  $$(gnav, '.feds-popup[popover]').forEach((popup) => {
+  $$(gnav, '.feds-popup').forEach((popup) => {
     const onToggle = (): void => {
-      if (!popup.matches(':popover-open')) setTabindex(popup, '[role="tabpanel"] a', false);
+      if (!popup.classList.contains('is-open')) {
+        setTabindex(popup, '[role="tabpanel"] a', false);
+      }
     };
-    popup.addEventListener('toggle', onToggle);
-    cleanups.push(() => popup.removeEventListener('toggle', onToggle));
+    popup.addEventListener('gnav:toggle', onToggle);
+    cleanups.push(() => popup.removeEventListener('gnav:toggle', onToggle));
 
     // Track if Tab key was pressed (without Shift)
     let tabPressed = false;
@@ -74,7 +76,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     // Auto-close popup when focus leaves it via Tab key (not Shift+Tab)
     const onFocusOut = (event: FocusEvent): void => {
       if (tabPressed && !popup.contains(event.relatedTarget as Node)) {
-        (popup as HTMLElement & { hidePopover?: () => void }).hidePopover?.();
+        closePanel(popup);
         if (!isDesktop.matches) {
           const gnavItems = popup.closest('.feds-gnav-items');
           gnavItems?.classList.remove('subscreen-opening');
@@ -90,7 +92,8 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
   const focusAndPrevent = (target: HTMLElement, event: KeyboardEvent): void => {
     target.focus(); event.preventDefault();
   };
-  const openPopup = (): HTMLElement | null => gnav.querySelector<HTMLElement>('.feds-popup:popover-open');
+  const openPopup = (): HTMLElement | null =>
+    gnav.querySelector<HTMLElement>('.feds-popup.is-open');
   const selectedTab = (
     scope: Element
   ): HTMLElement | null => scope.querySelector<HTMLElement>(SELECTED_TAB);
@@ -114,13 +117,14 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
       return true;
     }
 
-    const popover = popup ?? (menuWrapper?.matches(':popover-open') ? menuWrapper : null);
-    if (!popover) return false;
-    (popover as HTMLElement & { hidePopover?: () => void }).hidePopover?.();
-    const trigger = popup
-      ? `[popovertarget="${popover.id}"]`
+    const target = popup
+      ?? (menuWrapper.classList.contains('is-open') ? menuWrapper : null);
+    if (!target) return false;
+    closePanel(target);
+    const triggerSelector = popup
+      ? `[aria-controls="${popup.id}"]`
       : '.feds-nav-toggle';
-    gnav.querySelector<HTMLElement>(trigger)?.focus();
+    gnav.querySelector<HTMLElement>(triggerSelector)?.focus();
     event.preventDefault();
     return true;
   }

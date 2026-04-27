@@ -1,4 +1,4 @@
-import { isDesktop } from "../Utils/Utils";
+import { isDesktop, openPanel, closePanel } from "../Utils/Utils";
 
 type CleanupFunction = () => void
 
@@ -21,11 +21,70 @@ export const initClickListeners = (
   };
   skipLink?.addEventListener('click', onSkipLinkClick);
 
+  // Hamburger toggle for mobile menu wrapper
+  const navToggle = gnav.querySelector<HTMLButtonElement>('.feds-nav-toggle');
+  const menuWrapper = gnav.querySelector<HTMLElement>('#feds-menu-wrapper');
+  const onNavToggleClick = (): void => {
+    if (!menuWrapper) return;
+    if (menuWrapper.classList.contains('is-open')) {
+      closePanel(menuWrapper);
+    } else {
+      // Close any open mega menu first
+      const openPopup = gnav.querySelector<HTMLElement>('.feds-popup.is-open');
+      if (openPopup) closePanel(openPopup);
+      openPanel(menuWrapper);
+    }
+  };
+  navToggle?.addEventListener('click', onNavToggleClick);
+
+  // Mega menu trigger buttons
+  const mainMenuButtons = [
+    ...gnav.querySelectorAll<HTMLButtonElement>('.feds-gnav-items > li > .mega-menu'),
+  ];
+  const onMegaMenuButtonClick = (button: HTMLButtonElement): void => {
+    const popupId = button.getAttribute('aria-controls') ?? '';
+    if (popupId === '') return;
+    const popup = gnav.querySelector<HTMLElement>(`#${CSS.escape(popupId)}`);
+    if (!popup) return;
+    if (popup.classList.contains('is-open')) {
+      closePanel(popup);
+    } else {
+      // Close any other open popup (replaces popover="auto" auto-dismiss)
+      gnav.querySelectorAll<HTMLElement>('.feds-popup.is-open').forEach(p => {
+        if (p !== popup) closePanel(p);
+      });
+      openPanel(popup);
+    }
+  };
+  const megaMenuClickCallbacks = mainMenuButtons.map(
+    (button) => (): void => onMegaMenuButtonClick(button)
+  );
+  mainMenuButtons.forEach((button, i) => {
+    button.addEventListener('click', megaMenuClickCallbacks[i]);
+  });
+
+  // Outside-click dismissal (replaces popover="auto" light-dismiss)
+  const onDocumentClick = (e: MouseEvent): void => {
+    if (!(e.target instanceof Element)) return;
+    // Dismiss open mega menus when clicking outside the nav
+    if (!gnav.contains(e.target)) {
+      gnav.querySelectorAll<HTMLElement>('.feds-popup.is-open').forEach(p => closePanel(p));
+      return;
+    }
+    // Dismiss when clicking inside nav but not inside any open popup or trigger
+    const clickedInsidePopup = e.target.closest('.feds-popup');
+    const clickedTrigger = e.target.closest('.mega-menu[aria-controls]');
+    if (!clickedInsidePopup && !clickedTrigger) {
+      gnav.querySelectorAll<HTMLElement>('.feds-popup.is-open').forEach(p => closePanel(p));
+    }
+  };
+  document.addEventListener('click', onDocumentClick, true);
+
   const tabButtons = [...gnav.querySelectorAll<HTMLButtonElement>('.tabs button[role="tab"]')];
   const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
 
-      const popover = tabPanels[i].closest(':popover-open');
+      const popup = tabPanels[i].closest('.feds-popup.is-open');
 
       tabButtons.forEach(tabButton => {
         tabButton.setAttribute('aria-selected', 'false');
@@ -35,13 +94,13 @@ export const initClickListeners = (
       });
       tabPanels[i]?.removeAttribute('hidden');
       button.setAttribute('aria-selected', 'true');
-      
-      if (!popover) return;
+
+      if (!popup) return;
       if (!isDesktop.matches) return;
       const popoverBackgroundRule = getPopoverBackgroundRule()
       if (!popoverBackgroundRule) return;
 
-      const newHeight = popover?.clientHeight ?? 0;
+      const newHeight = popup?.clientHeight ?? 0;
       popoverBackgroundRule.style.height = `${newHeight + 72}px`;
 
     }
@@ -80,6 +139,11 @@ export const initClickListeners = (
 
   return () => {
     skipLink?.removeEventListener('click', onSkipLinkClick);
+    navToggle?.removeEventListener('click', onNavToggleClick);
+    mainMenuButtons.forEach((button, i) => {
+      button.removeEventListener('click', megaMenuClickCallbacks[i]);
+    });
+    document.removeEventListener('click', onDocumentClick, true);
     tabButtons.forEach((button, i) => {
       button.removeEventListener('click', tabButtonClickCallbacks[i]);
       button.removeEventListener('focus', tabButtonFocusCallbacks[i]);
@@ -91,7 +155,7 @@ export const initClickListeners = (
 const getPopoverBackgroundRule = (): CSSStyleRule | undefined =>
   [...document.adoptedStyleSheets
     .flatMap(sheet => [...sheet.cssRules] as (CSSStyleRule | undefined)[])]
-    .find(rule => 
+    .find(rule =>
           (rule)?.selectorText === 'header.global-navigation nav::after');
 
 
@@ -104,13 +168,15 @@ const animations = (gnav: HTMLElement): void => {
   const resizeObserver = new ResizeObserver(entries => {
     if (!popoverBackgroundRule) return;
     if (entries.length < 1) return;
-    const openPopover = gnav.querySelector('.feds-popup:popover-open');
-    if (!openPopover) {
+    const openPopup = gnav.querySelector('.feds-popup.is-open');
+    if (!openPopup) {
       popoverBackgroundRule.style.height = '100%';
       return;
     }
-    const resetPopoverHeight = openPopover.clientHeight < 1;
-    const height = resetPopoverHeight ? '100%' : `${openPopover.clientHeight + 72}px`;
+    const resetPopoverHeight = openPopup.clientHeight < 1;
+    const height = resetPopoverHeight
+      ? '100%'
+      : `${openPopup.clientHeight + 72}px`;
     popoverBackgroundRule.style.height = height;
   });
 
@@ -119,21 +185,22 @@ const animations = (gnav: HTMLElement): void => {
     const popup = button.nextElementSibling;
     if (!popup) return;
     resizeObserver.observe(popup);
-    // @ts-expect-error popup is a popover with a toggle event
-    popup.addEventListener('toggle', (event: ToggleEvent) => {
-      if (event.newState !== 'open' && !gnav.querySelector('.feds-popup:popover-open')) {
+    popup.addEventListener('gnav:toggle', () => {
+      const isOpen = popup.classList.contains('is-open');
+      if (!isOpen && !gnav.querySelector('.feds-popup.is-open')) {
         popoverBackgroundRule.style.height = '100%';
         if (isDesktop.matches) return;
         // Bandaid for using escape for closing the popup in mobile
         fedsGnavItems?.classList.remove('subscreen-opening');
         fedsGnavItems?.classList.add('subscreen-closing');
-      } else {
+      } else if (isOpen) {
         // in case the resize observer fails
         popoverBackgroundRule.style.height = `${popup.clientHeight + 72}px`;
         // On mobile (horizontal tabs), scroll active tab to the left edge
         if (!isDesktop.matches) {
           const tabsList = (popup as HTMLElement).querySelector<HTMLElement>('.tabs');
-          const activeTab = (popup as HTMLElement).querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
+          const activeTab = (popup as HTMLElement)
+            .querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
           const firstTab = tabsList?.querySelector<HTMLElement>('button[role="tab"]');
           if (tabsList && activeTab && firstTab) {
             tabsList.scrollLeft = activeTab.offsetLeft
@@ -158,7 +225,7 @@ const animations = (gnav: HTMLElement): void => {
       popup.querySelector('.feds-popup-back-button')?.addEventListener('click', () => {
         fedsGnavItems.classList.remove('subscreen-opening');
         fedsGnavItems.classList.add('subscreen-closing');
-        setTimeout(() => (popup as HTMLElement).hidePopover(), 240);
+        setTimeout(() => closePanel(popup as HTMLElement), 240);
       });
     });
   });

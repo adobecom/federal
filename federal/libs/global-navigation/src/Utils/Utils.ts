@@ -973,15 +973,21 @@ export function getMiloLocaleSettings(
   };
 }
 
+export const openPanel = (el: HTMLElement): void => {
+  el.classList.add('is-open');
+  el.dispatchEvent(new Event('gnav:toggle', { bubbles: true }));
+};
+
+export const closePanel = (el: HTMLElement): void => {
+  el.classList.remove('is-open');
+  el.dispatchEvent(new Event('gnav:toggle', { bubbles: true }));
+};
+
 export const closePopovers = (mountpoint: HTMLElement): void => {
-  const menuPopover = mountpoint.querySelector<
-    HTMLElement & { hidePopover?: () => void }
-  >('#feds-menu-wrapper');
-  menuPopover?.classList.remove('feds-menu-active');
-  menuPopover?.hidePopover?.();
-  mountpoint.querySelector<
-    HTMLElement & { hidePopover?: () => void }
-  >('.feds-popup:popover-open')?.hidePopover?.();
+  const menuWrapper = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
+  if (menuWrapper) closePanel(menuWrapper);
+  const openPopup = mountpoint.querySelector<HTMLElement>('.feds-popup.is-open');
+  if (openPopup) closePanel(openPopup);
 };
 
 export const animateInSequence = (xs: HTMLElement[], gap: number): void => {
@@ -1006,27 +1012,21 @@ export function getExperienceName(): string {
 
 export const tempFixJarvis = (gnav: HTMLElement): void => {
   const bringToTop = (): boolean => {
-    const adobeMsgClientWrapper = document.querySelector('.adbMsgClientWrapper');
+    const adobeMsgClientWrapper = document.querySelector<HTMLElement>('.adbMsgClientWrapper');
     if (!adobeMsgClientWrapper) return false;
-    if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
-      adobeMsgClientWrapper.setAttribute('popover', 'manual');
-      (adobeMsgClientWrapper as HTMLElement).style.padding = '0'; // override default popover styling
-      (adobeMsgClientWrapper as HTMLElement).style.border = 'none';
+    // Ensure Jarvis chat widget sits above nav via z-index
+    if (!adobeMsgClientWrapper.style.zIndex) {
+      adobeMsgClientWrapper.style.zIndex = '10000';
     }
-    // show and then hide to make sure the chat window container
-    // is the topmost popover.
-    (adobeMsgClientWrapper as HTMLElement)?.hidePopover();
-    (adobeMsgClientWrapper as HTMLElement)?.showPopover();
     return true;
-  }
-  const bringJarvisToTop = (event: Event | ToggleEvent): void => {
+  };
+  const onJarvisClick = (event: Event): void => {
     const jarvisLink = (event.target as HTMLElement).closest('[href*="#open-jarvis-chat"]');
-    if (!jarvisLink && (event as ToggleEvent).newState !== 'open') return;
+    if (!jarvisLink) return;
     bringToTop();
-  }
-  const popovers = gnav.querySelectorAll('[popover]');
-  document.addEventListener('click', bringJarvisToTop);
-  popovers.forEach(popover => popover.addEventListener('toggle', bringJarvisToTop));
+  };
+  document.addEventListener('click', onJarvisClick);
+  gnav.addEventListener('gnav:toggle', bringToTop);
   const intervalId = setInterval(() => {
     if (bringToTop()) clearInterval(intervalId);
   }, 150);
