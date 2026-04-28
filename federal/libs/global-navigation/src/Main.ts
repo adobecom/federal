@@ -356,14 +356,18 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   sentinel.setAttribute("tabindex", "-1");
   document.body.prepend(sentinel);
 
+  let scrolledPast = false;
   const observer = new IntersectionObserver(
-    ([entry]) => updateHeaderState(!entry.isIntersecting),
+    ([entry]) => {
+      scrolledPast = !entry.isIntersecting;
+      updateHeaderState(scrolledPast);
+    },
     { threshold: 0 }
   );
   observer.observe(sentinel);
 
   menuWrapper?.addEventListener("toggle", () =>
-    updateHeaderState(sentinel.getBoundingClientRect().bottom <= 0)
+    updateHeaderState(scrolledPast)
   );
 };
 
