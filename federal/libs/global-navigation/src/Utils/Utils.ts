@@ -1010,24 +1010,3 @@ export function getExperienceName(): string {
   return typeof imsClientId === 'string' && imsClientId !== '' ? imsClientId : '';
 }
 
-export const tempFixJarvis = (gnav: HTMLElement): void => {
-  const bringToTop = (): boolean => {
-    const adobeMsgClientWrapper = document.querySelector<HTMLElement>('.adbMsgClientWrapper');
-    if (!adobeMsgClientWrapper) return false;
-    // Ensure Jarvis chat widget sits above nav via z-index
-    if (!adobeMsgClientWrapper.style.zIndex) {
-      adobeMsgClientWrapper.style.zIndex = '10000';
-    }
-    return true;
-  };
-  const onJarvisClick = (event: Event): void => {
-    const jarvisLink = (event.target as HTMLElement).closest('[href*="#open-jarvis-chat"]');
-    if (!jarvisLink) return;
-    bringToTop();
-  };
-  document.addEventListener('click', onJarvisClick);
-  gnav.addEventListener('gnav:toggle', bringToTop);
-  const intervalId = setInterval(() => {
-    if (bringToTop()) clearInterval(intervalId);
-  }, 150);
-}

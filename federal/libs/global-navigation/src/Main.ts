@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence, tempFixJarvis } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -215,21 +215,7 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   // initStaggeredAnimations(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-  const handleModalLoaded = (): void => {
-    closePopovers(input.mountpoint);
-  };
-  if (document.querySelector('.dialog-modal')) {
-    handleModalLoaded();
-  }
-
-  document.addEventListener('click', (event) => {
-    if (event.target instanceof Element && event.target.closest('a[href*="#openPrivacy"]')) {
-      handleModalLoaded();
-    }
-  });
-  tempFixJarvis(input.mountpoint);
-  window.addEventListener('milo:modal:loaded', handleModalLoaded);
-  // Initialize merch links after DOM is rendered
+    // Initialize merch links after DOM is rendered
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
