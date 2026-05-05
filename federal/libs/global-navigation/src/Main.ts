@@ -314,6 +314,14 @@ const bindPopupTriggers = (mountpoint: HTMLElement): void => {
 
 // Replaces the implicit "auto" popover light-dismiss. A click anywhere outside
 // an open popup AND outside its trigger closes that popup.
+//
+// Subtlety: popups are reparented to <nav> at render time so they escape
+// transformed containing blocks (see renderGnav). After reparenting, a popup
+// is NOT a DOM descendant of the menu-wrapper even though it's still
+// logically part of the menu-wrapper's UI. A click inside any open popup
+// must therefore also count as "inside" the menu-wrapper for the purpose
+// of light-dismiss, otherwise clicking e.g. the popup's back button would
+// dismiss the parent menu-wrapper.
 const initLightDismiss = (mountpoint: HTMLElement): void => {
   document.addEventListener('click', (event) => {
     const target = event.target;
@@ -321,8 +329,13 @@ const initLightDismiss = (mountpoint: HTMLElement): void => {
     const openPopups = mountpoint.querySelectorAll<HTMLElement>(
       `.feds-popup.${FEDS_OPEN_CLASS}, .feds-menu-wrapper.${FEDS_OPEN_CLASS}`
     );
+    // If the click landed inside ANY open element of the gnav UI (a popup or
+    // the menu-wrapper), no light-dismiss applies. Per-element trigger and
+    // back-button handlers are responsible for any state changes.
+    const insideAnyOpen = [...openPopups]
+      .some(open => open.contains(target));
+    if (insideAnyOpen) return;
     openPopups.forEach(popup => {
-      if (popup.contains(target)) return;
       const trigger = popup.id !== ''
         ? mountpoint.querySelector<HTMLElement>(triggerSelector(popup.id))
         : null;
