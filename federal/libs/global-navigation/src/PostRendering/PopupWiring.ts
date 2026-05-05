@@ -3,25 +3,14 @@ import {
   togglePopup,
   isPopupOpen,
   triggerForPopupId,
-  FEDS_OPEN_CLASS,
+  IS_OPEN_CLASS,
 } from "../Utils/Utils";
 
 const MENU_WRAPPER_ID = 'feds-menu-wrapper';
 
-// Single wiring pass for every popup-like element in the gnav (mega-menu
-// popups + the mobile menu-wrapper). Replaces the native `popovertarget`
-// (click-to-toggle) and `:popover-open` ARIA reflection that the popover
-// API gave us for free.
-//
-// Two concerns are colocated on purpose:
-//   1. Click-to-toggle on the trigger, with mutual exclusion among mega-menu
-//      popups (the hamburger does NOT close mega-menus — light-dismiss handles
-//      that case after the fact, matching the original popover behaviour).
-//   2. ARIA / analytics reflection driven by our synthetic `toggle` event.
-//
-// Keeping both in one place means the trigger lookup happens exactly once per
-// popup and there's a single source of truth for "what does interacting with
-// this popup imply".
+// Click-to-toggle + aria reflection for every popup. Mutual exclusion only
+// applies between mega-menu popups; the hamburger does NOT close them
+// (light-dismiss owns that, matching original popover behaviour).
 export const wirePopups = (mountpoint: HTMLElement): void => {
   const popups = mountpoint
     .querySelectorAll<HTMLElement>(`.feds-popup, #${MENU_WRAPPER_ID}`);
@@ -36,7 +25,7 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
       const willOpen = !isPopupOpen(popup);
       if (willOpen && !isMenuWrapper) {
         mountpoint
-          .querySelectorAll<HTMLElement>(`.feds-popup.${FEDS_OPEN_CLASS}`)
+          .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
           .forEach(other => {
             if (other !== popup) closePopup(other);
           });
@@ -58,10 +47,7 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
 
     if (isMenuWrapper) {
       popup.addEventListener('transitionend', (event) => {
-        // transitionend bubbles and fires once per transitioned property.
-        // Filter to transitions on the menu-wrapper itself so we don't react
-        // to nested transitions (e.g. on .feds-link) and so we run the
-        // cleanup at most once per closing animation.
+        // Ignore bubbled transitionend from descendants (e.g. .feds-link).
         if (event.target !== popup) return;
         if (!isPopupOpen(popup)) popup.classList.remove('feds-menu-active');
       });
@@ -69,32 +55,19 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
   });
 };
 
-// Replaces the implicit "auto" popover light-dismiss. A click anywhere outside
-// an open popup AND outside its trigger closes that popup.
-//
-// Subtlety: popups are reparented to <nav> at render time so they escape
-// transformed containing blocks (see renderGnav). After reparenting, a popup
-// is NOT a DOM descendant of the menu-wrapper even though it's still
-// logically part of the menu-wrapper's UI. A click inside any open popup
-// must therefore also count as "inside" the menu-wrapper for the purpose
-// of light-dismiss, otherwise clicking e.g. the popup's back button would
-// dismiss the parent menu-wrapper.
+// Outside-click dismiss. Popups are reparented to <nav> (see renderGnav), so a
+// click inside an open popup is NOT contained by the menu-wrapper in the DOM
+// sense; we treat "inside any open gnav element" as inside both, otherwise
+// the popup back-button would dismiss the menu-wrapper.
 export const initLightDismiss = (mountpoint: HTMLElement): void => {
   document.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof Node)) return;
-    // Fast path: most clicks on the page are not relevant to gnav. Bail
-    // before doing any DOM work when nothing is open.
-    if (mountpoint.querySelector(`.${FEDS_OPEN_CLASS}`) === null) return;
+    if (mountpoint.querySelector(`.${IS_OPEN_CLASS}`) === null) return;
     const openPopups = mountpoint.querySelectorAll<HTMLElement>(
-      `.feds-popup.${FEDS_OPEN_CLASS}, .feds-menu-wrapper.${FEDS_OPEN_CLASS}`,
+      `.feds-popup.${IS_OPEN_CLASS}, .feds-menu-wrapper.${IS_OPEN_CLASS}`,
     );
-    // If the click landed inside ANY open element of the gnav UI (a popup or
-    // the menu-wrapper), no light-dismiss applies. Per-element trigger and
-    // back-button handlers are responsible for any state changes.
-    const insideAnyOpen = [...openPopups]
-      .some(open => open.contains(target));
-    if (insideAnyOpen) return;
+    if ([...openPopups].some(open => open.contains(target))) return;
     openPopups.forEach(popup => {
       const trigger = triggerForPopupId(mountpoint, popup.id);
       if (trigger?.contains(target) === true) return;

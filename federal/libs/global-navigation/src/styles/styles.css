@@ -106,7 +106,7 @@ header.feds-header-scrolled nav {
   background-color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) .universal-nav-container .profile-signed-out button {
+.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button {
   color: inherit;
   border-color: var(--s2a-color-gray-1000);
   background-color: transparent;
@@ -181,7 +181,7 @@ header.global-navigation.feds-header-scrolled nav::after {
   backdrop-filter: blur(var(--s2a-blur-sm));
 }
 
-header.global-navigation nav:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open)::after {
+header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
   width: 100vw;
   border-radius: 0 0 var(--s2a-border-radius-16) var(--s2a-border-radius-16);
   background-color: var(--s2a-color-gray-75);
@@ -191,7 +191,7 @@ header.global-navigation nav:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-
 }
 
 @media (max-width: 1023px) {
-  header.global-navigation nav:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open)::after {
+  header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
     height: calc(100dvh + var(--s2a-spacing-xs));
   }
 }
@@ -243,7 +243,7 @@ header.global-navigation.feds-header-scrolled nav::after {
   text-decoration: underline;
 }
 
-.global-navigation.site-pivot:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) .feds-gnav-items > li > .feds-link {
+.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link {
   color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-typography-font-size-title-2);
   line-height: var(--s2a-typography-line-height-title-2);
@@ -306,9 +306,9 @@ header.global-navigation.feds-header-scrolled nav::after {
   fill: var(--s2a-color-gray-25);
 }
 
-.global-navigation:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) .unav-comp-app-switcher.unav-comp-icon svg,
+.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-app-switcher.unav-comp-icon svg,
 .global-navigation .unav-comp-app-switcher.unav-comp-icon.unav-comp-app-switcher-open svg,
-.global-navigation:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) .unav-comp-cart svg {
+.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-cart svg {
   fill: var(--s2a-color-gray-1000);
 }
 
@@ -332,13 +332,13 @@ header.global-navigation.feds-header-scrolled nav::after {
   background-color: transparent;
 }
 
-header.global-navigation:has(.feds-popup.feds-open) .unav-comp-app-switcher.unav-comp-icon svg,
-header.global-navigation:has(.feds-popup.feds-open) .unav-comp-external-notifications svg path,
-header.global-navigation:has(.feds-popup.feds-open) .unav-comp-cart svg {
+header.global-navigation:has(.feds-popup.is-open) .unav-comp-app-switcher.unav-comp-icon svg,
+header.global-navigation:has(.feds-popup.is-open) .unav-comp-external-notifications svg path,
+header.global-navigation:has(.feds-popup.is-open) .unav-comp-cart svg {
   fill: inherit;
 }
 
-header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
+header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   display:none !important;
 }
 
@@ -347,7 +347,7 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
    ========================================= */
 
 .feds-popup {
-  display: none; /* hidden by default; the .feds-open class shows it */
+  display: none; /* hidden by default; the .is-open class shows it */
   position: fixed;
   inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 auto 0;
   width: 100%;
@@ -361,7 +361,7 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
   background-color:transparent;
 }
 
-.feds-popup.feds-open {
+.feds-popup.is-open {
   display: block;
   /* No token for 18px */
   border-bottom-left-radius: 18px;
@@ -606,7 +606,7 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
   .global-navigation.site-pivot .feds-gnav-items > li > .feds-link {
     letter-spacing: var(--s2a-typography-letter-spacing-label);
   }
-  .global-navigation.site-pivot:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) .feds-gnav-items > li > .feds-link {
+  .global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link {
     opacity: 60%;
     font-weight: var(--s2a-font-weight-adobe-clean-bold);
     font-size: var(--s2a-typography-font-size-label);
@@ -615,13 +615,13 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
     padding: var(--s2a-spacing-sm);
   }
 
-  .global-navigation.site-pivot:not(:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
+  .global-navigation.site-pivot:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
     opacity: 0.65;
   }
 
 
-  .global-navigation.site-pivot:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) .feds-gnav-items > li > .feds-link[aria-expanded="true"],
-  .global-navigation.site-pivot:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) .feds-gnav-items > li > .feds-link:hover {
+  .global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link[aria-expanded="true"],
+  .global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link:hover {
     opacity: 1;
   }
 
@@ -690,7 +690,7 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
   /* Stack the open popup above the open menu-wrapper (z-index: 2) on mobile.
      The popover API used to put us in the top layer; without it we stack
      manually via z-index. */
-  .feds-popup.feds-open {
+  .feds-popup.is-open {
     z-index: 3;
   }
 
@@ -699,12 +699,12 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
     border-radius: var(--s2a-border-radius-24);
   }
 
-  body:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open) {
+  body:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) {
     overflow: hidden;
     scrollbar-gutter: stable;
   }
 
-  header.global-navigation nav:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open)::after {
+  header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
     border-radius: 0;
   }
 
@@ -718,7 +718,7 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
    ========================================= */
 
 @media (min-width: 1920px) {
-  header.global-navigation nav:has(.feds-popup.feds-open, .feds-menu-wrapper.feds-open)::after {
+  header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
     left: calc(0px - var(--s2a-spacing-xs) - (100vw - 1920px) / 2);
   }
 
@@ -729,19 +729,8 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
 
 /* =========================================
    Popup Animations & Backdrop
-
-   We replaced the HTML Popover API with a `.feds-open` class to keep the gnav
-   out of the browser top layer (which fights legacy modals on consumer pages).
-   The `display: none → block` transition still animates because we keep
-   `transition: display ... allow-discrete` plus the @starting-style rule.
-   The `overlay ... allow-discrete` transition is gone — there is no top
-   layer to transition to/from anymore.
-
-   The dimmed/blurred overlay that the ::backdrop pseudo-element used to
-   provide is now a real `<div class="feds-backdrop">` rendered inside <nav>.
    ========================================= */
 
-/* Backdrop element shared across breakpoints. */
 .feds-backdrop {
   position: fixed;
   inset: 0;
@@ -769,27 +758,27 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
     transition-delay: 0s;
   }
 
-  .feds-popup.feds-open {
+  .feds-popup.is-open {
     background-color: transparent;
     opacity: 1;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transition-delay: 0.15s;
   }
 
-  .feds-popup.feds-open > :not(.feds-popup-header) {
+  .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
     max-height: calc(100dvh - var(--s2a-spacing-64));
   }
 
   @starting-style {
-    .feds-popup.feds-open {
+    .feds-popup.is-open {
       background-color: rgba(255,255,255,0.51);
       opacity: 0;
       clip-path: polygon(0 0, 100% 0, 100% 0%, 0 0%);
     }
   }
 
-  header.global-navigation nav:has(.feds-popup.feds-open) .feds-backdrop {
+  header.global-navigation nav:has(.feds-popup.is-open) .feds-backdrop {
     background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
   }
@@ -807,18 +796,18 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
     transform: translateY(0);
   }
 }
-.feds-popup.feds-open {
+.feds-popup.is-open {
   /* Animation Variables */
   --feds-anim-duration: 0.35s;
   --feds-anim-panel-delay: 0.18s;
   --feds-anim-stagger-interval: 25ms;
   --feds-anim-stagger-start: 0.20s;
 }
-.feds-popup.feds-open .product-list ul[role="tabpanel"] > li {
+.feds-popup.is-open .product-list ul[role="tabpanel"] > li {
   transform: translateY(6px);
   animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
 }
-.feds-popup.feds-open .product-list ul[role="tabpanel"] > li {
+.feds-popup.is-open .product-list ul[role="tabpanel"] > li {
   transform: translateY(6px);
   animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
 }
@@ -826,15 +815,15 @@ header.global-navigation:has(.feds-popup.feds-open) .unav-comp-tooltip {
 @media (min-width: 1024px) {
 
   /* 1. Pane Content (Base Slide & Fade) */
-  .feds-popup.feds-open > div {
+  .feds-popup.is-open > div {
     transform: translateY(6px);
     animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
     animation-delay: var(--feds-anim-panel-delay);
   }
 
   /* 2. Filters and Cards (Staggered) */
-  .feds-popup.feds-open .feds-gnav-cards > li,
-  .feds-popup.feds-open .product-list ul.tabs > li {
+  .feds-popup.is-open .feds-gnav-cards > li,
+  .feds-popup.is-open .product-list ul.tabs > li {
     transform: translateY(6px);
     animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
   }
@@ -966,7 +955,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     transition: opacity 0.2s ease, visibility 0s linear 0.2s;
   }
   
-  .global-navigation nav > ul > li.feds-menu-wrapper.feds-open {
+  .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
     display: flex;
     opacity: 1;
     z-index: 2;
@@ -977,13 +966,13 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     margin-top: 0;
   }
   
-  .global-navigation nav > ul > li.feds-menu-wrapper.feds-open .feds-gnav-items {
+  .global-navigation nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items {
     align-items: flex-start;
     padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
     width: calc(100% - var(--s2a-spacing-3xl));
   }
 
-  .global-navigation nav > ul > li.feds-menu-wrapper.feds-open {
+  .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
     & .feds-gnav-items > li {
       opacity: 0;
       transform: translateX(18px);
@@ -1007,14 +996,14 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     transition: transform 0.35s cubic-bezier(.4,0,.2,1);
   }
   
-  .global-navigation:has(.feds-menu-wrapper.feds-open, .feds-popup.feds-open) .feds-nav-toggle svg {
+  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
     height: 11px;
   }
   
-  .global-navigation:has(.feds-menu-wrapper.feds-open, .feds-popup.feds-open) .feds-nav-toggle path:first-child {
+  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
     transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
   }
-  .global-navigation:has(.feds-menu-wrapper.feds-open, .feds-popup.feds-open) .feds-nav-toggle path:last-child {
+  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
     transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
   }
   
@@ -1053,7 +1042,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
 
   /* Popup-interior animations driven by the gnav-items subscreen state.
      Popup lives at <nav> level now, so we cross-reference via :has(). */
-  header.global-navigation > nav:has(.feds-gnav-items.subscreen-opening) > .feds-popup.feds-open {
+  header.global-navigation > nav:has(.feds-gnav-items.subscreen-opening) > .feds-popup.is-open {
     opacity: 0;
     animation: fade-in 0s linear 0.3s forwards; /* zero-duration instant jump after delay */
 
@@ -1079,7 +1068,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.42s; }
   }
 
-  header.global-navigation > nav:has(.feds-gnav-items.subscreen-closing) > .feds-popup.feds-open {
+  header.global-navigation > nav:has(.feds-gnav-items.subscreen-closing) > .feds-popup.is-open {
     & .feds-popup-header {
       opacity: 1;
       transform: translateX(0px);

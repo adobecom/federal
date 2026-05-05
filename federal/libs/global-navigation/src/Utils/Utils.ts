@@ -973,15 +973,11 @@ export function getMiloLocaleSettings(
   };
 }
 
-// CSS-class–based open state replaces the HTML popover API so we never put
-// any gnav element into the browser top layer (which fights consumer modals
-// that rely on plain stacking contexts).
-export const FEDS_OPEN_CLASS = 'feds-open';
+// Open-state class used in compound selectors (`.feds-popup.is-open`,
+// `.feds-menu-wrapper.is-open`). Replaces the HTML popover API so the gnav
+// stays out of the browser top layer.
+export const IS_OPEN_CLASS = 'is-open';
 
-// Trigger/popup wiring uses `aria-controls` so the trigger element references
-// the popup by id. We always escape the id with `CSS.escape` so unusual
-// characters (whitespace, brackets, quotes, etc.) cannot produce a malformed
-// selector. Two helpers — one for each lookup direction — keep callers honest.
 export const triggerForPopupId = (
   root: ParentNode,
   id: string,
@@ -1005,10 +1001,7 @@ const dispatchToggle = (el: HTMLElement, opening: boolean): void => {
     bubbles: false,
     cancelable: false,
   } as const;
-  // ToggleEvent ships in browsers that supported the popover API, so it's
-  // safe in the same baseline (Chrome 114+, Firefox 125+, Safari 17+).
-  // We fall back to a CustomEvent shaped like ToggleEvent for older runtimes
-  // (e.g. test environments / older jsdom).
+  // Fall back to a shaped Event for runtimes without ToggleEvent (older jsdom).
   const ToggleEventCtor = (window as unknown as {
     ToggleEvent?: typeof ToggleEvent
   }).ToggleEvent;
@@ -1022,25 +1015,25 @@ const dispatchToggle = (el: HTMLElement, opening: boolean): void => {
 };
 
 export const isPopupOpen = (el: HTMLElement | null | undefined): boolean =>
-  el !== null && el !== undefined && el.classList.contains(FEDS_OPEN_CLASS);
+  el !== null && el !== undefined && el.classList.contains(IS_OPEN_CLASS);
 
 export const openPopup = (el: HTMLElement | null | undefined): void => {
   if (el === null || el === undefined) return;
-  if (el.classList.contains(FEDS_OPEN_CLASS)) return;
-  el.classList.add(FEDS_OPEN_CLASS);
+  if (el.classList.contains(IS_OPEN_CLASS)) return;
+  el.classList.add(IS_OPEN_CLASS);
   dispatchToggle(el, true);
 };
 
 export const closePopup = (el: HTMLElement | null | undefined): void => {
   if (el === null || el === undefined) return;
-  if (!el.classList.contains(FEDS_OPEN_CLASS)) return;
-  el.classList.remove(FEDS_OPEN_CLASS);
+  if (!el.classList.contains(IS_OPEN_CLASS)) return;
+  el.classList.remove(IS_OPEN_CLASS);
   dispatchToggle(el, false);
 };
 
 export const togglePopup = (el: HTMLElement | null | undefined): void => {
   if (el === null || el === undefined) return;
-  if (el.classList.contains(FEDS_OPEN_CLASS)) closePopup(el);
+  if (el.classList.contains(IS_OPEN_CLASS)) closePopup(el);
   else openPopup(el);
 };
 
@@ -1049,7 +1042,7 @@ export const closePopovers = (mountpoint: HTMLElement): void => {
   menuPopover?.classList.remove('feds-menu-active');
   closePopup(menuPopover);
   mountpoint
-    .querySelectorAll<HTMLElement>(`.feds-popup.${FEDS_OPEN_CLASS}`)
+    .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
     .forEach(closePopup);
 };
 
@@ -1079,11 +1072,10 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
     if (!adobeMsgClientWrapper) return false;
     if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
       adobeMsgClientWrapper.setAttribute('popover', 'manual');
-      (adobeMsgClientWrapper as HTMLElement).style.padding = '0'; // override default popover styling
+      (adobeMsgClientWrapper as HTMLElement).style.padding = '0';
       (adobeMsgClientWrapper as HTMLElement).style.border = 'none';
     }
-    // show and then hide to make sure the chat window container
-    // is the topmost popover.
+    // show then hide so the chat window is the topmost popover.
     (adobeMsgClientWrapper as HTMLElement)?.hidePopover();
     (adobeMsgClientWrapper as HTMLElement)?.showPopover();
     return true;
@@ -1093,9 +1085,6 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
     if (!jarvisLink && (event as ToggleEvent).newState !== 'open') return;
     bringToTop();
   }
-  // Gnav drawers are no longer top-layer popovers, so Jarvis' own popover
-  // already wins z-order naturally. We still re-show Jarvis on gnav open/close
-  // events as defensive insurance against page-level CSS that re-stacks things.
   const togglers = gnav.querySelectorAll('.feds-popup, #feds-menu-wrapper');
   document.addEventListener('click', bringJarvisToTop);
   togglers.forEach(el => el.addEventListener('toggle', bringJarvisToTop));

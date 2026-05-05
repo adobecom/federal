@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence, tempFixJarvis, isPopupOpen } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, tempFixJarvis, isPopupOpen } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -135,19 +135,12 @@ mountpoint: HTMLElement
     }
   }).flat());
 
-  // CRITICAL: reparent popups to be direct children of <nav>.
-  //
-  // Each `.feds-popup` is rendered as a sibling of its trigger button (inside
-  // `<li>` inside `.feds-gnav-items`). Several ancestors set `translate` /
-  // `transform` (the menu-wrapper open state and the per-item slide-in /
-  // subscreen-exit animations). Per the CSS Transforms spec, *any* transform
-  // value other than `none` makes that ancestor a containing block for
-  // `position: fixed` descendants — which collapses the popup against a
-  // tiny `<li>` instead of the viewport. The HTML Popover API used to mask
-  // this by hoisting the popup into the top layer; without it we have to
-  // hoist it ourselves in the DOM. Moving popups under <nav> (which has no
-  // transformed descendants between it and the popup) restores correct
-  // viewport-relative `position: fixed` behavior.
+  // Reparent popups directly under <nav>. Their default <li> ancestors get
+  // `transform` / `translate` from the open/subscreen animations, which per
+  // the CSS Transforms spec makes those ancestors the containing block for
+  // `position: fixed` descendants — collapsing the popup against the <li>
+  // instead of the viewport. The Popover API used to escape this via the top
+  // layer; without it we hoist in the DOM ourselves.
   const navEl = mountpoint.querySelector('nav');
   if (navEl !== null) {
     megaMenus.forEach(mm => navEl.appendChild(mm));
@@ -226,9 +219,7 @@ export const postRenderingTasks = async (
   }
   else 
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
-  // wirePopups attaches BOTH the click toggle and the aria-expanded reflection
-  // for every popup. Doing both in one pass (instead of two separate functions
-  // each iterating over `.feds-popup`) keeps the trigger lookup in one place.
+
   wirePopups(input.mountpoint);
   initClickListeners(input.mountpoint);
   initKeyboardNav(input.mountpoint);
@@ -238,25 +229,18 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
 
-  // Modals no longer fight us for the top layer (we don't use it anymore),
-  // but we still close any open menus when a modal opens so the page is clean.
-  const handleModalLoaded = (): void => {
-    closePopovers(input.mountpoint);
-  };
-  if (document.querySelector('.dialog-modal')) {
-    handleModalLoaded();
-  }
-
+  // Close any open menus when a Milo modal opens, so the modal isn't covered.
+  const handleModalLoaded = (): void => closePopovers(input.mountpoint);
+  if (document.querySelector('.dialog-modal')) handleModalLoaded();
   document.addEventListener('click', (event) => {
-    if (event.target instanceof Element && event.target.closest('a[href*="#openPrivacy"]')) {
+    if (event.target instanceof Element
+      && event.target.closest('a[href*="#openPrivacy"]')) {
       handleModalLoaded();
     }
   });
-  tempFixJarvis(input.mountpoint);
   window.addEventListener('milo:modal:loaded', handleModalLoaded);
-  // milo:modal:closed previously re-applied popover="manual" on <nav>; with
-  // the popover API removed there is nothing to restore.
-  // Initialize merch links after DOM is rendered
+  tempFixJarvis(input.mountpoint);
+
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -293,22 +277,6 @@ const initPopoverCloseOnUnavInteraction = (mountpoint: HTMLElement): void => {
     });
   });
 };
-
-const _initStaggeredAnimations = (mountpoint: HTMLElement): void => {
-  const tabs = [...mountpoint.querySelectorAll('.product-list ul.tabs > li')] as HTMLElement[];
-  animateInSequence(tabs, 0.025);
-  const popups = [...mountpoint.querySelectorAll('.feds-popup')];
-  popups.forEach(pop => {
-    if (pop.querySelector('.product-list')) {
-      [...pop.querySelectorAll('ul[role="tabpanel"]')].forEach(tabpanel => {
-        animateInSequence([...tabpanel.querySelectorAll('li')] as HTMLElement[], 0.025);
-      });
-    } else {
-      animateInSequence([...pop.querySelectorAll('.feds-gnav-cards > li')] as HTMLElement[], 0.025);
-    }
-  });
-
-}
 
 const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const header = mountpoint.closest("header");

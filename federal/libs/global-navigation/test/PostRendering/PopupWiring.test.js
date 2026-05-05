@@ -1,24 +1,9 @@
 import { expect } from '@esm-bundle/chai';
 import { wirePopups, initLightDismiss } from '../../src/PostRendering/PopupWiring';
-import { FEDS_OPEN_CLASS, isPopupOpen } from '../../src/Utils/Utils';
+import { IS_OPEN_CLASS, isPopupOpen } from '../../src/Utils/Utils';
 
-
-/**
- * Wiring integration tests
- *
- * SCOPE: covers the post-render wiring that replaced the native popover API:
- *   - wirePopups: click-to-toggle, mutual exclusion among mega-menu popups,
- *                 aria-expanded reflection, daa-ll analytics swap, and the
- *                 menu-wrapper's `feds-menu-active` state.
- *   - initLightDismiss: outside-click closes open popups; clicks inside any
- *                       open gnav element are protected (this was the
- *                       back-button regression we fixed once already).
- *
- * Each test builds a minimal DOM matching the shape that `renderGnavString`
- * produces — specifically with `.feds-popup`s reparented to be direct children
- * of <nav> (which is what `renderGnav` does post-content-fill).
- */
-
+// Builds the minimal DOM that `renderGnav` produces post-content-fill, with
+// .feds-popup elements reparented to be direct children of <nav>.
 const buildGnav = () => {
   const host = document.createElement('div');
   host.innerHTML = `
@@ -122,8 +107,6 @@ describe('wirePopups', () => {
   });
 
   it('opening the menu-wrapper does NOT close open mega-menu popups', () => {
-    // (Hamburger toggling closed should NOT auto-close popups; light-dismiss
-    // owns that case after the fact.)
     triggerA.click();
     navToggle.click();
     expect(isPopupOpen(popupA)).to.equal(true);
@@ -144,12 +127,9 @@ describe('wirePopups', () => {
   });
 
   it('ignores transitionend bubbling from descendants', () => {
-    navToggle.click(); // open — sets feds-menu-active
-    // Simulate a transition on a nested element completing (e.g. .feds-link).
+    navToggle.click();
     const link = host.querySelector('.feds-link');
-    const bubbled = new Event('transitionend', { bubbles: true });
-    link.dispatchEvent(bubbled);
-    // Wrapper is still open, so feds-menu-active must still be there.
+    link.dispatchEvent(new Event('transitionend', { bubbles: true }));
     expect(menuWrapper.classList.contains('feds-menu-active')).to.equal(true);
   });
 });
@@ -196,30 +176,20 @@ describe('initLightDismiss', () => {
     expect(isPopupOpen(popupA)).to.equal(true);
   });
 
-  it('clicking the back button inside a reparented popup does not dismiss the menu-wrapper', () => {
-    // Regression test for the reparenting interaction: popups are direct
-    // children of <nav>, so they are NOT DOM descendants of the menu-wrapper.
-    // A naive light-dismiss would treat a click inside the popup as "outside
-    // the menu-wrapper" and close it.
+  it('back-button click in a reparented popup does not dismiss the menu-wrapper', () => {
+    // Popups are reparented out of the menu-wrapper; light-dismiss must treat
+    // popup-internal clicks as "inside" the wrapper too.
     const navToggle = host.querySelector('.feds-nav-toggle');
-    navToggle.click(); // open menu wrapper
-    triggerA.click(); // open popup
-    expect(isPopupOpen(menuWrapper)).to.equal(true);
-    expect(isPopupOpen(popupA)).to.equal(true);
-
-    const backButton = popupA.querySelector('.feds-popup-back-button');
-    clickAt(backButton);
-
-    // Light dismiss must NOT have closed the menu wrapper just because the
-    // click target wasn't a descendant of the wrapper.
+    navToggle.click();
+    triggerA.click();
+    clickAt(popupA.querySelector('.feds-popup-back-button'));
     expect(isPopupOpen(menuWrapper)).to.equal(true);
   });
 
-  it('clicking the trigger of an open popup does not double-close it', () => {
-    triggerA.click(); // opens
-    triggerA.click(); // closes via trigger (NOT light dismiss)
+  it('clicking the trigger of an open popup closes it cleanly', () => {
+    triggerA.click();
+    triggerA.click();
     expect(isPopupOpen(popupA)).to.equal(false);
-    // No errors, no extra toggles needed.
-    expect(popupA.classList.contains(FEDS_OPEN_CLASS)).to.equal(false);
+    expect(popupA.classList.contains(IS_OPEN_CLASS)).to.equal(false);
   });
 });

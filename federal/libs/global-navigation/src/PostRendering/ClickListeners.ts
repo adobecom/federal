@@ -1,4 +1,4 @@
-import { isDesktop, closePopup, FEDS_OPEN_CLASS, popupForTriggerId } from "../Utils/Utils";
+import { isDesktop, closePopup, IS_OPEN_CLASS, popupForTriggerId } from "../Utils/Utils";
 
 type CleanupFunction = () => void
 
@@ -25,7 +25,7 @@ export const initClickListeners = (
   const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
 
-      const popup = tabPanels[i].closest(`.feds-popup.${FEDS_OPEN_CLASS}`);
+      const popup = tabPanels[i].closest(`.feds-popup.${IS_OPEN_CLASS}`);
 
       tabButtons.forEach(tabButton => {
         tabButton.setAttribute('aria-selected', 'false');
@@ -111,7 +111,7 @@ const animations = (gnav: HTMLElement): void => {
   const resizeObserver = new ResizeObserver(entries => {
     if (!popoverBackgroundRule) return;
     if (entries.length < 1) return;
-    const openPopup = gnav.querySelector(`.feds-popup.${FEDS_OPEN_CLASS}`);
+    const openPopup = gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`);
     if (!openPopup) {
       popoverBackgroundRule.style.height = '100%';
       return;
@@ -128,7 +128,7 @@ const animations = (gnav: HTMLElement): void => {
     resizeObserver.observe(popup);
     popup.addEventListener('toggle', (event: Event) => {
       const newState = (event as ToggleEvent).newState;
-      if (newState !== 'open' && !gnav.querySelector(`.feds-popup.${FEDS_OPEN_CLASS}`)) {
+      if (newState !== 'open' && !gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`)) {
         popoverBackgroundRule.style.height = '100%';
         if (isDesktop.matches) return;
         // Bandaid for using escape for closing the popup in mobile

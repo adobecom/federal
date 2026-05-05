@@ -1,4 +1,4 @@
-import { isDesktop, closePopup, isPopupOpen, FEDS_OPEN_CLASS, triggerForPopupId } from "../../Utils/Utils";
+import { isDesktop, closePopup, isPopupOpen, IS_OPEN_CLASS, triggerForPopupId } from "../../Utils/Utils";
 
 function $$(root: Element, selector: string): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(selector)];
@@ -90,7 +90,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
   const focusAndPrevent = (target: HTMLElement, event: KeyboardEvent): void => {
     target.focus(); event.preventDefault();
   };
-  const openPopup = (): HTMLElement | null => gnav.querySelector<HTMLElement>(`.feds-popup.${FEDS_OPEN_CLASS}`);
+  const openPopup = (): HTMLElement | null => gnav.querySelector<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`);
   const selectedTab = (
     scope: Element
   ): HTMLElement | null => scope.querySelector<HTMLElement>(SELECTED_TAB);

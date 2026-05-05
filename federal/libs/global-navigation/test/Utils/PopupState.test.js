@@ -1,6 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import {
-  FEDS_OPEN_CLASS,
+  IS_OPEN_CLASS,
   isPopupOpen,
   openPopup,
   closePopup,
@@ -10,21 +10,6 @@ import {
   popupForTriggerId,
 } from '../../src/Utils/Utils';
 
-/**
- * PopupState unit tests
- *
- * SCOPE: covers the class-based open-state primitives that replaced the HTML
- * Popover API:
- *   - isPopupOpen / openPopup / closePopup / togglePopup
- *   - the synthetic ToggleEvent with newState/oldState
- *   - closePopovers (close everything)
- *   - triggerForPopupId / popupForTriggerId (CSS.escape-based lookup)
- *
- * These primitives are the contract every other module relies on (Main,
- * ClickListeners, Keyboard); regressions here are silent and break every
- * caller. Each invariant has its own test so a failure points at exactly
- * one behaviour.
- */
 describe('Popup state primitives', () => {
   let host;
   beforeEach(() => {
@@ -48,7 +33,7 @@ describe('Popup state primitives', () => {
 
     it('returns true when the open class is present', () => {
       const el = document.createElement('div');
-      el.classList.add(FEDS_OPEN_CLASS);
+      el.classList.add(IS_OPEN_CLASS);
       expect(isPopupOpen(el)).to.equal(true);
     });
   });
@@ -57,9 +42,9 @@ describe('Popup state primitives', () => {
     it('adds and removes the open class', () => {
       const el = document.createElement('div');
       openPopup(el);
-      expect(el.classList.contains(FEDS_OPEN_CLASS)).to.equal(true);
+      expect(el.classList.contains(IS_OPEN_CLASS)).to.equal(true);
       closePopup(el);
-      expect(el.classList.contains(FEDS_OPEN_CLASS)).to.equal(false);
+      expect(el.classList.contains(IS_OPEN_CLASS)).to.equal(false);
     });
 
     it('is idempotent (no double-dispatch on repeat calls)', () => {
@@ -119,7 +104,7 @@ describe('Popup state primitives', () => {
 
     it('fires a closing event with newState=closed', () => {
       const el = document.createElement('div');
-      el.classList.add(FEDS_OPEN_CLASS);
+      el.classList.add(IS_OPEN_CLASS);
       let captured = null;
       el.addEventListener('toggle', (e) => { captured = e; });
       closePopup(el);
@@ -131,13 +116,13 @@ describe('Popup state primitives', () => {
   describe('closePopovers', () => {
     it('closes any open .feds-popup and the menu wrapper', () => {
       host.innerHTML = `
-        <div id="feds-menu-wrapper" class="feds-menu-wrapper feds-open feds-menu-active"></div>
-        <div id="p1" class="feds-popup feds-open"></div>
-        <div id="p2" class="feds-popup feds-open"></div>
+        <div id="feds-menu-wrapper" class="feds-menu-wrapper is-open feds-menu-active"></div>
+        <div id="p1" class="feds-popup is-open"></div>
+        <div id="p2" class="feds-popup is-open"></div>
         <div id="p3" class="feds-popup"></div>
       `;
       closePopovers(host);
-      expect(host.querySelectorAll(`.${FEDS_OPEN_CLASS}`).length).to.equal(0);
+      expect(host.querySelectorAll(`.${IS_OPEN_CLASS}`).length).to.equal(0);
       expect(host.querySelector('#feds-menu-wrapper').classList.contains('feds-menu-active'))
         .to.equal(false);
     });
