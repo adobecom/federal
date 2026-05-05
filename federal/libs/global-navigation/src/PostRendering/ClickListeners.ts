@@ -1,4 +1,4 @@
-import { isDesktop, closePopup, FEDS_OPEN_CLASS } from "../Utils/Utils";
+import { isDesktop, closePopup, FEDS_OPEN_CLASS, popupForTriggerId } from "../Utils/Utils";
 
 type CleanupFunction = () => void
 
@@ -101,13 +101,9 @@ const animations = (gnav: HTMLElement): void => {
 
   // Popups are reparented to <nav> at render time (see renderGnav), so they
   // are no longer DOM-siblings of their trigger button. Look them up via
-  // `aria-controls` instead. We escape only the double-quote in case the
-  // popup id ever contains one, which keeps the attribute selector valid.
-  const popupFor = (button: HTMLElement): HTMLElement | null => {
-    const id = button.getAttribute('aria-controls');
-    if (id === null || id === '') return null;
-    return gnav.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
-  };
+  // `aria-controls`.
+  const popupFor = (button: HTMLElement): HTMLElement | null =>
+    popupForTriggerId(gnav, button.getAttribute('aria-controls'));
 
   // popup height animations: the nav::after pseudo-element is the gray
   // dropdown background; we adjust its height to match the open popup.

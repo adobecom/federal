@@ -978,6 +978,26 @@ export function getMiloLocaleSettings(
 // that rely on plain stacking contexts).
 export const FEDS_OPEN_CLASS = 'feds-open';
 
+// Trigger/popup wiring uses `aria-controls` so the trigger element references
+// the popup by id. We always escape the id with `CSS.escape` so unusual
+// characters (whitespace, brackets, quotes, etc.) cannot produce a malformed
+// selector. Two helpers — one for each lookup direction — keep callers honest.
+export const triggerForPopupId = (
+  root: ParentNode,
+  id: string,
+): HTMLElement | null => {
+  if (id === '') return null;
+  return root.querySelector<HTMLElement>(`[aria-controls="${CSS.escape(id)}"]`);
+};
+
+export const popupForTriggerId = (
+  root: ParentNode,
+  id: string | null,
+): HTMLElement | null => {
+  if (id === null || id === '') return null;
+  return root.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
+};
+
 const dispatchToggle = (el: HTMLElement, opening: boolean): void => {
   const init = {
     newState: opening ? 'open' : 'closed',

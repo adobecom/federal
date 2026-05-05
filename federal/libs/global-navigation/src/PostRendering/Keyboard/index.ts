@@ -1,4 +1,4 @@
-import { isDesktop, closePopup, isPopupOpen, FEDS_OPEN_CLASS } from "../../Utils/Utils";
+import { isDesktop, closePopup, isPopupOpen, FEDS_OPEN_CLASS, triggerForPopupId } from "../../Utils/Utils";
 
 function $$(root: Element, selector: string): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(selector)];
@@ -117,10 +117,10 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     const target = popup ?? (isPopupOpen(menuWrapper) ? menuWrapper : null);
     if (!target) return false;
     closePopup(target);
-    const triggerSelector = popup
-      ? `[aria-controls="${target.id.replace(/"/g, '\\"')}"]`
-      : '.feds-nav-toggle';
-    gnav.querySelector<HTMLElement>(triggerSelector)?.focus();
+    const trigger = popup
+      ? triggerForPopupId(gnav, target.id)
+      : gnav.querySelector<HTMLElement>('.feds-nav-toggle');
+    trigger?.focus();
     event.preventDefault();
     return true;
   }

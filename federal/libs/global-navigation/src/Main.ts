@@ -7,11 +7,12 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence, tempFixJarvis, closePopup, togglePopup, isPopupOpen, FEDS_OPEN_CLASS } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence, tempFixJarvis, isPopupOpen } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
+import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
  
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -225,14 +226,12 @@ export const postRenderingTasks = async (
   }
   else 
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
-  // Order matters: bind triggers BEFORE click listeners so the click flow is
-  // (1) ClickListeners' subscreen-opening class, (2) our trigger toggle, (3)
-  // our light-dismiss handler. Light dismiss runs last (document level) and
-  // skips the popup that was just opened.
-  bindPopupTriggers(input.mountpoint);
+  // wirePopups attaches BOTH the click toggle and the aria-expanded reflection
+  // for every popup. Doing both in one pass (instead of two separate functions
+  // each iterating over `.feds-popup`) keeps the trigger lookup in one place.
+  wirePopups(input.mountpoint);
   initClickListeners(input.mountpoint);
   initKeyboardNav(input.mountpoint);
-  initAriaToggleListeners(input.mountpoint);
   initLightDismiss(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
   initPopoverCloseOnUnavInteraction(input.mountpoint);
@@ -278,105 +277,6 @@ export const postRenderingTasks = async (
   };
 };
 
-const triggerSelector = (id: string): string =>
-  // Use attribute selector to safely handle ids with characters that would
-  // otherwise need CSS escaping (`CSS.escape` isn't worth pulling in here).
-  `[aria-controls="${id.replace(/"/g, '\\"')}"]`;
-
-// Wires every popup/menu-wrapper trigger button to its target. This replaces
-// the native `popovertarget` attribute behavior. When a mega-menu trigger is
-// clicked we also close any other open mega-menu popups (mutual exclusion that
-// "auto" popovers used to give us for free via light-dismiss).
-const bindPopupTriggers = (mountpoint: HTMLElement): void => {
-  const targets = [
-    ...mountpoint.querySelectorAll<HTMLElement>('.feds-popup'),
-    ...mountpoint.querySelectorAll<HTMLElement>('#feds-menu-wrapper'),
-  ];
-  targets.forEach(target => {
-    if (target.id === '') return;
-    const trigger = mountpoint
-      .querySelector<HTMLElement>(triggerSelector(target.id));
-    if (trigger === null) return;
-    trigger.addEventListener('click', (event) => {
-      event.preventDefault();
-      const willOpen = !isPopupOpen(target);
-      if (willOpen && target.classList.contains('feds-popup')) {
-        mountpoint
-          .querySelectorAll<HTMLElement>(`.feds-popup.${FEDS_OPEN_CLASS}`)
-          .forEach(other => {
-            if (other !== target) closePopup(other);
-          });
-      }
-      togglePopup(target);
-    });
-  });
-};
-
-// Replaces the implicit "auto" popover light-dismiss. A click anywhere outside
-// an open popup AND outside its trigger closes that popup.
-//
-// Subtlety: popups are reparented to <nav> at render time so they escape
-// transformed containing blocks (see renderGnav). After reparenting, a popup
-// is NOT a DOM descendant of the menu-wrapper even though it's still
-// logically part of the menu-wrapper's UI. A click inside any open popup
-// must therefore also count as "inside" the menu-wrapper for the purpose
-// of light-dismiss, otherwise clicking e.g. the popup's back button would
-// dismiss the parent menu-wrapper.
-const initLightDismiss = (mountpoint: HTMLElement): void => {
-  document.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof Node)) return;
-    const openPopups = mountpoint.querySelectorAll<HTMLElement>(
-      `.feds-popup.${FEDS_OPEN_CLASS}, .feds-menu-wrapper.${FEDS_OPEN_CLASS}`
-    );
-    // If the click landed inside ANY open element of the gnav UI (a popup or
-    // the menu-wrapper), no light-dismiss applies. Per-element trigger and
-    // back-button handlers are responsible for any state changes.
-    const insideAnyOpen = [...openPopups]
-      .some(open => open.contains(target));
-    if (insideAnyOpen) return;
-    openPopups.forEach(popup => {
-      const trigger = popup.id !== ''
-        ? mountpoint.querySelector<HTMLElement>(triggerSelector(popup.id))
-        : null;
-      if (trigger?.contains(target) === true) return;
-      closePopup(popup);
-    });
-  });
-};
-
-const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
-  const menuWrapper = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
-  const navToggle = mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
-
-  menuWrapper?.addEventListener('toggle', () => {
-    const open = isPopupOpen(menuWrapper);
-    navToggle?.setAttribute('aria-expanded', String(open));
-    navToggle?.setAttribute(
-      'daa-ll',
-      open ? 'hamburgermenu|close' : 'hamburgermenu|open'
-    );
-    if (open) menuWrapper.classList.add('feds-menu-active');
-  });
-
-  menuWrapper?.addEventListener('transitionend', () => {
-    if (!isPopupOpen(menuWrapper)) {
-      menuWrapper.classList.remove('feds-menu-active');
-    }
-  });
-
-  const megaMenuPopups = mountpoint.querySelectorAll<HTMLElement>('.feds-popup');
-  megaMenuPopups.forEach(popup => {
-    popup.addEventListener('toggle', () => {
-      if (popup.id === '') return;
-      const trigger = mountpoint
-        .querySelector<HTMLElement>(triggerSelector(popup.id));
-      const open = isPopupOpen(popup);
-      trigger?.setAttribute('aria-expanded', String(open));
-      trigger?.setAttribute('daa-ll', open ? 'header|Close' : 'header|Open');
-    });
-  });
-};
 
 const initPopoverCloseOnResize = (mountpoint: HTMLElement): void => {
   isDesktop.addEventListener('change', () => {
