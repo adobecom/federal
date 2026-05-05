@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, tempFixJarvis, isPopupOpen } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, isPopupOpen } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -228,19 +228,6 @@ export const postRenderingTasks = async (
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-
-  // Close any open menus when a Milo modal opens, so the modal isn't covered.
-  const handleModalLoaded = (): void => closePopovers(input.mountpoint);
-  if (document.querySelector('.dialog-modal')) handleModalLoaded();
-  document.addEventListener('click', (event) => {
-    if (event.target instanceof Element
-      && event.target.closest('a[href*="#openPrivacy"]')) {
-      handleModalLoaded();
-    }
-  });
-  window.addEventListener('milo:modal:loaded', handleModalLoaded);
-  tempFixJarvis(input.mountpoint);
-
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);

@@ -1065,30 +1065,3 @@ export function getExperienceName(): string {
   }).adobeid?.client_id;
   return typeof imsClientId === 'string' && imsClientId !== '' ? imsClientId : '';
 }
-
-export const tempFixJarvis = (gnav: HTMLElement): void => {
-  const bringToTop = (): boolean => {
-    const adobeMsgClientWrapper = document.querySelector('.adbMsgClientWrapper');
-    if (!adobeMsgClientWrapper) return false;
-    if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
-      adobeMsgClientWrapper.setAttribute('popover', 'manual');
-      (adobeMsgClientWrapper as HTMLElement).style.padding = '0';
-      (adobeMsgClientWrapper as HTMLElement).style.border = 'none';
-    }
-    // show then hide so the chat window is the topmost popover.
-    (adobeMsgClientWrapper as HTMLElement)?.hidePopover();
-    (adobeMsgClientWrapper as HTMLElement)?.showPopover();
-    return true;
-  }
-  const bringJarvisToTop = (event: Event | ToggleEvent): void => {
-    const jarvisLink = (event.target as HTMLElement).closest('[href*="#open-jarvis-chat"]');
-    if (!jarvisLink && (event as ToggleEvent).newState !== 'open') return;
-    bringToTop();
-  }
-  const togglers = gnav.querySelectorAll('.feds-popup, #feds-menu-wrapper');
-  document.addEventListener('click', bringJarvisToTop);
-  togglers.forEach(el => el.addEventListener('toggle', bringJarvisToTop));
-  const intervalId = setInterval(() => {
-    if (bringToTop()) clearInterval(intervalId);
-  }, 150);
-}
