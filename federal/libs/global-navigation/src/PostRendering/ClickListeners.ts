@@ -1,4 +1,4 @@
-import { isDesktop } from "../Utils/Utils";
+import { isDesktop, closePopup, FEDS_OPEN_CLASS } from "../Utils/Utils";
 
 type CleanupFunction = () => void
 
@@ -25,7 +25,7 @@ export const initClickListeners = (
   const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
 
-      const popover = tabPanels[i].closest(':popover-open');
+      const popup = tabPanels[i].closest(`.feds-popup.${FEDS_OPEN_CLASS}`);
 
       tabButtons.forEach(tabButton => {
         tabButton.setAttribute('aria-selected', 'false');
@@ -35,13 +35,13 @@ export const initClickListeners = (
       });
       tabPanels[i]?.removeAttribute('hidden');
       button.setAttribute('aria-selected', 'true');
-      
-      if (!popover) return;
+
+      if (!popup) return;
       if (!isDesktop.matches) return;
       const popoverBackgroundRule = getPopoverBackgroundRule()
       if (!popoverBackgroundRule) return;
 
-      const newHeight = popover?.clientHeight ?? 0;
+      const newHeight = popup?.clientHeight ?? 0;
       popoverBackgroundRule.style.height = `${newHeight + 72}px`;
 
     }
@@ -96,32 +96,43 @@ const getPopoverBackgroundRule = (): CSSStyleRule | undefined =>
 
 
 const animations = (gnav: HTMLElement): void => {
-  const mainMenuButtons = [...gnav.querySelectorAll('.feds-gnav-items > li > button')];
+  const mainMenuButtons = [...gnav.querySelectorAll<HTMLElement>('.feds-gnav-items > li > button')];
   const fedsGnavItems = gnav.querySelector('.feds-gnav-items');
 
-  // popover height animations
+  // Popups are reparented to <nav> at render time (see renderGnav), so they
+  // are no longer DOM-siblings of their trigger button. Look them up via
+  // `aria-controls` instead. We escape only the double-quote in case the
+  // popup id ever contains one, which keeps the attribute selector valid.
+  const popupFor = (button: HTMLElement): HTMLElement | null => {
+    const id = button.getAttribute('aria-controls');
+    if (id === null || id === '') return null;
+    return gnav.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
+  };
+
+  // popup height animations: the nav::after pseudo-element is the gray
+  // dropdown background; we adjust its height to match the open popup.
   const popoverBackgroundRule = getPopoverBackgroundRule();
   const resizeObserver = new ResizeObserver(entries => {
     if (!popoverBackgroundRule) return;
     if (entries.length < 1) return;
-    const openPopover = gnav.querySelector('.feds-popup:popover-open');
-    if (!openPopover) {
+    const openPopup = gnav.querySelector(`.feds-popup.${FEDS_OPEN_CLASS}`);
+    if (!openPopup) {
       popoverBackgroundRule.style.height = '100%';
       return;
     }
-    const resetPopoverHeight = openPopover.clientHeight < 1;
-    const height = resetPopoverHeight ? '100%' : `${openPopover.clientHeight + 72}px`;
+    const resetPopoverHeight = openPopup.clientHeight < 1;
+    const height = resetPopoverHeight ? '100%' : `${openPopup.clientHeight + 72}px`;
     popoverBackgroundRule.style.height = height;
   });
 
   mainMenuButtons.forEach(button => {
     if (!popoverBackgroundRule) return;
-    const popup = button.nextElementSibling;
+    const popup = popupFor(button);
     if (!popup) return;
     resizeObserver.observe(popup);
-    // @ts-expect-error popup is a popover with a toggle event
-    popup.addEventListener('toggle', (event: ToggleEvent) => {
-      if (event.newState !== 'open' && !gnav.querySelector('.feds-popup:popover-open')) {
+    popup.addEventListener('toggle', (event: Event) => {
+      const newState = (event as ToggleEvent).newState;
+      if (newState !== 'open' && !gnav.querySelector(`.feds-popup.${FEDS_OPEN_CLASS}`)) {
         popoverBackgroundRule.style.height = '100%';
         if (isDesktop.matches) return;
         // Bandaid for using escape for closing the popup in mobile
@@ -132,8 +143,8 @@ const animations = (gnav: HTMLElement): void => {
         popoverBackgroundRule.style.height = `${popup.clientHeight + 72}px`;
         // On mobile (horizontal tabs), scroll active tab to the left edge
         if (!isDesktop.matches) {
-          const tabsList = (popup as HTMLElement).querySelector<HTMLElement>('.tabs');
-          const activeTab = (popup as HTMLElement).querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
+          const tabsList = popup.querySelector<HTMLElement>('.tabs');
+          const activeTab = popup.querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
           const firstTab = tabsList?.querySelector<HTMLElement>('button[role="tab"]');
           if (tabsList && activeTab && firstTab) {
             tabsList.scrollLeft = activeTab.offsetLeft
@@ -151,14 +162,14 @@ const animations = (gnav: HTMLElement): void => {
     button.addEventListener('click', () => {
       if (isDesktop.matches) return;
       if (!fedsGnavItems) return;
-      const popup = button.nextElementSibling;
+      const popup = popupFor(button);
       if (!popup) return;
       fedsGnavItems.classList.remove('subscreen-closing');
       fedsGnavItems.classList.add('subscreen-opening');
       popup.querySelector('.feds-popup-back-button')?.addEventListener('click', () => {
         fedsGnavItems.classList.remove('subscreen-opening');
         fedsGnavItems.classList.add('subscreen-closing');
-        setTimeout(() => (popup as HTMLElement).hidePopover(), 240);
+        setTimeout(() => closePopup(popup), 240);
       });
     });
   });

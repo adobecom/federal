@@ -973,15 +973,64 @@ export function getMiloLocaleSettings(
   };
 }
 
+// CSS-class–based open state replaces the HTML popover API so we never put
+// any gnav element into the browser top layer (which fights consumer modals
+// that rely on plain stacking contexts).
+export const FEDS_OPEN_CLASS = 'feds-open';
+
+const dispatchToggle = (el: HTMLElement, opening: boolean): void => {
+  const init = {
+    newState: opening ? 'open' : 'closed',
+    oldState: opening ? 'closed' : 'open',
+    bubbles: false,
+    cancelable: false,
+  } as const;
+  // ToggleEvent ships in browsers that supported the popover API, so it's
+  // safe in the same baseline (Chrome 114+, Firefox 125+, Safari 17+).
+  // We fall back to a CustomEvent shaped like ToggleEvent for older runtimes
+  // (e.g. test environments / older jsdom).
+  const ToggleEventCtor = (window as unknown as {
+    ToggleEvent?: typeof ToggleEvent
+  }).ToggleEvent;
+  const event = ToggleEventCtor !== undefined
+    ? new ToggleEventCtor('toggle', init)
+    : Object.assign(new Event('toggle', init), {
+      newState: init.newState,
+      oldState: init.oldState,
+    });
+  el.dispatchEvent(event);
+};
+
+export const isPopupOpen = (el: HTMLElement | null | undefined): boolean =>
+  el !== null && el !== undefined && el.classList.contains(FEDS_OPEN_CLASS);
+
+export const openPopup = (el: HTMLElement | null | undefined): void => {
+  if (el === null || el === undefined) return;
+  if (el.classList.contains(FEDS_OPEN_CLASS)) return;
+  el.classList.add(FEDS_OPEN_CLASS);
+  dispatchToggle(el, true);
+};
+
+export const closePopup = (el: HTMLElement | null | undefined): void => {
+  if (el === null || el === undefined) return;
+  if (!el.classList.contains(FEDS_OPEN_CLASS)) return;
+  el.classList.remove(FEDS_OPEN_CLASS);
+  dispatchToggle(el, false);
+};
+
+export const togglePopup = (el: HTMLElement | null | undefined): void => {
+  if (el === null || el === undefined) return;
+  if (el.classList.contains(FEDS_OPEN_CLASS)) closePopup(el);
+  else openPopup(el);
+};
+
 export const closePopovers = (mountpoint: HTMLElement): void => {
-  const menuPopover = mountpoint.querySelector<
-    HTMLElement & { hidePopover?: () => void }
-  >('#feds-menu-wrapper');
+  const menuPopover = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
   menuPopover?.classList.remove('feds-menu-active');
-  menuPopover?.hidePopover?.();
-  mountpoint.querySelector<
-    HTMLElement & { hidePopover?: () => void }
-  >('.feds-popup:popover-open')?.hidePopover?.();
+  closePopup(menuPopover);
+  mountpoint
+    .querySelectorAll<HTMLElement>(`.feds-popup.${FEDS_OPEN_CLASS}`)
+    .forEach(closePopup);
 };
 
 export const animateInSequence = (xs: HTMLElement[], gap: number): void => {
@@ -1024,9 +1073,12 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
     if (!jarvisLink && (event as ToggleEvent).newState !== 'open') return;
     bringToTop();
   }
-  const popovers = gnav.querySelectorAll('[popover]');
+  // Gnav drawers are no longer top-layer popovers, so Jarvis' own popover
+  // already wins z-order naturally. We still re-show Jarvis on gnav open/close
+  // events as defensive insurance against page-level CSS that re-stacks things.
+  const togglers = gnav.querySelectorAll('.feds-popup, #feds-menu-wrapper');
   document.addEventListener('click', bringJarvisToTop);
-  popovers.forEach(popover => popover.addEventListener('toggle', bringJarvisToTop));
+  togglers.forEach(el => el.addEventListener('toggle', bringJarvisToTop));
   const intervalId = setInterval(() => {
     if (bringToTop()) clearInterval(intervalId);
   }, 150);
