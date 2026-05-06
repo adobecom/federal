@@ -1,7 +1,0 @@
-{
-  "name": "grid",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/grid/src",
-  "projectType": "library",
-  "tags": ["scope:grid", "type:package"]
-}
