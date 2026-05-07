@@ -60,17 +60,17 @@ export const parseBrand = (
         errors.add(new RecoverableError(ERRORS.missingImageSections));
     }
 
-    const lightThemeImages = mobileImageSection?.querySelectorAll('a[href$=".svg"]');
-    const darkThemeImages = desktopImageSection?.querySelectorAll('a[href$=".svg"]');
+    const mobileImages = mobileImageSection?.querySelectorAll('a[href$=".svg"]');
+    const desktopImages = desktopImageSection?.querySelectorAll('a[href$=".svg"]');
 
-    const lightThemeMobileImageSrc = lightThemeImages?.[0]?.getAttribute('href') ?? '';
-    const lightThemeMobileImageAlt = lightThemeImages?.[0]?.textContent?.split('|')[1]?.trim() ?? '';
-    const darkThemeMobileImageSrc = lightThemeImages?.[1]?.getAttribute('href') ?? '';
-    const darkThemeMobileImageAlt = lightThemeImages?.[1]?.textContent?.split('|')[1]?.trim() ?? '';
-    const lightThemeDesktopImageSrc = darkThemeImages?.[0]?.getAttribute('href') ?? '';
-    const lightThemeDesktopImageAlt = darkThemeImages?.[0]?.textContent?.split('|')[1]?.trim() ?? '';
-    const darkThemeDesktopImageSrc = darkThemeImages?.[1]?.getAttribute('href') ?? '';
-    const darkThemeDesktopImageAlt = darkThemeImages?.[1]?.textContent?.split('|')[1]?.trim() ?? '';
+    const lightThemeMobileImageSrc = mobileImages?.[0]?.getAttribute('href') ?? '';
+    const lightThemeMobileImageAlt = mobileImages?.[0]?.textContent?.split('|')[1]?.trim() ?? '';
+    const darkThemeMobileImageSrc = mobileImages?.[1]?.getAttribute('href') ?? '';
+    const darkThemeMobileImageAlt = mobileImages?.[1]?.textContent?.split('|')[1]?.trim() ?? '';
+    const lightThemeDesktopImageSrc = desktopImages?.[0]?.getAttribute('href') ?? '';
+    const lightThemeDesktopImageAlt = desktopImages?.[0]?.textContent?.split('|')[1]?.trim() ?? '';
+    const darkThemeDesktopImageSrc = desktopImages?.[1]?.getAttribute('href') ?? '';
+    const darkThemeDesktopImageAlt = desktopImages?.[1]?.textContent?.split('|')[1]?.trim() ?? '';
 
     if (
       !lightThemeMobileImageSrc
