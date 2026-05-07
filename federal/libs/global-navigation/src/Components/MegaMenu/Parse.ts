@@ -66,9 +66,6 @@ export const parseMegaMenu = (
     }
   })();
 
-  if (content instanceof IrrecoverableError)
-    throw content;
-
   return [
     {
       type: "MegaMenu",
