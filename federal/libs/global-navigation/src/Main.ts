@@ -134,17 +134,7 @@ mountpoint: HTMLElement
       return [error];
     }
   }).flat());
-
-  // Reparent popups directly under <nav>. Their default <li> ancestors get
-  // `transform` / `translate` from the open/subscreen animations, which per
-  // the CSS Transforms spec makes those ancestors the containing block for
-  // `position: fixed` descendants — collapsing the popup against the <li>
-  // instead of the viewport. The Popover API used to escape this via the top
-  // layer; without it we hoist in the DOM ourselves.
-  const navEl = mountpoint.querySelector('nav');
-  if (navEl !== null) {
-    megaMenus.forEach(mm => navEl.appendChild(mm));
-  }
+  
   return mountpoint;
 };
 
