@@ -658,8 +658,8 @@ export function getMetadata(
   // Use 'property' for namespaced metadata (e.g., Open Graph), 'name' 
   // for standard metadata
   const attr = name && name.includes(':') ? 'property' : 'name';
-  const meta = doc.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement;
-  return meta?.content ?? null;
+  const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
+  return meta instanceof HTMLMetaElement ? meta.content : null;
 }
 
 type MiloConfigEnv = {
