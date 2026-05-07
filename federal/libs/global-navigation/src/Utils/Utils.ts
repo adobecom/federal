@@ -600,7 +600,7 @@ export const loadScript = (
       script.setAttribute('type', type);
     }
     // Set loading mode (async or defer) if specified
-    if (mode && ['async', 'defer'].includes(mode)) script.setAttribute(mode, '');
+    if (mode !== undefined) script.setAttribute(mode, '');
     head.append(script);
   }
 
