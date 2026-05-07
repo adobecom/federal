@@ -257,7 +257,6 @@ export const getFederatedContentRoot = (): string => {
     'https://news.adobe.com',
     'graybox.adobe.com',
   ];
-  if (federatedContentRoot) return federatedContentRoot;
   // Non milo consumers will have its origin from config
   // TODO: allow the passing of a configured origin
   const origin = window.location.origin;
@@ -1027,7 +1026,14 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
   const popovers = gnav.querySelectorAll('[popover]');
   document.addEventListener('click', bringJarvisToTop);
   popovers.forEach(popover => popover.addEventListener('toggle', bringJarvisToTop));
+  let attempts = 0;
+  const maxAttempts = 200;
   const intervalId = setInterval(() => {
-    if (bringToTop()) clearInterval(intervalId);
+    attempts += 1;
+    if (bringToTop()) { clearInterval(intervalId); return; }
+    if (attempts >= maxAttempts) {
+      clearInterval(intervalId);
+      lanaLog('tempFixJarvis: gave up waiting for adbMsgClientWrapper');
+    }
   }, 150);
 }
