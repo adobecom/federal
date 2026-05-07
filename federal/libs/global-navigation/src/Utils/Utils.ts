@@ -49,11 +49,11 @@ export const split = <T>(
 export const zip = <T, R>(
   xs: T[],
   ys: R[]
-): List<[T, R]> => {
+): Array<[T, R]> => {
   const len = xs.length < ys.length
             ? xs.length
             : ys.length;
-  const result = new Array(len) as List<[T, R]>;
+  const result = new Array(len) as Array<[T, R]>;
   for (let i = 0; i < len; i = i + 1) {
     result[i] = [xs[i], ys[i]];
   }
@@ -119,9 +119,9 @@ export const parseListAndAccumulateErrors = <
   ParsedObj,
   ErrorType
   >(
-  elements: List<UnParsedObj>,
+  elements: Array<UnParsedObj>,
   parse: (element: UnParsedObj) => Parsed<ParsedObj, ErrorType>
-): Parsed<List<ParsedObj>, ErrorType> => elements.reduce(
+): Parsed<Array<ParsedObj>, ErrorType> => elements.reduce(
   ([accElems, accErrors], element) => {
     try {
       const [parsedElement, parseErrors] = parse(element);
@@ -139,7 +139,7 @@ export const parseListAndAccumulateErrors = <
       return [accElems, accErrors];
     }
   },
-  [[],[]] as Parsed<List<ParsedObj>, ErrorType>
+  [[],[]] as Parsed<Array<ParsedObj>, ErrorType>
   );
 
 export type PersonalizationConfig = {
@@ -372,7 +372,7 @@ export const inlineNestedFragments = async (
           } catch {
             return;
           }
-        }, [] as List<[HTMLAnchorElement, URL]>)
+        }, [] as Array<[HTMLAnchorElement, URL]>)
       await Promise.all(inlineLinks);
       return currentElem
     } catch (error) {
