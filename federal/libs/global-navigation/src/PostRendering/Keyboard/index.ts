@@ -1,4 +1,5 @@
-import { isDesktop, closePopup, isPopupOpen, IS_OPEN_CLASS, triggerForPopupId } from "../../Utils/Utils";
+import { isDesktop } from "../../Utils/Utils";
+import { IS_OPEN_CLASS, triggerForPopupId, closePopup, isPopupOpen } from "../PopupWiring";
 
 function $$(root: Element, selector: string): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(selector)];

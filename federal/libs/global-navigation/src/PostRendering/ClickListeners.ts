@@ -1,4 +1,5 @@
-import { isDesktop, closePopup, IS_OPEN_CLASS } from "../Utils/Utils";
+import { isDesktop } from "../Utils/Utils";
+import { IS_OPEN_CLASS, closePopup } from "./PopupWiring";
 
 type CleanupFunction = () => void
 

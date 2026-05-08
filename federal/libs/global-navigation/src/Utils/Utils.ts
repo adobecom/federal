@@ -1,6 +1,7 @@
 import { IrrecoverableError } from "../Error/Error";
 import { lanaLog } from "./Log";
 import { getPlaceholders, replacePlaceholders } from "./Placeholders";
+import { IS_OPEN_CLASS, closePopup } from "../PostRendering/PopupWiring";
 
 export const isDesktop = window.matchMedia('(min-width: 1024px)');
 
@@ -972,70 +973,6 @@ export function getMiloLocaleSettings(
     locale: `${language}_${country}`,
   };
 }
-
-// Open-state class used in compound selectors (`.feds-popup.is-open`,
-// `.feds-menu-wrapper.is-open`). Replaces the HTML popover API so the gnav
-// stays out of the browser top layer.
-export const IS_OPEN_CLASS = 'is-open';
-
-export const triggerForPopupId = (
-  root: ParentNode,
-  id: string,
-): HTMLElement | null => {
-  if (id === '') return null;
-  return root.querySelector<HTMLElement>(`[aria-controls="${CSS.escape(id)}"]`);
-};
-
-export const popupForTriggerId = (
-  root: ParentNode,
-  id: string | null,
-): HTMLElement | null => {
-  if (id === null || id === '') return null;
-  return root.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
-};
-
-const dispatchToggle = (el: HTMLElement, opening: boolean): void => {
-  const init = {
-    newState: opening ? 'open' : 'closed',
-    oldState: opening ? 'closed' : 'open',
-    bubbles: false,
-    cancelable: false,
-  } as const;
-  // Fall back to a shaped Event for runtimes without ToggleEvent (older jsdom).
-  const ToggleEventCtor = (window as unknown as {
-    ToggleEvent?: typeof ToggleEvent
-  }).ToggleEvent;
-  const event = ToggleEventCtor !== undefined
-    ? new ToggleEventCtor('toggle', init)
-    : Object.assign(new Event('toggle', init), {
-      newState: init.newState,
-      oldState: init.oldState,
-    });
-  el.dispatchEvent(event);
-};
-
-export const isPopupOpen = (el: HTMLElement | null | undefined): boolean =>
-  el !== null && el !== undefined && el.classList.contains(IS_OPEN_CLASS);
-
-export const openPopup = (el: HTMLElement | null | undefined): void => {
-  if (el === null || el === undefined) return;
-  if (el.classList.contains(IS_OPEN_CLASS)) return;
-  el.classList.add(IS_OPEN_CLASS);
-  dispatchToggle(el, true);
-};
-
-export const closePopup = (el: HTMLElement | null | undefined): void => {
-  if (el === null || el === undefined) return;
-  if (!el.classList.contains(IS_OPEN_CLASS)) return;
-  el.classList.remove(IS_OPEN_CLASS);
-  dispatchToggle(el, false);
-};
-
-export const togglePopup = (el: HTMLElement | null | undefined): void => {
-  if (el === null || el === undefined) return;
-  if (el.classList.contains(IS_OPEN_CLASS)) closePopup(el);
-  else openPopup(el);
-};
 
 export const closePopovers = (mountpoint: HTMLElement): void => {
   const menuPopover = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
