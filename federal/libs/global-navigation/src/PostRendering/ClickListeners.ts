@@ -1,4 +1,4 @@
-import { isDesktop, closePopup, IS_OPEN_CLASS, popupForTriggerId } from "../Utils/Utils";
+import { isDesktop, closePopup, IS_OPEN_CLASS } from "../Utils/Utils";
 
 type CleanupFunction = () => void
 
@@ -99,14 +99,6 @@ const animations = (gnav: HTMLElement): void => {
   const mainMenuButtons = [...gnav.querySelectorAll<HTMLElement>('.feds-gnav-items > li > button')];
   const fedsGnavItems = gnav.querySelector('.feds-gnav-items');
 
-  // Popups are reparented to <nav> at render time (see renderGnav), so they
-  // are no longer DOM-siblings of their trigger button. Look them up via
-  // `aria-controls`.
-  const popupFor = (button: HTMLElement): HTMLElement | null =>
-    popupForTriggerId(gnav, button.getAttribute('aria-controls'));
-
-  // popup height animations: the nav::after pseudo-element is the gray
-  // dropdown background; we adjust its height to match the open popup.
   const popoverBackgroundRule = getPopoverBackgroundRule();
   const resizeObserver = new ResizeObserver(entries => {
     if (!popoverBackgroundRule) return;
@@ -123,7 +115,7 @@ const animations = (gnav: HTMLElement): void => {
 
   mainMenuButtons.forEach(button => {
     if (!popoverBackgroundRule) return;
-    const popup = popupFor(button);
+    const popup = button.nextElementSibling;
     if (!popup) return;
     resizeObserver.observe(popup);
     popup.addEventListener('toggle', (event: Event) => {
@@ -158,8 +150,8 @@ const animations = (gnav: HTMLElement): void => {
     button.addEventListener('click', () => {
       if (isDesktop.matches) return;
       if (!fedsGnavItems) return;
-      const popup = popupFor(button);
-      if (!popup) return;
+      const popup = button.nextElementSibling;
+      if (!(popup instanceof HTMLElement)) return;
       fedsGnavItems.classList.remove('subscreen-closing');
       fedsGnavItems.classList.add('subscreen-opening');
       popup.querySelector('.feds-popup-back-button')?.addEventListener('click', () => {

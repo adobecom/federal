@@ -3,16 +3,16 @@ import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
+import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, isPopupOpen } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, isPopupOpen, IS_OPEN_CLASS } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
-import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
  
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -210,10 +210,11 @@ export const postRenderingTasks = async (
   else 
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
-  wirePopups(input.mountpoint);
   initClickListeners(input.mountpoint);
-  initKeyboardNav(input.mountpoint);
+  wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
+  initKeyboardNav(input.mountpoint);
+  initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
@@ -238,6 +239,38 @@ export const postRenderingTasks = async (
   };
 };
 
+const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
+  const menuWrapper = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
+  const navToggle = mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
+
+  menuWrapper?.addEventListener('toggle', () => {
+    const isOpen = menuWrapper.classList.contains(IS_OPEN_CLASS);
+    navToggle?.setAttribute('aria-expanded', String(isOpen));
+    navToggle?.setAttribute(
+      'daa-ll',
+      isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
+    );
+    if (isOpen) menuWrapper.classList.add('feds-menu-active');
+  });
+
+  menuWrapper?.addEventListener('transitionend', () => {
+    if (!menuWrapper.classList.contains(IS_OPEN_CLASS)) {
+      menuWrapper.classList.remove('feds-menu-active');
+    }
+  });
+
+  const megaMenuPopovers = mountpoint.querySelectorAll<HTMLElement>('.feds-popup');
+  megaMenuPopovers.forEach(popup => {
+    popup.addEventListener('toggle', () => {
+      const trigger = mountpoint.querySelector<HTMLElement>(
+        `[aria-controls="${popup.id}"]`
+      );
+      const isOpen = popup.classList.contains(IS_OPEN_CLASS);
+      trigger?.setAttribute('aria-expanded', String(isOpen));
+      trigger?.setAttribute('daa-ll', isOpen ? 'header|Close' : 'header|Open');
+    });
+  });
+};
 
 const initPopoverCloseOnResize = (mountpoint: HTMLElement): void => {
   isDesktop.addEventListener('change', () => {

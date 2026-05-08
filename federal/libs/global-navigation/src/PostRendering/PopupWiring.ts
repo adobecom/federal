@@ -55,18 +55,12 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
   });
 };
 
-// Outside-click dismiss. Popups are reparented to <nav> (see renderGnav), so a
-// click inside an open popup is NOT contained by the menu-wrapper in the DOM
-// sense; we treat "inside any open gnav element" as inside both, otherwise
-// the popup back-button would dismiss the menu-wrapper.
 export const initLightDismiss = (mountpoint: HTMLElement): void => {
   document.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof Node)) return;
     if (mountpoint.querySelector(`.${IS_OPEN_CLASS}`) === null) return;
-    const openPopups = mountpoint.querySelectorAll<HTMLElement>(
-      `.feds-popup.${IS_OPEN_CLASS}, .feds-menu-wrapper.${IS_OPEN_CLASS}`,
-    );
+    const openPopups = mountpoint.querySelectorAll<HTMLElement>(`.${IS_OPEN_CLASS}`);
     if ([...openPopups].some(open => open.contains(target))) return;
     openPopups.forEach(popup => {
       const trigger = triggerForPopupId(mountpoint, popup.id);
