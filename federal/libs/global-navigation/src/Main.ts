@@ -14,7 +14,7 @@ import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
- 
+
 type GlobalNavigation = {
   closeEverything: () => void;
   reloadUnav: () => void;
@@ -74,10 +74,10 @@ export const main = async (
     lanaLog(`Failed to initialize MiloConfig: ${error}`);
     throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
   }
-  
+
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
-  
+
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
 
@@ -101,7 +101,7 @@ export const main = async (
     lanaLog(gnavData.message);
     throw gnavData;
   }
-  
+
   // TODO: Implement Aside
   await renderGnav(gnavData)(mountpoint);
 
@@ -135,7 +135,7 @@ mountpoint: HTMLElement
       return [error];
     }
   }).flat());
-  
+
   return mountpoint;
 };
 
@@ -208,7 +208,7 @@ export const postRenderingTasks = async (
     errors.add(unav);
     lanaLog(unav.message);
   }
-  else 
+  else
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
   initClickListeners(input.mountpoint);
@@ -225,7 +225,7 @@ export const postRenderingTasks = async (
     errors.add(error);
     lanaLog(error.message);
   });
-  
+
   const reloadUnav
     = unav instanceof RecoverableError
     ? (): void => {}

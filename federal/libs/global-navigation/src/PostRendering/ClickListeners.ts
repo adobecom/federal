@@ -3,6 +3,10 @@ import { IS_OPEN_CLASS, closePopup } from "./PopupWiring";
 
 type CleanupFunction = () => void
 
+/** Height in px added to the popover background pseudo-element
+ *  to cover the nav bar */
+const POPOVER_BG_HEIGHT_OFFSET_PX = 72;
+
 export const initClickListeners = (
   gnav: HTMLElement
 ): CleanupFunction => {
@@ -43,7 +47,7 @@ export const initClickListeners = (
       if (!popoverBackgroundRule) return;
 
       const newHeight = popup?.clientHeight ?? 0;
-      popoverBackgroundRule.style.height = `${newHeight + 72}px`;
+      popoverBackgroundRule.style.height = `${newHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
 
     }
   );
@@ -92,7 +96,7 @@ export const initClickListeners = (
 const getPopoverBackgroundRule = (): CSSStyleRule | undefined =>
   [...document.adoptedStyleSheets
     .flatMap(sheet => [...sheet.cssRules] as (CSSStyleRule | undefined)[])]
-    .find(rule => 
+    .find(rule =>
           (rule)?.selectorText === 'header.global-navigation nav::after');
 
 
@@ -110,7 +114,7 @@ const animations = (gnav: HTMLElement): void => {
       return;
     }
     const resetPopoverHeight = openPopup.clientHeight < 1;
-    const height = resetPopoverHeight ? '100%' : `${openPopup.clientHeight + 72}px`;
+    const height = resetPopoverHeight ? '100%' : `${openPopup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
     popoverBackgroundRule.style.height = height;
   });
 
@@ -129,7 +133,7 @@ const animations = (gnav: HTMLElement): void => {
         fedsGnavItems?.classList.add('subscreen-closing');
       } else {
         // in case the resize observer fails
-        popoverBackgroundRule.style.height = `${popup.clientHeight + 72}px`;
+        popoverBackgroundRule.style.height = `${popup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
         // On mobile (horizontal tabs), scroll active tab to the left edge
         if (!isDesktop.matches) {
           const tabsList = popup.querySelector<HTMLElement>('.tabs');
