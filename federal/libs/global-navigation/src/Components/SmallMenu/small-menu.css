@@ -1,0 +1,54 @@
+/* =========================================
+   Small Menu — Anchor the li so top:100% works
+   ========================================= */
+
+.feds-gnav-items > li:has(.small-menu-popup) {
+  position: relative;
+}
+
+/* =========================================
+   Small Menu — Popup overrides
+   Overrides the full-width fixed .feds-popup base styles
+   ========================================= */
+
+.feds-popup.small-menu-popup {
+  position: absolute;
+  inset: auto;
+  top: 100%;
+  left: 0;
+  width: auto;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background-color: var(--s2a-color-background-default, white);
+  border: 1px solid var(--s2a-color-transparent-black-12, rgba(0, 0, 0, 0.12));
+  border-radius: var(--s2a-spacing-xs, 8px);
+  padding: var(--s2a-spacing-md, 16px) var(--s2a-spacing-lg, 24px);
+  box-sizing: border-box;
+}
+
+.feds-popup.small-menu-popup.is-open {
+  border-radius: var(--s2a-spacing-xs, 8px);
+}
+
+/* =========================================
+   Small Menu — Gnav Cards overrides (desktop)
+   Stacks columns vertically rather than in a wide grid
+   ========================================= */
+
+@media (min-width: 1024px) {
+  .small-menu-popup .feds-gnav-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2a-spacing-xs, 8px);
+  }
+
+  .small-menu-popup .feds-gnav-cards > li {
+    width: auto;
+    flex: none;
+  }
+
+  .small-menu-popup .feds-gnav-cards > li:has(> :nth-child(2)) {
+    flex-direction: column;
+  }
+}

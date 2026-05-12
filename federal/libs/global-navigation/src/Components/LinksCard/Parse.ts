@@ -32,10 +32,6 @@ const parseCard = (
   element: Element
 ): Parsed<LinksCardItem, RecoverableError> => {
   const titleElement = element.querySelector('h2, h3, h4') || null;
-  if (!titleElement) {
-    throw new IrrecoverableError("Expected links card title");
-  }
-
   const footerCtaAnchor = element.querySelector('em > a');
   const linkElements = [...element.querySelectorAll('a')]
     .filter((anchor) => anchor !== footerCtaAnchor);
@@ -59,12 +55,12 @@ const parseCard = (
       }
     })();
   if (footerCTA) {
-    footerCTA.daaLl = `${titleElement.textContent ?? ''} - ${footerCTA?.daaLl}`;
+    footerCTA.daaLl = `${titleElement?.textContent ?? ''} - ${footerCTA?.daaLl}`;
   }
   return [
     {
       type: "LinksCardItem",
-      title: titleElement.textContent ?? "",
+      title: titleElement?.textContent ?? "",
       links,
       footerCTA,
     },

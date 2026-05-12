@@ -21,6 +21,7 @@
 /* Component styles */
 @import "../Components/Brand/brand.css";
 @import "../Components/MegaMenu/mega-menu.css";
+@import "../Components/SmallMenu/small-menu.css";
 @import "../Components/GnavCards/gnav-cards.css";
 @import "../Components/PromoCard/promo-card.css";
 @import "../Components/LinksCard/links-card.css";
