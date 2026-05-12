@@ -28,20 +28,19 @@ export const parseComponent = (
     throw new IrrecoverableError(ERRORS.elementNull);
 
   const brandElem = element.querySelector('.gnav-brand');
-  if (brandElem !== null) 
+  if (brandElem !== null)
     return parseBrand(brandElem);
 
   const largeMenu = element.querySelector('.large-menu');
   if (largeMenu !== null)
     return parseMegaMenu(largeMenu);
 
-  const smallMenuElem = element.querySelector('.small-menu');
-  if (smallMenuElem !== null)
-    return parseSmallMenu(smallMenuElem);
+  if (element.querySelector('h5') !== null && element.querySelector('.links-card') !== null)
+    return parseSmallMenu(element);
 
   if (element.querySelector('strong') !== null)
     return parsePrimaryCTA(element);
-  
+
   if (element.querySelector('em') !== null)
     return parseSecondaryCTA(element);
 

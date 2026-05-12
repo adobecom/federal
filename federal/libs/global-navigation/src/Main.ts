@@ -140,19 +140,11 @@ mountpoint: HTMLElement
   const smallMenus = [
     ...mountpoint.querySelectorAll('button.small-menu ~ .feds-popup')
   ];
-  smallMenus.forEach(sm => {
-    sm.innerHTML = '';
-  });
   const smallMenuComponents = data.components.filter(com => com.type === "SmallMenu");
-  const smPromises = smallMenuComponents.map(com => com.content);
-  await Promise.all(smPromises.map(async (smPromise, idx) => {
-    try {
-      const [content] = await smPromise;
-      smallMenus[idx].innerHTML = smallMenuPopup(content, smallMenus[idx].id);
-    } catch (error) {
-      return [error];
-    }
-  }));
+  smallMenuComponents.forEach((com, idx) => {
+    const [content] = com.content;
+    smallMenus[idx].innerHTML = smallMenuPopup(content, smallMenus[idx].id);
+  });
 
   return mountpoint;
 };
