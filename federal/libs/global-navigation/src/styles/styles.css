@@ -20,6 +20,7 @@
 
 /* Component styles */
 @import "../Components/Brand/brand.css";
+@import "../Components/Breadcrumbs/breadcrumbs.css";
 @import "../Components/MegaMenu/mega-menu.css";
 @import "../Components/SmallMenu/small-menu.css";
 @import "../Components/GnavCards/gnav-cards.css";
@@ -74,6 +75,9 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
   --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
   --s2a-typography-line-height-title-5-temp: 1;
+  /* Height of the breadcrumbs row; consumed by both the breadcrumbs
+     component and the nav::after backdrop that extends to cover it. */
+  --feds-breadcrumbs-height: var(--s2a-spacing-48);
 }
 
 
@@ -90,6 +94,13 @@ header.global-navigation {
   /* right: 0;
   max-width: var(--grid-max-width-default);
   margin: auto; */
+  /* Drives the height of `nav::after` (the rounded backdrop frame).
+     Default value covers the nav row; the JS in
+     PostRendering/ClickListeners.ts mutates this property when a
+     mega-menu popover opens so the backdrop slides down to cover
+     the popover content. Using a custom property keeps the JS free
+     of CSSOM walks and immune to CSS selector refactors. */
+  --feds-popup-bg-height: 100%;
 }
 
 header.feds-header-scrolled .feds-link {
@@ -126,6 +137,100 @@ header.feds-header-scrolled nav {
 .global-navigation.site-pivot .feds-utilities {
   margin-left: auto;
   padding-right: var(--s2a-spacing-md);
+}
+
+/* =========================================
+   Product Entry CTA
+   ========================================= */
+
+.global-navigation.site-pivot .feds-product-entry-cta {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding-right: var(--s2a-spacing-md);
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
+  margin-left: 0;
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box;
+  padding: 11px var(--s2a-spacing-lg) 10px;
+  border-radius: var(--s2a-border-radius-round);
+  border: var(--s2a-border-width-sm) solid transparent;
+  font-family: var(--feds-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Default (transparent gnav over imagery):
+   - primary: filled white pill with dark text
+   - secondary: outlined in white, transparent fill */
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-25);
+}
+
+/* Scrolled (blurred whitish backdrop):
+   - primary: filled dark pill with white text (inverse of default)
+   - secondary: outlined in dark, transparent fill (matches popup secondary) */
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Open popup / mobile drawer state: gnav gets a light/grey backdrop, so
+   force the dark-outline treatment regardless of scroll state, mirroring
+   the unav profile button at styles.css:109-113. */
+.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-primary-cta,
+.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Hover. In the non-scrolled state the resting color of the secondary CTA
+   is white (over a transparent gnav), so on hover we darken the text as
+   well so it remains legible against the gray-75 hover fill. The primary
+   CTA already resolves to dark text on hover in both states. */
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta:hover {
+  background-color: var(--s2a-color-gray-75);
+  color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-gray-75);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-75);
+}
+
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-gray-75);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-75);
 }
 
 .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
@@ -168,7 +273,7 @@ header.global-navigation nav::after {
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
+  height: var(--feds-popup-bg-height);
   padding: 0;
   background-color: transparent;
   backdrop-filter: blur(0px);
@@ -180,6 +285,24 @@ header.global-navigation nav::after {
 
 header.global-navigation.feds-header-scrolled nav::after {
   backdrop-filter: blur(var(--s2a-blur-sm));
+}
+
+/* When breadcrumbs are present they sit absolutely below the nav row.
+   Bump --feds-popup-bg-height by the breadcrumbs height so the rounded
+   backdrop frame visually contains both rows. We modify the variable
+   (rather than setting `height` directly on `::after`) so this rule
+   coexists with the JS-driven popup-open height set on <header> by
+   PostRendering/ClickListeners.ts.
+
+   The :not() guard intentionally excludes only LARGE menus
+   (`.feds-popup.is-open:not(.small-menu)`) — small menus do not hide
+   breadcrumbs (see Components/Breadcrumbs/breadcrumbs.css), so the
+   backdrop must keep covering them. For the small-menu-open state
+   this rule wins over the inline `--feds-popup-bg-height` JS writes
+   on <header>, because the variable is being declared on a closer
+   ancestor (nav) of the consuming pseudo-element (nav::after). */
+header.global-navigation nav:has(> .feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu))) {
+  --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
 }
 
 header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
@@ -360,6 +483,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   overflow: auto;
   overscroll-behavior: contain;
   background-color:transparent;
+  z-index: 1;
 }
 
 .feds-popup.is-open {
@@ -696,7 +820,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   .feds-popup .feds-product-card {
-    gap: var(--s2a-spacing-2xl);     
+    gap: var(--s2a-spacing-2xl);
     border-radius: var(--s2a-border-radius-24);
   }
 
@@ -954,11 +1078,11 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     background-color: transparent;
     padding: 0;
   }
-  
+
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
     transition: opacity 0.2s ease, visibility 0s linear 0.2s;
   }
-  
+
   .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
     display: flex;
     opacity: 1;
@@ -969,7 +1093,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     padding: 0;
     margin-top: 0;
   }
-  
+
   .global-navigation nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items {
     align-items: flex-start;
     padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
@@ -982,7 +1106,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
       transform: translateX(18px);
       animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
     }
-  
+
     & .feds-gnav-items > li:nth-child(1) > .feds-link { animation-delay: 0.18s; }
     & .feds-gnav-items > li:nth-child(2) > .feds-link { animation-delay: 0.24s; }
     & .feds-gnav-items > li:nth-child(3) > .feds-link { animation-delay: 0.30s; }
@@ -999,18 +1123,18 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     transform-origin: 7px 3.5px;
     transition: transform 0.35s cubic-bezier(.4,0,.2,1);
   }
-  
+
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
     height: 11px;
   }
-  
+
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
     transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
   }
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
     transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
   }
-  
+
   /* Mobile gnav-item slide-out / re-enter when subscreen opens / closes.
      The popup-interior animations live in a separate rule below because the
      popup is no longer a descendant of .feds-gnav-items (we reparent it to

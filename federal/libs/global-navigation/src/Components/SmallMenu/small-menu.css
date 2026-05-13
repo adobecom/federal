@@ -122,6 +122,10 @@
     top: 0;
   }
 
+  header.global-navigation nav:has(.small-menu.is-open):has(.feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+    height: var(--feds-popup-bg-height);
+  }
+
   header.global-navigation.feds-header-scrolled nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
     width: 100%;
     left: 0;
