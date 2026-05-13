@@ -25,6 +25,7 @@
 @import "../Components/SmallMenu/small-menu.css";
 @import "../Components/GnavCards/gnav-cards.css";
 @import "../Components/PromoCard/promo-card.css";
+@import "../Components/PromoCard/promo-card-small.css";
 @import "../Components/LinksCard/links-card.css";
 @import "../Components/ProductList/productlist.css";
 @import "../Components/Panels/panels.css";
@@ -573,9 +574,9 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
 .feds-popup .feds-product-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-size: var(--s2a-typography-font-size-title-5);
-  line-height: var(--s2a-typography-line-height-title-5-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
+  font-size: var(--s2a-typography-font-size-title-4);
+  line-height: var(--s2a-typography-line-height-title-4);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-family: var(--feds-heading-font-family);
 }
 
@@ -662,6 +663,29 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   display: flex;
   width: 100%;
   justify-content: space-between;
+}
+
+
+.feds-popup .feds-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 11px 14px 10px;;
+  border-radius: var(--s2a-border-radius-round);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  color: var(--s2a-color-gray-25);
+  text-decoration: none;
+  background-color: rgba(59, 99, 251, 1);
+
+  /* &:hover {
+    background: var(--s2a-color-gray-75);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-75);
+  } */
 }
 
 /* =========================================

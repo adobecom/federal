@@ -14,9 +14,9 @@
 
 .feds-popup .links-card .links-card-title {
   margin: 0 0 var(--s2a-spacing-sm);
-  font-size: var(--s2a-typography-font-size-title-5);
-  line-height: var(--s2a-typography-line-height-title-5-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
+  font-size: var(--s2a-typography-font-size-title-4);
+  line-height: var(--s2a-typography-line-height-title-4);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);
   font-family: var(--feds-heading-font-family);
@@ -46,8 +46,27 @@
   display: inline-flex;
 }
 
+.feds-popup .links-card .links-card-links .links-card-links__item-link {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2a-spacing-2xs, 4px);
+}
+
+.feds-popup .links-card .links-card-links .links-card-links__item-description {
+  font-size: var(--s2a-font-family-body);
+  color: var(--s2a-color-content-default);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-regular);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  max-width: 294px;
+}
+
 .feds-popup .links-card .links-card-links .feds-link--highlight {
   color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
+  font-weight: 700;
+}
+
+.links-card-links__item-title {
   font-weight: 700;
 }
 
@@ -58,13 +77,6 @@
 .feds-popup .links-card .links-card-footer {
   width: 100%;
   margin-top: var(--s2a-spacing-lg);
-}
-
-.feds-popup .links-card .links-card-footer .feds-secondary-cta {
-  width: 100%;
-  box-sizing: border-box;
-  justify-content: center;
-  background-color: transparent;
 }
 
 /* =========================================

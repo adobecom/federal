@@ -1,7 +1,7 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { Link, parseLink } from "../Link/Parse";
 import { parseListAndAccumulateErrors } from "../../Utils/Utils";
-import { parseSecondaryCTA, SecondaryCTA } from "../CTA/Parse";
+import { parsePrimaryCTA, parseSecondaryCTA, PrimaryCTA, SecondaryCTA } from "../CTA/Parse";
 
 export type LinksCard = {
   type: "LinksCard";
@@ -11,8 +11,8 @@ export type LinksCard = {
 export type LinksCardItem = {
   type: "LinksCardItem";
   title: string;
-  links: Array<Link & { highlight?: boolean }>;
-  footerCTA: SecondaryCTA | null;
+  links: Array<Link & { highlight?: boolean; description?: string }>;
+  footerCTA: PrimaryCTA | SecondaryCTA | null;
 };
 
 export const parseLinksCard = (
@@ -32,7 +32,9 @@ const parseCard = (
   element: Element
 ): Parsed<LinksCardItem, RecoverableError> => {
   const titleElement = element.querySelector('h2, h3, h4') || null;
-  const footerCtaAnchor = element.querySelector('em > a');
+  const footerCtaAnchor = element.querySelector('em > a')
+    || element.querySelector(':not(h6) > strong > a')
+    || null;
   const linkElements = [...element.querySelectorAll('a')]
     .filter((anchor) => anchor !== footerCtaAnchor);
   if (linkElements.length === 0) {
@@ -42,20 +44,28 @@ const parseCard = (
     linkElements,
     (anchor) => {
       const [parsedLink, errors] = parseLink(anchor);
-      const link: Link & { highlight?: boolean } = parsedLink;
+      const link: Link & { highlight?: boolean; description?: string }
+        = parsedLink;
       link.highlight = anchor.parentElement?.tagName === 'STRONG'
         && anchor.parentElement?.parentElement?.tagName === 'H6';
+      const anchorParentP = anchor.closest('p');
+      const nextSibling = anchorParentP?.nextElementSibling;
+      if (nextSibling?.tagName === 'P' && nextSibling.querySelector('a') === null) {
+        link.description = nextSibling.textContent?.trim() ?? undefined;
+      }
       return [link, errors];
     }
   );
 
+  const isPrimary = footerCtaAnchor?.parentElement?.tagName === 'STRONG';
   const [footerCTA, ctaErrors]
-    = (() : Parsed<SecondaryCTA | null, RecoverableError> => {
+    = (() : Parsed<PrimaryCTA | SecondaryCTA | null, RecoverableError> => {
       try {
-        return parseSecondaryCTA(element) as Parsed<
-          SecondaryCTA,
-          RecoverableError
-        >;
+        return isPrimary
+          ? parsePrimaryCTA(element) as Parsed<PrimaryCTA, RecoverableError>
+          : parseSecondaryCTA(element) as Parsed<
+              SecondaryCTA, RecoverableError
+            >;
       } catch (_error) {
         return [null, []];
       }

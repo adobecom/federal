@@ -1,4 +1,4 @@
-import { secondaryCTA } from "../CTA/Render";
+import { primaryCTA, secondaryCTA } from "../CTA/Render";
 import { link } from "../Link/Render";
 import { LinksCard, LinksCardItem } from "./Parse";
 import { getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
@@ -16,14 +16,24 @@ const renderCard = ({
     <div>
       <h2 id="links-card-${sanitize(title)}" class="links-card-title" role="heading" aria-level="2">${title}</h2>
       <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
-        ${links.map(item => `<li>${link(item)}</li>`).join("")}
+        ${links.map(item => item.description !== undefined && item.description !== ''
+          ? `<li class="links-card-links__item--has-description">
+               <a class="feds-link links-card-links__item-link ${item.highlight ?? false ? 'feds-link--highlight' : ''}" href="${item.href}">
+                 <span class="links-card-links__item-title">${item.text}</span>
+                 <span class="links-card-links__item-description">${item.description}</span>
+               </a>
+             </li>`
+          : `<li>${link(item)}</li>`
+        ).join("")}
       </ul>
     </div>
     ${footerCTA === null
       ? ""
       : `
     <div class="links-card-footer">
-      ${secondaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': `links-card-${sanitize(title)}` } })}
+      ${footerCTA.type === 'PrimaryCTA'
+        ? primaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': `links-card-${sanitize(title)}` } })
+        : secondaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': `links-card-${sanitize(title)}` } })}
     </div>`}
   </article>
 `.trim();
