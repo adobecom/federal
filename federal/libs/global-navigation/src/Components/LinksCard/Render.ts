@@ -1,16 +1,11 @@
 import { secondaryCTA } from "../CTA/Render";
 import { link } from "../Link/Render";
 import { LinksCard, LinksCardItem } from "./Parse";
-import { getAnalyticsAttrs, getAriaAttrs, localizeHref, sanitize } from "../../Utils/Utils";
+import { getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
 
 export const linkscard = ({
   card
 }: LinksCard): HTML => renderCard(card);
-
-const renderLink = (item: LinksCardItem['links'][number]): HTML =>
-  item.highlight
-    ? `<a class="feds-link feds-link--highlight" href="${localizeHref(item.href)}"${getAriaAttrs(item.ariaAttrs, item.ariaLabel)}${getAnalyticsAttrs(null, item.daaLl ?? item.text)}>${item.text}</a>`
-    : link(item);
 
 const renderCard = ({
   title,
@@ -21,7 +16,7 @@ const renderCard = ({
     <div>
       <h2 id="links-card-${sanitize(title)}" class="links-card-title" role="heading" aria-level="2">${title}</h2>
       <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
-        ${links.map(item => `<li>${renderLink(item)}</li>`).join("")}
+        ${links.map(item => `<li>${link(item)}</li>`).join("")}
       </ul>
     </div>
     ${footerCTA === null

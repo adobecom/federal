@@ -8,6 +8,7 @@ export type Link = {
   ariaLabel?: string;
   ariaAttrs?: Record<string, string>;
   svgIcon?: string;
+  highlight?: boolean;
 };
 
 const ERRORS = {

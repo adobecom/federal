@@ -51,7 +51,6 @@
     flex-direction: column;
   }
 
-  /* Links Card overrides — strip card chrome, render as plain link list */
   .feds-popup.small-menu .links-card-title {
     display: none;
   }

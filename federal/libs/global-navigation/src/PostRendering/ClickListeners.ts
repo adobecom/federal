@@ -63,7 +63,6 @@ export const initClickListeners = (
 
       const newHeight = popup?.clientHeight ?? 0;
       setPopoverBgHeight(gnav, `${newHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`);
-
     }
   );
 
