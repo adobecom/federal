@@ -122,4 +122,13 @@
     border-radius: 0 0 0 0;
     top: 0;
   }
+
+  header.global-navigation.feds-header-scrolled nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+    width: 100%;
+    left: 0;
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.51);
+    backdrop-filter: blur(var(--s2a-blur-sm));
+    border-radius: var(--s2a-border-radius-16);
+  }
 }
