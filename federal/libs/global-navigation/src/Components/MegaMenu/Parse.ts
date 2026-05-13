@@ -117,7 +117,7 @@ const parseGnavColumn = (
   columnDiv: Element
 ): Parsed<GnavColumn, RecoverableError> => {
   // Find cards within this specific column div
-  const cardElements = [...columnDiv.querySelectorAll('.featured-card, .links-card, .promo-card')];
+  const cardElements = [...columnDiv.querySelectorAll('.featured-card, .links-card, .promo-card, .promo-card-small')];
   if (cardElements.length === 0) {
     throw new IrrecoverableError(
       "Column contains no cards (did you forget to label them correctly?)"

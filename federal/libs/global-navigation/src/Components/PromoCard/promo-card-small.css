@@ -75,28 +75,18 @@
 }
 
 /* Primary CTA — outlined on dark */
-.feds-gnav-cards .promo-card-small__cta .feds-primary-cta {
+.feds-gnav-cards .promo-card-small__cta .feds-secondary-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14px var(--s2a-spacing-lg);
-  border-radius: var(--s2a-border-radius-999, 999px);
   border: var(--s2a-border-width-md, 2px) solid var(--s2a-color-button-border-primary-outlined-on-dark, white);
   background: transparent;
-  backdrop-filter: blur(var(--s2a-blur-md, 16px));
-  font-family: var(--s2a-font-family-label);
-  font-size: var(--s2a-typography-font-size-label);
-  font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  line-height: var(--s2a-typography-line-height-label);
-  letter-spacing: var(--s2a-typography-letter-spacing-label);
-  color: var(--s2a-color-button-content-primary-outlined-knockout, white);
-  text-decoration: none;
-  white-space: nowrap;
+  color: var(--s2a-color-button-border-primary-outlined-on-dark, var(--s2a-color-gray-25));
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.feds-gnav-cards .promo-card-small__cta .feds-primary-cta:hover,
-.feds-gnav-cards .promo-card-small__cta .feds-primary-cta:focus {
+.feds-gnav-cards .promo-card-small__cta .feds-secondary-cta:hover,
+.feds-gnav-cards .promo-card-small__cta .feds-secondary-cta:focus {
   background: rgba(255, 255, 255, 0.15);
 }
 
