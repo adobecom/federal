@@ -1,11 +1,11 @@
+import { Breadcrumbs, parseBreadcrumbs } from "../Components/Breadcrumbs/Parse";
 import { Component, parseComponent } from "../Components/Component";
 import { ProductEntryCTA } from "../Components/CTA/Parse";
-import { Link, parseLink } from "../Components/Link/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
 import { parseListAndAccumulateErrors } from "../Utils/Utils";
 
 export type GlobalNavigationData = {
-  breadcrumbs: Array<Link>;
+  breadcrumbs: Breadcrumbs | null;
   components: Array<Component>;
   productCTA: ProductEntryCTA | null;
   localnav: boolean;
@@ -19,11 +19,16 @@ export const parseNavigation = (
   unavEnabled: boolean,
   placeholders: Map<string, string> = new Map(),
 ): GlobalNavigationData | IrrecoverableError => {
-  const [breadcrumbs, breadcrumbErrors]
-    = parseListAndAccumulateErrors(
-      [...document.querySelectorAll('.breadcrumbs ul > li > a') ?? []],
-      parseLink
-    );
+  // Breadcrumbs are authored in the page body, not in the gnav source,
+  // and they're optional. If the block is missing we silently skip
+  // them rather than surfacing an error.
+  const breadcrumbsEl = document.querySelector('.breadcrumbs');
+  const [breadcrumbs, breadcrumbErrors]: [
+    Breadcrumbs | null,
+    Array<RecoverableError>
+  ] = breadcrumbsEl === null
+    ? [null, []]
+    : parseBreadcrumbs(breadcrumbsEl);
   const [parsedComponents, componentErrors]
     = parseListAndAccumulateErrors(
       [...mainNav.children],

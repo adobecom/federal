@@ -7,6 +7,23 @@ type CleanupFunction = () => void
  *  to cover the nav bar */
 const POPOVER_BG_HEIGHT_OFFSET_PX = 72;
 
+/**
+ * Drive the height of `nav::after` (the rounded backdrop frame) by
+ * setting the `--feds-popup-bg-height` custom property on the host
+ * <header>. The CSS rule at `styles/styles.css` consumes the variable
+ * via `height: var(--feds-popup-bg-height)`. This sidesteps the
+ * CSSOM-walk approach that used to inspect `document.adoptedStyleSheets`
+ * and break the moment the CSS selector text was refactored.
+ *
+ * Falls back to writing on the gnav element itself when the gnav is
+ * not wrapped in a <header> (e.g. test harnesses), since custom
+ * properties inherit through the DOM tree.
+ */
+const setPopoverBgHeight = (gnav: HTMLElement, value: string): void => {
+  const header = gnav.closest('header');
+  (header ?? gnav).style.setProperty('--feds-popup-bg-height', value);
+};
+
 export const initClickListeners = (
   gnav: HTMLElement
 ): CleanupFunction => {
@@ -43,11 +60,9 @@ export const initClickListeners = (
 
       if (!popup) return;
       if (!isDesktop.matches) return;
-      const popoverBackgroundRule = getPopoverBackgroundRule()
-      if (!popoverBackgroundRule) return;
 
       const newHeight = popup?.clientHeight ?? 0;
-      popoverBackgroundRule.style.height = `${newHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
+      setPopoverBgHeight(gnav, `${newHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`);
 
     }
   );
@@ -93,47 +108,39 @@ export const initClickListeners = (
   };
 };
 
-const getPopoverBackgroundRule = (): CSSStyleRule | undefined =>
-  [...document.adoptedStyleSheets
-    .flatMap(sheet => [...sheet.cssRules] as (CSSStyleRule | undefined)[])]
-    .find(rule =>
-          (rule)?.selectorText === 'header.global-navigation nav::after');
-
-
 const animations = (gnav: HTMLElement): void => {
   const mainMenuButtons = [...gnav.querySelectorAll<HTMLElement>('.feds-gnav-items > li > button')];
   const fedsGnavItems = gnav.querySelector('.feds-gnav-items');
 
-  const popoverBackgroundRule = getPopoverBackgroundRule();
   const resizeObserver = new ResizeObserver(entries => {
-    if (!popoverBackgroundRule) return;
     if (entries.length < 1) return;
     const openPopup = gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`);
     if (!openPopup) {
-      popoverBackgroundRule.style.height = '100%';
+      setPopoverBgHeight(gnav, '100%');
       return;
     }
     const resetPopoverHeight = openPopup.clientHeight < 1;
-    const height = resetPopoverHeight ? '100%' : `${openPopup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
-    popoverBackgroundRule.style.height = height;
+    const height = resetPopoverHeight
+      ? '100%'
+      : `${openPopup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
+    setPopoverBgHeight(gnav, height);
   });
 
   mainMenuButtons.forEach(button => {
-    if (!popoverBackgroundRule) return;
     const popup = button.nextElementSibling;
     if (!popup) return;
     resizeObserver.observe(popup);
     popup.addEventListener('toggle', (event: Event) => {
       const newState = (event as ToggleEvent).newState;
       if (newState !== 'open' && !gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`)) {
-        popoverBackgroundRule.style.height = '100%';
+        setPopoverBgHeight(gnav, '100%');
         if (isDesktop.matches) return;
         // Bandaid for using escape for closing the popup in mobile
         fedsGnavItems?.classList.remove('subscreen-opening');
         fedsGnavItems?.classList.add('subscreen-closing');
       } else {
         // in case the resize observer fails
-        popoverBackgroundRule.style.height = `${popup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
+        setPopoverBgHeight(gnav, `${popup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`);
         // On mobile (horizontal tabs), scroll active tab to the left edge
         if (!isDesktop.matches) {
           const tabsList = popup.querySelector<HTMLElement>('.tabs');

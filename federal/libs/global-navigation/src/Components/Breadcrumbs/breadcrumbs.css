@@ -1,0 +1,79 @@
+/* =========================================
+   Breadcrumbs
+   =========================================
+   Breadcrumbs render as the last <ul> inside <nav>. The nav itself
+   is a fixed-height (s2a-spacing-64) flex row, so we lift the
+   breadcrumbs out of that row by absolutely positioning them
+   directly underneath it. The nav::after backdrop is extended by
+   --feds-breadcrumbs-height (see styles/styles.css) so the rounded
+   frame visually contains the breadcrumb row too. A border-top
+   draws the separator between the gnav row and the trail. */
+
+.global-navigation.site-pivot .feds-breadcrumbs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  box-sizing: border-box;
+  height: var(--feds-breadcrumbs-height);
+  max-width:100%;
+  margin: 0;
+  padding: 0 var(--s2a-spacing-md);
+  list-style: none;
+
+  display: flex;
+  align-items: center;
+  gap: var(--s2a-spacing-xs);
+
+  /* Separator line between the nav row and the breadcrumb trail. */
+  border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
+}
+
+.global-navigation.site-pivot .feds-breadcrumbs > li {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.global-navigation.site-pivot .feds-breadcrumbs > li > a {
+  font-family: var(--feds-font-family);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  color: var(--s2a-color-gray-25);
+  text-decoration: none;
+}
+
+.global-navigation.site-pivot .feds-breadcrumbs > li > a:hover {
+  text-decoration: underline;
+}
+
+/* Chevron between adjacent crumbs. */
+.global-navigation.site-pivot .feds-breadcrumbs > li + li::before {
+  content: '/';
+  margin-right: var(--s2a-spacing-xs);
+  color: var(--s2a-color-gray-25);
+  opacity: 0.6;
+}
+
+/* When the header has scrolled the gnav backdrop turns light, so
+   flip the crumb colors (and separator) to dark to keep contrast. */
+.global-navigation.feds-header-scrolled .feds-breadcrumbs {
+  border-top-color: rgba(0, 0, 0, 0.12);
+}
+
+.global-navigation.feds-header-scrolled .feds-breadcrumbs > li > a,
+.global-navigation.feds-header-scrolled .feds-breadcrumbs > li + li::before {
+  color: var(--s2a-color-gray-1000);
+}
+
+/* While a large (mega) menu popup is open the breadcrumb row would
+   sit awkwardly underneath the open menu, so we hide it for the
+   duration of the open state. Small-menu popups carry the
+   .small-menu marker on their .feds-popup (see SmallMenu/Render.ts)
+   and are explicitly excluded — they're anchored dropdowns and
+   don't overlap the breadcrumb row. */
+.global-navigation.site-pivot nav:has(.feds-popup.is-open:not(.small-menu)) .feds-breadcrumbs {
+  display: none;
+}

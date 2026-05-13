@@ -1,3 +1,4 @@
+import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
 import { component } from "./Components/Component";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
@@ -151,6 +152,7 @@ mountpoint: HTMLElement
 
 export const renderGnavString = ({
   components,
+  breadcrumbs,
   productCTA,
   unavEnabled,
   placeholders,
@@ -203,6 +205,7 @@ export const renderGnavString = ({
   </ul>
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
 </nav>
 `;
