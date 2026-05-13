@@ -132,11 +132,6 @@ header.feds-header-scrolled nav {
    Product Entry CTA
    ========================================= */
 
-/* The product entry CTA renders between the gnav <ul> and the
-   .feds-utilities element. Pushing it with margin-left: auto sits it
-   immediately to the left of the unav. When the product CTA is present
-   we also drop the auto margin from .feds-utilities so the two stay
-   together on the right side instead of being spread apart. */
 .global-navigation.site-pivot .feds-product-entry-cta {
   display: flex;
   align-items: center;
@@ -148,19 +143,13 @@ header.feds-header-scrolled nav {
   margin-left: 0;
 }
 
-/* Shared pill geometry. The 14px block padding has no semantic spacing
-   token (between --s2a-spacing-12 and --s2a-spacing-16) so it's authored
-   as a literal value; everything else is token-driven. width + content-box
-   constrains the text area to exactly 82px (padding adds outside), and
-   nowrap prevents wrapping. */
 .global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 82px;
   box-sizing: content-box;
-  padding: 14px var(--s2a-spacing-lg);
+  padding: 11px var(--s2a-spacing-lg) 10px;
   border-radius: var(--s2a-border-radius-round);
   border: var(--s2a-border-width-sm) solid transparent;
   font-family: var(--feds-font-family);
@@ -212,9 +201,13 @@ header.feds-header-scrolled nav {
   border-color: var(--s2a-color-gray-1000);
 }
 
-/* Hover */
+/* Hover. In the non-scrolled state the resting color of the secondary CTA
+   is white (over a transparent gnav), so on hover we darken the text as
+   well so it remains legible against the gray-75 hover fill. The primary
+   CTA already resolves to dark text on hover in both states. */
 .global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta:hover {
   background-color: var(--s2a-color-gray-75);
+  color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta:hover {
@@ -797,7 +790,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   .feds-popup .feds-product-card {
-    gap: var(--s2a-spacing-2xl);     
+    gap: var(--s2a-spacing-2xl);
     border-radius: var(--s2a-border-radius-24);
   }
 
@@ -1055,11 +1048,11 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     background-color: transparent;
     padding: 0;
   }
-  
+
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
     transition: opacity 0.2s ease, visibility 0s linear 0.2s;
   }
-  
+
   .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
     display: flex;
     opacity: 1;
@@ -1070,7 +1063,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     padding: 0;
     margin-top: 0;
   }
-  
+
   .global-navigation nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items {
     align-items: flex-start;
     padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
@@ -1083,7 +1076,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
       transform: translateX(18px);
       animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
     }
-  
+
     & .feds-gnav-items > li:nth-child(1) > .feds-link { animation-delay: 0.18s; }
     & .feds-gnav-items > li:nth-child(2) > .feds-link { animation-delay: 0.24s; }
     & .feds-gnav-items > li:nth-child(3) > .feds-link { animation-delay: 0.30s; }
@@ -1100,18 +1093,18 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     transform-origin: 7px 3.5px;
     transition: transform 0.35s cubic-bezier(.4,0,.2,1);
   }
-  
+
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
     height: 11px;
   }
-  
+
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
     transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
   }
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
     transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
   }
-  
+
   /* Mobile gnav-item slide-out / re-enter when subscreen opens / closes.
      The popup-interior animations live in a separate rule below because the
      popup is no longer a descendant of .feds-gnav-items (we reparent it to
