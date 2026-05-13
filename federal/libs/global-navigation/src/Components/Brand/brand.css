@@ -111,6 +111,10 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   header.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-nav-toggle {
     transform: translateX(-30px);
   }
+
+  [dir="rtl"] header.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-nav-toggle {
+    transform: translateX(30px);
+  }
 }
 
 /* =========================================

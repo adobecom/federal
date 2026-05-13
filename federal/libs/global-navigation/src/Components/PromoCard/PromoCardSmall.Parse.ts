@@ -34,9 +34,11 @@ export const parsePromoCardSmall = (
   const bodyElement = element.querySelectorAll('p:not(:has(strong > a, em > a))')[1] ?? null;
   const body = bodyElement?.textContent?.trim() ?? "";
 
-  const [cta, ctaErrors] = (() : Parsed<SecondaryCTA | null, RecoverableError> => {
+  const [cta, ctaErrors] =
+  (() : Parsed<SecondaryCTA | null, RecoverableError> => {
     try {
-      return parseSecondaryCTA(element) as Parsed<SecondaryCTA, RecoverableError>;
+      return parseSecondaryCTA(element) as
+        Parsed<SecondaryCTA, RecoverableError>;
     } catch (_error) {
       return [null, []];
     }

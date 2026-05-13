@@ -334,6 +334,10 @@ header.global-navigation.feds-header-scrolled nav::after {
   padding-left: 0;
 }
 
+[dir="rtl"] .global-navigation nav > ul {
+  padding-right: 0;
+}
+
 .global-navigation nav > ul > li {
   display: flex;
   align-items: center;
@@ -526,6 +530,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 .feds-popup .feds-popup-back-button svg {
   width: var(--s2a-spacing-20);
   height: var(--s2a-spacing-20);
+}
+
+[dir='rtl'] .feds-popup .feds-popup-back-button svg {
+  transform: scaleX(-1);
 }
 
 .feds-popup .feds-popup-back-button .feds-popup-title {
@@ -778,6 +786,11 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     position: relative;
   }
 
+  [dir="rtl"] .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+    margin-left: 0;
+    margin-right: 6px;
+  }
+
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
     margin-top: 3px;
     margin-left: 6px;
@@ -826,6 +839,12 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     margin-left: var(--s2a-spacing-xs);
     flex-shrink: 0;
     transform: rotate(-90deg) scale(2.5);
+  }
+
+  [dir="rtl"] .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+    margin-left: 0;
+    margin-right: var(--s2a-spacing-xs);
+    transform: rotate(90deg) scale(2.5);
   }
 
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
@@ -1086,6 +1105,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
   .feds-popup.is-open {
     position: fixed;
   }
+
   .global-navigation nav > ul > li.feds-menu-wrapper {
     position: fixed;
     top: var(--s2a-spacing-64);
@@ -1101,6 +1121,11 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     color: var(--s2a-color-gray-1000);
     background-color: transparent;
     padding: 0;
+  }
+
+  [dir="rtl"] .global-navigation nav > ul > li.feds-menu-wrapper {
+    right: 0;
+    left: var(--s2a-spacing-20);
   }
 
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {

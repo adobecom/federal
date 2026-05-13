@@ -142,7 +142,10 @@ const parseGnavColumn = (
 
 const parseGnavCardSection = (
   section: Element
-): Parsed<FeaturedCard | LinksCard | PromoCard | PromoCardSmall, RecoverableError> => {
+): Parsed<
+  FeaturedCard | LinksCard | PromoCard | PromoCardSmall,
+  RecoverableError
+> => {
   if (section.classList.contains('featured-card')) {
     return parseFeaturedCard(section);
   }
