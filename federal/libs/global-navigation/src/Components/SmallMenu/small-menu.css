@@ -1,116 +1,38 @@
 /* =========================================
-   Small Menu — Anchor the li so top:100% works
-   ========================================= */
-
-.feds-gnav-items > li:has(.feds-popup.small-menu) {
-  position: relative;
-}
-
-/* =========================================
-   Small Menu — Popup overrides
-   Overrides the full-width fixed .feds-popup base styles
-   ========================================= */
-
-.feds-popup.small-menu {
-  position: absolute;
-  inset: auto;
-  top: 100%;
-  left: 0;
-  width: auto;
-  max-width: none;
-  max-height: none;
-  overflow: visible;
-  border: 1px solid var(--s2a-color-transparent-black-12, rgba(0, 0, 0, 0.12));
-  border-radius: var(--s2a-spacing-xs, 8px);
-  box-sizing: border-box;
-
-  .feds-gnav-cards {
-    background-color: var(--s2a-color-background-default, white);
-    border-radius: var(--s2a-spacing-xs, 8px);
-  }
-}
-
-.feds-popup.small-menu.is-open {
-  border-radius: var(--s2a-spacing-xs, 8px);
-}
-
-/* =========================================
-   Small Menu — Links Card overrides
-   Strip card chrome; render as a plain link list
-   ========================================= */
-
-.feds-popup.small-menu .links-card {
-  background: var(--s2a-color-background-default, white);
-  border-radius: 0;
-  padding: 0;
-}
-
-.feds-popup.small-menu .links-card-title {
-  display: none;
-}
-
-.feds-popup.small-menu .links-card-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.feds-popup.small-menu .links-card-links li {
-  display: flex;
-  height: 34px;
-  align-items: center;
-  padding: var(--s2a-spacing-xs, 8px) 0;
-}
-
-.feds-popup.small-menu .links-card-links .feds-link {
-  font-family: var(--s2a-font-family-body, 'Adobe_Clean', sans-serif);
-  font-size: var(--s2a-typography-font-size-body-sm, 14px);
-  font-weight: var(--s2a-font-weight-adobe-clean-regular, 400);
-  line-height: var(--s2a-typography-line-height-body-sm, 18px);
-  letter-spacing: var(--s2a-typography-letter-spacing-body-sm, 0.14px);
-  color: var(--s2a-color-content-body-strong, #131313);
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.feds-popup.small-menu .links-card-links .feds-link:hover {
-  text-decoration: underline;
-}
-
-.feds-popup.small-menu .links-card-footer {
-  margin-top: 0;
-}
-
-.feds-popup.small-menu .links-card-footer .feds-secondary-cta {
-  font-family: var(--s2a-font-family-label, 'Adobe_Clean', sans-serif);
-  font-size: var(--s2a-typography-font-size-body-sm, 14px);
-  font-weight: var(--s2a-font-weight-adobe-clean-black, 700);
-  line-height: var(--s2a-typography-line-height-body-sm, 18px);
-  letter-spacing: 0;
-  color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
-  white-space: nowrap;
-  background: none;
-  border: none;
-  padding: var(--s2a-spacing-xs, 8px) 0;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  width: auto;
-  justify-content: flex-start;
-  text-decoration: none;
-}
-
-.feds-popup.small-menu .links-card-footer .feds-secondary-cta:hover {
-  text-decoration: underline;
-  background: none;
-  color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
-}
-
-/* =========================================
-   Small Menu — Desktop overrides (min-width: 1024px)
+   Small Menu — Desktop only (min-width: 1024px)
    ========================================= */
 
 @media (min-width: 1024px) {
+  /* Anchor the li so top:100% works */
+  .feds-gnav-items > li:has(.feds-popup.small-menu) {
+    position: relative;
+  }
+
+  /* Popup overrides — position as a dropdown below the trigger */
+  .feds-popup.small-menu {
+    position: absolute;
+    inset: auto;
+    top: 100%;
+    left: 0;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    border: 1px solid var(--s2a-color-transparent-black-12, rgba(0, 0, 0, 0.12));
+    border-radius: var(--s2a-spacing-xs, 8px);
+    box-sizing: border-box;
+
+    .feds-gnav-cards {
+      background-color: var(--s2a-color-background-default, white);
+      border-radius: var(--s2a-spacing-xs, 8px);
+    }
+  }
+
+  .feds-popup.small-menu.is-open {
+    border-radius: var(--s2a-spacing-xs, 8px);
+  }
+
+  /* Gnav cards layout */
   .feds-popup.small-menu .feds-gnav-cards {
     display: flex;
     flex-direction: column;
@@ -126,12 +48,80 @@
     flex-direction: column;
   }
 
-  /* When only a small menu is open, suppress the full-bleed backdrop and keep nav::after at nav height */
+  /* Links Card overrides — strip card chrome, render as plain link list */
+  .feds-popup.small-menu .links-card-title {
+    display: none;
+  }
+
+  .feds-popup.small-menu .links-card-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .feds-popup.small-menu .links-card-links li {
+    display: flex;
+    height: 34px;
+    align-items: center;
+    padding: var(--s2a-spacing-xs, 8px) 0;
+  }
+
+  .feds-popup.small-menu .links-card-links .feds-link {
+    font-family: var(--s2a-font-family-body, 'Adobe_Clean', sans-serif);
+    font-size: var(--s2a-typography-font-size-body-sm, 14px);
+    font-weight: var(--s2a-font-weight-adobe-clean-regular, 400);
+    line-height: var(--s2a-typography-line-height-body-sm, 18px);
+    letter-spacing: var(--s2a-typography-letter-spacing-body-sm, 0.14px);
+    color: var(--s2a-color-content-body-strong, #131313);
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .feds-popup.small-menu .links-card-links .feds-link:hover {
+    text-decoration: underline;
+  }
+
+  .feds-popup.small-menu .links-card-footer {
+    margin-top: 0;
+  }
+
+  .feds-popup.small-menu .links-card-footer .feds-secondary-cta {
+    font-family: var(--s2a-font-family-label, 'Adobe_Clean', sans-serif);
+    font-size: var(--s2a-typography-font-size-body-sm, 14px);
+    font-weight: var(--s2a-font-weight-adobe-clean-black, 700);
+    line-height: var(--s2a-typography-line-height-body-sm, 18px);
+    letter-spacing: 0;
+    color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
+    white-space: nowrap;
+    background: none;
+    border: none;
+    padding: var(--s2a-spacing-xs, 8px) 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    width: auto;
+    justify-content: flex-start;
+    text-decoration: none;
+  }
+
+  .feds-popup.small-menu .links-card-footer .feds-secondary-cta:hover {
+    text-decoration: underline;
+    background: none;
+    color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
+  }
+
+  /* When only a small menu is open: suppress backdrop, nav::after expansion, and nav link/icon color changes */
   header.global-navigation nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu))) .feds-backdrop {
     display: none;
   }
 
+  /* header.global-navigation nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu))) {
+    inset: 0;
+  } */
+
   header.global-navigation nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
-    height: 70px;
+    height: 64px;
+    border-radius: 0 0 0 0;
+    top: 0;
   }
 }
