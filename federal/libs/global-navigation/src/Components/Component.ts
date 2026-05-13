@@ -7,6 +7,8 @@ import { Link, parseLink } from "./Link/Parse";
 import { link } from "./Link/Render";
 import { MegaMenu, parseMegaMenu } from "./MegaMenu/Parse";
 import { megaMenu } from "./MegaMenu/Render";
+import { SmallMenu, parseSmallMenu } from "./SmallMenu/Parse";
+import { smallMenu } from "./SmallMenu/Render";
 import { parseText, Text } from "./Text/Parse";
 import { text } from "./Text/Render";
 
@@ -16,7 +18,8 @@ export type Component
   | SecondaryCTA
   | PrimaryCTA
   | Brand
-  | MegaMenu;
+  | MegaMenu
+  | SmallMenu;
 
 export const parseComponent = (
   element: Element
@@ -25,16 +28,19 @@ export const parseComponent = (
     throw new IrrecoverableError(ERRORS.elementNull);
 
   const brandElem = element.querySelector('.gnav-brand');
-  if (brandElem !== null) 
+  if (brandElem !== null)
     return parseBrand(brandElem);
 
   const largeMenu = element.querySelector('.large-menu');
   if (largeMenu !== null)
     return parseMegaMenu(largeMenu);
 
+  if (element.querySelector('h5') !== null && element.querySelector('.links-card') !== null)
+    return parseSmallMenu(element);
+
   if (element.querySelector('strong') !== null)
     return parsePrimaryCTA(element);
-  
+
   if (element.querySelector('em') !== null)
     return parseSecondaryCTA(element);
 
@@ -55,6 +61,7 @@ export const component = (
     case "PrimaryCTA": return primaryCTA(c);
     case "Brand": return brand(c);
     case "MegaMenu": return megaMenu(c, index);
+    case "SmallMenu": return smallMenu(c, index);
     default: {
       const exhaustive : never = c;
       console.error(`Failed to recognize component: ${exhaustive}`);

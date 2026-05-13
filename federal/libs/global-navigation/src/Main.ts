@@ -14,6 +14,7 @@ import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
+import { smallMenuPopup } from "./Components/SmallMenu/Render";
 
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -135,6 +136,15 @@ mountpoint: HTMLElement
       return [error];
     }
   }).flat());
+
+  const smallMenus = [
+    ...mountpoint.querySelectorAll('button.small-menu ~ .feds-popup')
+  ];
+  const smallMenuComponents = data.components.filter(com => com.type === "SmallMenu");
+  smallMenuComponents.forEach((com, idx) => {
+    const [content] = com.content;
+    smallMenus[idx].innerHTML = smallMenuPopup(content, smallMenus[idx].id);
+  });
 
   return mountpoint;
 };

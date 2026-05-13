@@ -11,7 +11,7 @@ export type LinksCard = {
 export type LinksCardItem = {
   type: "LinksCardItem";
   title: string;
-  links: Array<Link>;
+  links: Array<Link & { highlight?: boolean }>;
   footerCTA: SecondaryCTA | null;
 };
 
@@ -32,10 +32,6 @@ const parseCard = (
   element: Element
 ): Parsed<LinksCardItem, RecoverableError> => {
   const titleElement = element.querySelector('h2, h3, h4') || null;
-  if (!titleElement) {
-    throw new IrrecoverableError("Expected links card title");
-  }
-
   const footerCtaAnchor = element.querySelector('em > a');
   const linkElements = [...element.querySelectorAll('a')]
     .filter((anchor) => anchor !== footerCtaAnchor);
@@ -44,7 +40,13 @@ const parseCard = (
   }
   const [links, linkErrors] = parseListAndAccumulateErrors(
     linkElements,
-    parseLink
+    (anchor) => {
+      const [parsedLink, errors] = parseLink(anchor);
+      const link: Link & { highlight?: boolean } = parsedLink;
+      link.highlight = anchor.parentElement?.tagName === 'STRONG'
+        && anchor.parentElement?.parentElement?.tagName === 'H6';
+      return [link, errors];
+    }
   );
 
   const [footerCTA, ctaErrors]
@@ -59,12 +61,12 @@ const parseCard = (
       }
     })();
   if (footerCTA) {
-    footerCTA.daaLl = `${titleElement.textContent ?? ''} - ${footerCTA?.daaLl}`;
+    footerCTA.daaLl = `${titleElement?.textContent ?? ''} - ${footerCTA?.daaLl}`;
   }
   return [
     {
       type: "LinksCardItem",
-      title: titleElement.textContent ?? "",
+      title: titleElement?.textContent ?? "",
       links,
       footerCTA,
     },
