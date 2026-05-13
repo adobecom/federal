@@ -19,24 +19,27 @@
     max-height: none;
     overflow: visible;
     border: 1px solid var(--s2a-color-transparent-black-12, rgba(0, 0, 0, 0.12));
-    border-radius: var(--s2a-spacing-xs, 8px);
+    border-radius: var(--s2a-spacing-xs);
     box-sizing: border-box;
 
-    .feds-gnav-cards {
-      background-color: var(--s2a-color-background-default, white);
-      border-radius: var(--s2a-spacing-xs, 8px);
+    .links-card {
+      padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
     }
   }
 
   .feds-popup.small-menu.is-open {
-    border-radius: var(--s2a-spacing-xs, 8px);
+    border-radius: var(--s2a-spacing-xs);
   }
 
   /* Gnav cards layout */
   .feds-popup.small-menu .feds-gnav-cards {
     display: flex;
     flex-direction: column;
-    gap: var(--s2a-spacing-xs, 8px);
+    gap: var(--s2a-spacing-xs);
+    background-color: var(--s2a-color-background-default, white);
+    border-radius: var(--s2a-spacing-xs);
+    padding: 0;
+    border-color: var(--s2a-color-transparent-black-12);
   }
 
   .feds-popup.small-menu .feds-gnav-cards > li {
@@ -67,11 +70,6 @@
   }
 
   .feds-popup.small-menu .links-card-links .feds-link {
-    font-family: var(--s2a-font-family-body, 'Adobe_Clean', sans-serif);
-    font-size: var(--s2a-typography-font-size-body-sm, 14px);
-    font-weight: var(--s2a-font-weight-adobe-clean-regular, 400);
-    line-height: var(--s2a-typography-line-height-body-sm, 18px);
-    letter-spacing: var(--s2a-typography-letter-spacing-body-sm, 0.14px);
     color: var(--s2a-color-content-body-strong, #131313);
     white-space: nowrap;
     text-decoration: none;
@@ -81,7 +79,7 @@
     text-decoration: underline;
   }
 
-  .feds-popup.small-menu .links-card-footer {
+.feds-popup.small-menu .links-card-footer {
     margin-top: 0;
   }
 
@@ -110,7 +108,7 @@
     color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
   }
 
-  /* When only a small menu is open: suppress backdrop, nav::after expansion, and nav link/icon color changes */
+  /* When only a small menu is open: suppress backdrop, nav::after expansion */
   header.global-navigation nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu))) .feds-backdrop {
     display: none;
   }

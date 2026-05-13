@@ -46,6 +46,11 @@
   display: inline-flex;
 }
 
+.feds-popup .links-card .links-card-links .feds-link--highlight {
+  color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
+  font-weight: 700;
+}
+
 /* =========================================
    Links Card Footer
    ========================================= */
@@ -90,4 +95,4 @@
   .feds-popup .links-card {
     padding-bottom: var(--s2a-spacing-lg);
   }
-} 
+}

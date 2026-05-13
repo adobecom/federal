@@ -11,7 +11,7 @@ export type LinksCard = {
 export type LinksCardItem = {
   type: "LinksCardItem";
   title: string;
-  links: Array<Link>;
+  links: Array<Link & { highlight?: boolean }>;
   footerCTA: SecondaryCTA | null;
 };
 
@@ -40,7 +40,13 @@ const parseCard = (
   }
   const [links, linkErrors] = parseListAndAccumulateErrors(
     linkElements,
-    parseLink
+    (anchor) => {
+      const [parsedLink, errors] = parseLink(anchor);
+      const link: Link & { highlight?: boolean } = parsedLink;
+      link.highlight = anchor.parentElement?.tagName === 'STRONG'
+        && anchor.parentElement?.parentElement?.tagName === 'H6';
+      return [link, errors];
+    }
   );
 
   const [footerCTA, ctaErrors]
