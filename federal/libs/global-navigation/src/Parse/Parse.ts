@@ -1,5 +1,5 @@
 import { Component, parseComponent } from "../Components/Component";
-import { parseProductEntryCTA, ProductEntryCTA } from "../Components/CTA/Parse";
+import { ProductEntryCTA } from "../Components/CTA/Parse";
 import { Link, parseLink } from "../Components/Link/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
 import { parseListAndAccumulateErrors } from "../Utils/Utils";
@@ -24,21 +24,21 @@ export const parseNavigation = (
       [...document.querySelectorAll('.breadcrumbs ul > li > a') ?? []],
       parseLink
     );
-  const [components, componentErrors] 
+  const [parsedComponents, componentErrors]
     = parseListAndAccumulateErrors(
       [...mainNav.children],
       parseComponent
-    ); 
-  const productEntryElement = mainNav.querySelector('.product-entry-cta');
-  const [productCTA, productCtaErrors]
-    = (
-  (): Parsed<ProductEntryCTA | null, RecoverableError> => {
-    try {
-      return parseProductEntryCTA(productEntryElement);
-    } catch (_) {
-      return [null, []];
-    }
-  })();
+    );
+  // The product entry CTA is parsed via parseComponent but should be
+  // rendered to the right of the gnav (immediately to the left of the
+  // unav) rather than inside the menu list, so we lift the first
+  // ProductEntryCTA out of the components array.
+  const productCTA = parsedComponents.find(
+    (c): c is ProductEntryCTA => c.type === "ProductEntryCTA"
+  ) ?? null;
+  const components = parsedComponents.filter(
+    (c) => c.type !== "ProductEntryCTA"
+  );
   // const localnav = components
   //   .filter((component): boolean =>
   //           component.type === "MegaMenu" &&
@@ -47,7 +47,6 @@ export const parseNavigation = (
   const errors = [
     breadcrumbErrors,
     componentErrors,
-    productCtaErrors,
   ].flat();
 
   return {

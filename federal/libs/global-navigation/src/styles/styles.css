@@ -128,6 +128,107 @@ header.feds-header-scrolled nav {
   padding-right: var(--s2a-spacing-md);
 }
 
+/* =========================================
+   Product Entry CTA
+   ========================================= */
+
+/* The product entry CTA renders between the gnav <ul> and the
+   .feds-utilities element. Pushing it with margin-left: auto sits it
+   immediately to the left of the unav. When the product CTA is present
+   we also drop the auto margin from .feds-utilities so the two stay
+   together on the right side instead of being spread apart. */
+.global-navigation.site-pivot .feds-product-entry-cta {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding-right: var(--s2a-spacing-md);
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
+  margin-left: 0;
+}
+
+/* Shared pill geometry. The 14px block padding has no semantic spacing
+   token (between --s2a-spacing-12 and --s2a-spacing-16) so it's authored
+   as a literal value; everything else is token-driven. width + content-box
+   constrains the text area to exactly 82px (padding adds outside), and
+   nowrap prevents wrapping. */
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 82px;
+  box-sizing: content-box;
+  padding: 14px var(--s2a-spacing-lg);
+  border-radius: var(--s2a-border-radius-round);
+  border: var(--s2a-border-width-sm) solid transparent;
+  font-family: var(--feds-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Default (transparent gnav over imagery):
+   - primary: filled white pill with dark text
+   - secondary: outlined in white, transparent fill */
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-25);
+}
+
+/* Scrolled (blurred whitish backdrop):
+   - primary: filled dark pill with white text (inverse of default)
+   - secondary: outlined in dark, transparent fill (matches popup secondary) */
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Open popup / mobile drawer state: gnav gets a light/grey backdrop, so
+   force the dark-outline treatment regardless of scroll state, mirroring
+   the unav profile button at styles.css:109-113. */
+.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-primary-cta,
+.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Hover */
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta:hover {
+  background-color: var(--s2a-color-gray-75);
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-gray-75);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-75);
+}
+
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-gray-75);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-75);
+}
+
 .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
 }
