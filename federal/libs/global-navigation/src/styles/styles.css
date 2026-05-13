@@ -108,6 +108,11 @@ header.feds-header-scrolled .feds-link {
 }
 
 header.feds-header-scrolled nav {
+  inset:
+    var(--s2a-spacing-xs)
+    var(--s2a-spacing-xs)
+    0
+    var(--s2a-spacing-xs);
   color: var(--s2a-color-gray-1000);
   box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
 }
@@ -251,11 +256,6 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
-  inset:
-    var(--s2a-spacing-xs)
-    var(--s2a-spacing-xs)
-    0
-    var(--s2a-spacing-xs);
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
   margin: 0 auto;
