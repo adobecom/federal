@@ -154,20 +154,27 @@ header.feds-header-scrolled nav {
   margin-left: 0;
 }
 
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta {
+  margin-left: var(--s2a-spacing-sm);
+}
+
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: content-box;
-  padding: 11px var(--s2a-spacing-lg) 10px;
+  padding: 10px var(--s2a-spacing-lg);
   border-radius: var(--s2a-border-radius-round);
   border: var(--s2a-border-width-sm) solid transparent;
   font-family: var(--feds-font-family);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-size: var(--s2a-typography-font-size-body-sm);
-  line-height: var(--s2a-typography-line-height-body-sm);
-  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
@@ -176,12 +183,14 @@ header.feds-header-scrolled nav {
 /* Default (transparent gnav over imagery):
    - primary: filled white pill with dark text
    - secondary: outlined in white, transparent fill */
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta {
   background-color: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-25);
 }
 
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
   background-color: transparent;
   color: var(--s2a-color-gray-25);
@@ -191,12 +200,14 @@ header.feds-header-scrolled nav {
 /* Scrolled (blurred whitish backdrop):
    - primary: filled dark pill with white text (inverse of default)
    - secondary: outlined in dark, transparent fill (matches popup secondary) */
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
 .global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
   background-color: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
   border-color: var(--s2a-color-gray-1000);
 }
 
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
 .global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-1000);
@@ -216,17 +227,20 @@ header.feds-header-scrolled nav {
    is white (over a transparent gnav), so on hover we darken the text as
    well so it remains legible against the gray-75 hover fill. The primary
    CTA already resolves to dark text on hover in both states. */
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta:hover,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta:hover {
   background-color: var(--s2a-color-gray-75);
   color: var(--s2a-color-gray-1000);
 }
 
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta:hover,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta:hover {
   background-color: var(--s2a-color-gray-75);
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-75);
 }
 
+.global-navigation.site-pivot.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
 .global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
   background-color: var(--s2a-color-gray-75);
   color: var(--s2a-color-gray-1000);
