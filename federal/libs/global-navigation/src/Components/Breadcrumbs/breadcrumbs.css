@@ -111,3 +111,26 @@
 .global-navigation.site-pivot nav:has(.feds-popup.is-open:not(.small-menu)) .feds-breadcrumbs {
   display: none;
 }
+
+/* breadcrumbs in mobile mega menu */
+
+@media (max-width: 1023px) {
+  header.global-navigation.site-pivot nav {
+    &:has(.feds-menu-wrapper.is-open) > .feds-breadcrumbs {
+      display: none;
+    }
+    .feds-popup.is-open:not(.small-menu) > ul.feds-breadcrumbs {
+      display: flex;
+      position: static;
+      padding: 0 var(--s2a-spacing-lg);
+    }
+  }
+
+  /* In localnav mobile the .feds-localnav-bar (rendered inside the
+     menu-wrapper, see Main.ts) is positioned where the breadcrumbs would
+     otherwise sit and uses the last crumb's text as its label, so the
+     standalone breadcrumb row is hidden to avoid overlap. */
+  header.global-navigation.site-pivot nav.localnav > .feds-breadcrumbs {
+    display: none;
+  }
+}

@@ -9,13 +9,14 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
 import { smallMenuPopup } from "./Components/SmallMenu/Render";
+import { MegaMenuExtraData } from "./Components/MegaMenu/Parse";
 
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -131,7 +132,8 @@ mountpoint: HTMLElement
   const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
     try {
       const [content, errors] = await mmPromise;
-      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id);
+      const extraData: MegaMenuExtraData = { type: "MegaMenuExtraData", breadcrumbs: data.breadcrumbs };
+      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, extraData);
       return errors;
     } catch (error) {
       return [error];
@@ -156,10 +158,18 @@ export const renderGnavString = ({
   productCTA,
   unavEnabled,
   placeholders,
+  localnav,
 }: GlobalNavigationData
 ): string => {
+  // In localnav mobile, the menu-wrapper is repurposed as the localnav bar
+  // (a thin clickable strip below the main nav row that expands inline to
+  // reveal the remaining mega-menu entries). Its label mirrors the last
+  // breadcrumb crumb so it reads as the current section.
+  const localnavBarLabel = localnav && breadcrumbs !== null && breadcrumbs.items.length > 0
+    ? breadcrumbs.items[breadcrumbs.items.length - 1].text
+    : '';
   return `
-<nav data-lenis-prevent>
+<nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul role="presentation">
@@ -168,6 +178,14 @@ export const renderGnavString = ({
         c.type === "Brand"
       ) ?? null;
       const menuComponents = components.filter((c) => c.type !== "Brand");
+      // In localnav mode the hamburger should open the first mega menu's
+      // popup directly rather than the menu wrapper / gnav-items list.
+      const firstMegaMenu = localnav
+        ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
+        : null;
+      const toggleControlsId = firstMegaMenu !== null
+        ? sanitize(firstMegaMenu.title)
+        : 'feds-menu-wrapper';
       const toggleButton = `
         <button
           class="feds-nav-toggle"
@@ -175,7 +193,7 @@ export const renderGnavString = ({
           aria-label="Navigation menu"
           daa-ll="hamburgermenu|open"
           aria-expanded="false"
-          aria-controls="feds-menu-wrapper"
+          aria-controls="${toggleControlsId}"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 7" fill="currentColor" aria-hidden="true">
             <path d="M13.25 5.5H0.75C0.33594 5.5 0 5.83594 0 6.25C0 6.66406 0.33594 7 0.75 7H13.25C13.6641 7 14 6.66406 14 6.25C14 5.83594 13.6641 5.5 13.25 5.5Z"/>
@@ -185,7 +203,9 @@ export const renderGnavString = ({
       `.trim();
 
       const brandHTML = brandComponent ? component(brandComponent) : "";
-      const menuItemsHTML = renderListItems(menuComponents, component);
+      const menuItemsHTML = menuComponents
+        .map((c, index) => `<li>${component(c, index)}</li>`)
+        .join('');
 
       return `
         <li class="feds-brand-wrapper">
@@ -196,6 +216,14 @@ export const renderGnavString = ({
           id="feds-menu-wrapper"
           class="feds-menu-wrapper"
         >
+          ${localnav ? `
+            <button
+              class="feds-localnav-bar"
+              type="button"
+              aria-controls="feds-menu-wrapper"
+              aria-expanded="false"
+            ><span class="feds-localnav-bar-label">${localnavBarLabel}</span></button>
+          ` : ''}
           <ul class="feds-gnav-items">
             ${menuItemsHTML}
           </ul>
@@ -259,11 +287,18 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
 
   menuWrapper?.addEventListener('toggle', () => {
     const isOpen = menuWrapper.classList.contains(IS_OPEN_CLASS);
-    navToggle?.setAttribute('aria-expanded', String(isOpen));
-    navToggle?.setAttribute(
-      'daa-ll',
-      isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
-    );
+    // Only reflect open-state on the hamburger when it actually controls the
+    // menu-wrapper. In localnav the hamburger's aria-controls points at the
+    // first mega-menu's popup (the menu-wrapper is opened via the localnav
+    // bar instead), so reflecting menu-wrapper state on the hamburger here
+    // would be incorrect.
+    if (navToggle?.getAttribute('aria-controls') === 'feds-menu-wrapper') {
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      navToggle.setAttribute(
+        'daa-ll',
+        isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
+      );
+    }
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
   });
 
@@ -311,12 +346,53 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const menuWrapper = mountpoint.querySelector<HTMLElement>("#feds-menu-wrapper");
   const isMenuOpen = (): boolean => isPopupOpen(menuWrapper);
 
-  const updateHeaderState = (scrolledPast: boolean): void => {
+  const nav = mountpoint.querySelector<HTMLElement>("nav");
+  const isLocalnav = (): boolean => nav?.classList.contains("localnav") ?? false;
+
+  // Track the most recent "queued add" so a subsequent toggle can cancel it.
+  // Prevents a race where the user re-opens the bar mid-slide-down and the
+  // deferred add still fires, applying `feds-header-scrolled` over an
+  // already-open menu.
+  let pendingAddCleanup: (() => void) | null = null;
+  const cancelPendingAdd = (): void => {
+    if (pendingAddCleanup !== null) {
+      pendingAddCleanup();
+      pendingAddCleanup = null;
+    }
+  };
+
+  const updateHeaderState = (scrolledPast: boolean, fromToggle: boolean = false): void => {
+    cancelPendingAdd();
     if (isMenuOpen() || !scrolledPast) {
       header.classList.remove("feds-header-scrolled");
+      header.classList.remove("feds-localnav-closing");
       return;
     }
     header.classList.add("feds-header-scrolled");
+    // Closing the localnav bar in scrolled state: the header's `top` animates
+    // from -64px back to 0 over 0.3s. The `feds-header-scrolled` class is
+    // needed immediately for color (the bar title would otherwise flash from
+    // dark back to its default light shade during the slide-down). But the
+    // same class pulls `inset: xs xs 0 xs` onto `nav` via
+    // `header.feds-header-scrolled nav`, which would instantly pin nav to
+    // `top: xs` and kill the slide (nav holds the visible content). The
+    // `feds-localnav-closing` marker class is added in tandem and consumed by
+    // a CSS rule that suppresses that inset for the duration of the
+    // transition; we remove the marker on `transitionend`.
+    if (fromToggle && isLocalnav()) {
+      header.classList.add("feds-localnav-closing");
+      const onTransitionEnd = (event: TransitionEvent): void => {
+        if (event.target !== header || event.propertyName !== "top") return;
+        header.removeEventListener("transitionend", onTransitionEnd);
+        pendingAddCleanup = null;
+        header.classList.remove("feds-localnav-closing");
+      };
+      header.addEventListener("transitionend", onTransitionEnd);
+      pendingAddCleanup = (): void => {
+        header.removeEventListener("transitionend", onTransitionEnd);
+        header.classList.remove("feds-localnav-closing");
+      };
+    }
   };
 
   // A 20px sentinel placed at the top of the document body. When it scrolls
@@ -338,7 +414,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   observer.observe(sentinel);
 
   menuWrapper?.addEventListener("toggle", () =>
-    updateHeaderState(scrolledPast)
+    updateHeaderState(scrolledPast, true)
   );
 };
 
