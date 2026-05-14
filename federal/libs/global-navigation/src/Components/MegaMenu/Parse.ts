@@ -10,6 +10,7 @@ import { LinksCard, parseLinksCard } from "../LinksCard/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
 import { parseFeaturedCard, FeaturedCard } from "../FeaturedCard/Parse";
 import { parsePromoCard, PromoCard } from "../PromoCard/Parse";
+import { parsePromoCardSmall, PromoCardSmall } from "../PromoCard/PromoCardSmall.Parse";
 
 export type MegaMenu = {
   type: "MegaMenu";
@@ -22,7 +23,7 @@ export type MegaMenuContent = ProductList
 
 export type GnavColumn = {
   type: "GnavColumn";
-  cards: Array<FeaturedCard | LinksCard | PromoCard>;
+  cards: Array<FeaturedCard | LinksCard | PromoCard | PromoCardSmall>;
 };
 
 export type GnavCards = {
@@ -42,7 +43,7 @@ export const parseMegaMenu = (
   if (title === "")
     errors.add(new RecoverableError(ERRORS.noTitle))
 
-  const content = (async (): 
+  const content = (async ():
                    Promise<Parsed<MegaMenuContent, RecoverableError>> => {
     try {
       const fragment: HTMLAnchorElement | null = element.querySelector('a');
@@ -97,7 +98,7 @@ const parseGnavCards = (
 
   // Parse each column div and its child cards
   const [sections, errors]
-    = parseListAndAccumulateErrors(columnDivs, 
+    = parseListAndAccumulateErrors(columnDivs,
       (columnDiv) => parseGnavColumn(columnDiv));
   if (sections.length === 0) {
     throw new IrrecoverableError("Failed to parse gnav cards sections");
@@ -116,20 +117,20 @@ const parseGnavColumn = (
   columnDiv: Element
 ): Parsed<GnavColumn, RecoverableError> => {
   // Find cards within this specific column div
-  const cardElements = [...columnDiv.querySelectorAll('.featured-card, .links-card, .promo-card')];
+  const cardElements = [...columnDiv.querySelectorAll('.featured-card, .links-card, .promo-card, .promo-card-small')];
   if (cardElements.length === 0) {
     throw new IrrecoverableError(
       "Column contains no cards (did you forget to label them correctly?)"
     );
   }
-  
+
   const [cards, errors]
     = parseListAndAccumulateErrors(cardElements,
       (card) => parseGnavCardSection(card));
   if (cards.length === 0) {
     throw new IrrecoverableError("Failed to parse cards in column");
   }
-  
+
   return [
     {
       type: "GnavColumn",
@@ -141,12 +142,18 @@ const parseGnavColumn = (
 
 const parseGnavCardSection = (
   section: Element
-): Parsed<FeaturedCard | LinksCard | PromoCard, RecoverableError> => {
+): Parsed<
+  FeaturedCard | LinksCard | PromoCard | PromoCardSmall,
+  RecoverableError
+> => {
   if (section.classList.contains('featured-card')) {
     return parseFeaturedCard(section);
   }
   if (section.classList.contains('links-card')) {
     return parseLinksCard(section);
+  }
+  if (section.classList.contains('promo-card-small')) {
+    return parsePromoCardSmall(section);
   }
   if (section.classList.contains('promo-card')) {
     return parsePromoCard(section);
