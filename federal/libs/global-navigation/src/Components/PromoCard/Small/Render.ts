@@ -1,6 +1,6 @@
-import { PromoCardSmall, PromoCardSmallData } from "./PromoCardSmall.Parse";
-import { secondaryCTA } from "../CTA/Render";
-import { sanitize, federateUrl } from "../../Utils/Utils";
+import { PromoCardSmall, PromoCardSmallData } from "./Parse";
+import { secondaryCTA } from "../../CTA/Render";
+import { sanitize, federateUrl } from "../../../Utils/Utils";
 
 export const promoCardSmall = ({ card }: PromoCardSmall): HTML =>
   renderCard(card);

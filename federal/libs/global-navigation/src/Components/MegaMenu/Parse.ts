@@ -9,8 +9,8 @@ import { getPlaceholders } from "../../Utils/Placeholders";
 import { LinksCard, parseLinksCard } from "../LinksCard/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
 import { parseFeaturedCard, FeaturedCard } from "../FeaturedCard/Parse";
-import { parsePromoCard, PromoCard } from "../PromoCard/Parse";
-import { parsePromoCardSmall, PromoCardSmall } from "../PromoCard/PromoCardSmall.Parse";
+import { parsePromoCard, PromoCard } from "../PromoCard/Standard/Parse";
+import { parsePromoCardSmall, PromoCardSmall } from "../PromoCard/Small/Parse";
 
 export type MegaMenu = {
   type: "MegaMenu";

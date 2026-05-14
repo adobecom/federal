@@ -1,6 +1,6 @@
-import { IrrecoverableError, RecoverableError } from "../../Error/Error";
-import { parseSecondaryCTA, SecondaryCTA } from "../CTA/Parse";
-import { isMerchLink } from "../../Utils/Utils";
+import { IrrecoverableError, RecoverableError } from "../../../Error/Error";
+import { parseSecondaryCTA, SecondaryCTA } from "../../CTA/Parse";
+import { isMerchLink } from "../../../Utils/Utils";
 
 export type PromoCard = {
   type: "PromoCard";

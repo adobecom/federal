@@ -24,8 +24,8 @@
 @import "../Components/MegaMenu/mega-menu.css";
 @import "../Components/SmallMenu/small-menu.css";
 @import "../Components/GnavCards/gnav-cards.css";
-@import "../Components/PromoCard/promo-card.css";
-@import "../Components/PromoCard/promo-card-small.css";
+@import "../Components/PromoCard/Standard/promo-card.css";
+@import "../Components/PromoCard/Small/promo-card-small.css";
 @import "../Components/LinksCard/links-card.css";
 @import "../Components/ProductList/productlist.css";
 @import "../Components/Panels/panels.css";

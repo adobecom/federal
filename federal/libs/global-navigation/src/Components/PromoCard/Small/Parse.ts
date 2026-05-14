@@ -1,5 +1,5 @@
-import { IrrecoverableError, RecoverableError } from "../../Error/Error";
-import { parseSecondaryCTA, SecondaryCTA } from "../CTA/Parse";
+import { IrrecoverableError, RecoverableError } from "../../../Error/Error";
+import { parseSecondaryCTA, SecondaryCTA } from "../../CTA/Parse";
 
 export type PromoCardSmall = {
   type: "PromoCardSmall";
