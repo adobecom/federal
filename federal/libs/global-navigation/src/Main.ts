@@ -161,6 +161,13 @@ export const renderGnavString = ({
   localnav,
 }: GlobalNavigationData
 ): string => {
+  // In localnav mobile, the menu-wrapper is repurposed as the localnav bar
+  // (a thin clickable strip below the main nav row that expands inline to
+  // reveal the remaining mega-menu entries). Its label mirrors the last
+  // breadcrumb crumb so it reads as the current section.
+  const localnavBarLabel = localnav && breadcrumbs !== null && breadcrumbs.items.length > 0
+    ? breadcrumbs.items[breadcrumbs.items.length - 1].text
+    : '';
   return `
 <nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
@@ -209,6 +216,14 @@ export const renderGnavString = ({
           id="feds-menu-wrapper"
           class="feds-menu-wrapper"
         >
+          ${localnav ? `
+            <button
+              class="feds-localnav-bar"
+              type="button"
+              aria-controls="feds-menu-wrapper"
+              aria-expanded="false"
+            ><span class="feds-localnav-bar-label">${localnavBarLabel}</span></button>
+          ` : ''}
           <ul class="feds-gnav-items">
             ${menuItemsHTML}
           </ul>
@@ -331,12 +346,53 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const menuWrapper = mountpoint.querySelector<HTMLElement>("#feds-menu-wrapper");
   const isMenuOpen = (): boolean => isPopupOpen(menuWrapper);
 
-  const updateHeaderState = (scrolledPast: boolean): void => {
+  const nav = mountpoint.querySelector<HTMLElement>("nav");
+  const isLocalnav = (): boolean => nav?.classList.contains("localnav") ?? false;
+
+  // Track the most recent "queued add" so a subsequent toggle can cancel it.
+  // Prevents a race where the user re-opens the bar mid-slide-down and the
+  // deferred add still fires, applying `feds-header-scrolled` over an
+  // already-open menu.
+  let pendingAddCleanup: (() => void) | null = null;
+  const cancelPendingAdd = (): void => {
+    if (pendingAddCleanup !== null) {
+      pendingAddCleanup();
+      pendingAddCleanup = null;
+    }
+  };
+
+  const updateHeaderState = (scrolledPast: boolean, fromToggle: boolean = false): void => {
+    cancelPendingAdd();
     if (isMenuOpen() || !scrolledPast) {
       header.classList.remove("feds-header-scrolled");
+      header.classList.remove("feds-localnav-closing");
       return;
     }
     header.classList.add("feds-header-scrolled");
+    // Closing the localnav bar in scrolled state: the header's `top` animates
+    // from -64px back to 0 over 0.3s. The `feds-header-scrolled` class is
+    // needed immediately for color (the bar title would otherwise flash from
+    // dark back to its default light shade during the slide-down). But the
+    // same class pulls `inset: xs xs 0 xs` onto `nav` via
+    // `header.feds-header-scrolled nav`, which would instantly pin nav to
+    // `top: xs` and kill the slide (nav holds the visible content). The
+    // `feds-localnav-closing` marker class is added in tandem and consumed by
+    // a CSS rule that suppresses that inset for the duration of the
+    // transition; we remove the marker on `transitionend`.
+    if (fromToggle && isLocalnav()) {
+      header.classList.add("feds-localnav-closing");
+      const onTransitionEnd = (event: TransitionEvent): void => {
+        if (event.target !== header || event.propertyName !== "top") return;
+        header.removeEventListener("transitionend", onTransitionEnd);
+        pendingAddCleanup = null;
+        header.classList.remove("feds-localnav-closing");
+      };
+      header.addEventListener("transitionend", onTransitionEnd);
+      pendingAddCleanup = (): void => {
+        header.removeEventListener("transitionend", onTransitionEnd);
+        header.classList.remove("feds-localnav-closing");
+      };
+    }
   };
 
   // A 20px sentinel placed at the top of the document body. When it scrolls
@@ -358,7 +414,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   observer.observe(sentinel);
 
   menuWrapper?.addEventListener("toggle", () =>
-    updateHeaderState(scrolledPast)
+    updateHeaderState(scrolledPast, true)
   );
 };
 
