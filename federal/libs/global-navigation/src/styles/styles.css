@@ -24,8 +24,8 @@
 @import "../Components/MegaMenu/mega-menu.css";
 @import "../Components/SmallMenu/small-menu.css";
 @import "../Components/GnavCards/gnav-cards.css";
-@import "../Components/PromoCard/promo-card.css";
-@import "../Components/PromoCard/promo-card-small.css";
+@import "../Components/PromoCard/Standard/promo-card.css";
+@import "../Components/PromoCard/Small/promo-card-small.css";
 @import "../Components/LinksCard/links-card.css";
 @import "../Components/ProductList/productlist.css";
 @import "../Components/Panels/panels.css";
@@ -166,6 +166,19 @@ header.feds-header-scrolled.feds-localnav-closing nav.localnav {
   align-items: center;
   margin-left: auto;
   padding-right: var(--s2a-spacing-md);
+}
+
+[dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta {
+  margin-left: 0;
+  margin-right: auto;
+  padding-right: 0;
+  padding-left: var(--s2a-spacing-md);
+}
+
+[dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
+  padding-right: 0;
+  padding-left: var(--s2a-spacing-md);
+  margin-left: 0;
 }
 
 .global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
@@ -470,7 +483,8 @@ header.global-navigation.feds-header-scrolled nav::after {
 
 .global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-app-switcher.unav-comp-icon svg,
 .global-navigation .unav-comp-app-switcher.unav-comp-icon.unav-comp-app-switcher-open svg,
-.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-cart svg {
+.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-cart svg,
+.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-external-notifications svg path {
   fill: var(--s2a-color-gray-1000);
 }
 
@@ -788,6 +802,10 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+  }
+
+  [dir="rtl"] .global-navigation.site-pivot nav .feds-gnav-items {
+    padding-right: 0;
   }
 
   .global-navigation nav .feds-gnav-items {

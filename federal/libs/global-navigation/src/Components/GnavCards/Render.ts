@@ -1,7 +1,7 @@
 import { featuredcards } from "../FeaturedCard/Render";
 import { linkscard } from "../LinksCard/Render";
-import { promoCard } from "../PromoCard/Render";
-import { promoCardSmall } from "../PromoCard/PromoCardSmall.Render";
+import { promoCard } from "../PromoCard/Standard/Render";
+import { promoCardSmall } from "../PromoCard/Small/Render";
 import { GnavCards, GnavColumn } from "../MegaMenu/Parse";
 
 const renderCard = (card: GnavColumn["cards"][number], megaMenuTitle: string): HTML => {
