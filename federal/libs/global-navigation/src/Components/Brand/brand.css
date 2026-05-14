@@ -30,6 +30,10 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   column-gap: 10px;
 }
 
+[dir="rtl"] .feds-brand {
+  padding: 0 var(--s2a-spacing-md) 0 var(--s2a-spacing-sm);
+}
+
 .feds-brand-image svg {
   width: 100%;
   display: block;
