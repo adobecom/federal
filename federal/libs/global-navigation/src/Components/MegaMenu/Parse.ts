@@ -11,6 +11,7 @@ import { parseProductList, ProductList } from "../ProductList/Parse";
 import { parseFeaturedCard, FeaturedCard } from "../FeaturedCard/Parse";
 import { parsePromoCard, PromoCard } from "../PromoCard/Parse";
 import { parsePromoCardSmall, PromoCardSmall } from "../PromoCard/PromoCardSmall.Parse";
+import { Breadcrumbs } from "../Breadcrumbs/Parse";
 
 export type MegaMenu = {
   type: "MegaMenu";
@@ -20,6 +21,11 @@ export type MegaMenu = {
 
 export type MegaMenuContent = ProductList
                             | GnavCards;
+
+export type MegaMenuExtraData = {
+  type: "MegaMenuExtraData";
+  breadcrumbs: Breadcrumbs | null;
+};
 
 export type GnavColumn = {
   type: "GnavColumn";

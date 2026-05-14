@@ -9,13 +9,14 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
 import { smallMenuPopup } from "./Components/SmallMenu/Render";
+import { MegaMenuExtraData } from "./Components/MegaMenu/Parse";
 
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -131,7 +132,8 @@ mountpoint: HTMLElement
   const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
     try {
       const [content, errors] = await mmPromise;
-      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id);
+      const extraData: MegaMenuExtraData = { type: "MegaMenuExtraData", breadcrumbs: data.breadcrumbs };
+      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, extraData);
       return errors;
     } catch (error) {
       return [error];
@@ -156,10 +158,11 @@ export const renderGnavString = ({
   productCTA,
   unavEnabled,
   placeholders,
+  localnav,
 }: GlobalNavigationData
 ): string => {
   return `
-<nav data-lenis-prevent>
+<nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul role="presentation">
@@ -168,6 +171,14 @@ export const renderGnavString = ({
         c.type === "Brand"
       ) ?? null;
       const menuComponents = components.filter((c) => c.type !== "Brand");
+      // In localnav mode the hamburger should open the first mega menu's
+      // popup directly rather than the menu wrapper / gnav-items list.
+      const firstMegaMenu = localnav
+        ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
+        : null;
+      const toggleControlsId = firstMegaMenu !== null
+        ? sanitize(firstMegaMenu.title)
+        : 'feds-menu-wrapper';
       const toggleButton = `
         <button
           class="feds-nav-toggle"
@@ -175,7 +186,7 @@ export const renderGnavString = ({
           aria-label="Navigation menu"
           daa-ll="hamburgermenu|open"
           aria-expanded="false"
-          aria-controls="feds-menu-wrapper"
+          aria-controls="${toggleControlsId}"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 7" fill="currentColor" aria-hidden="true">
             <path d="M13.25 5.5H0.75C0.33594 5.5 0 5.83594 0 6.25C0 6.66406 0.33594 7 0.75 7H13.25C13.6641 7 14 6.66406 14 6.25C14 5.83594 13.6641 5.5 13.25 5.5Z"/>
@@ -185,7 +196,9 @@ export const renderGnavString = ({
       `.trim();
 
       const brandHTML = brandComponent ? component(brandComponent) : "";
-      const menuItemsHTML = renderListItems(menuComponents, component);
+      const menuItemsHTML = menuComponents
+        .map((c, index) => `<li>${component(c, index)}</li>`)
+        .join('');
 
       return `
         <li class="feds-brand-wrapper">
@@ -259,11 +272,18 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
 
   menuWrapper?.addEventListener('toggle', () => {
     const isOpen = menuWrapper.classList.contains(IS_OPEN_CLASS);
-    navToggle?.setAttribute('aria-expanded', String(isOpen));
-    navToggle?.setAttribute(
-      'daa-ll',
-      isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
-    );
+    // Only reflect open-state on the hamburger when it actually controls the
+    // menu-wrapper. In localnav the hamburger's aria-controls points at the
+    // first mega-menu's popup (the menu-wrapper is opened via the localnav
+    // bar instead), so reflecting menu-wrapper state on the hamburger here
+    // would be incorrect.
+    if (navToggle?.getAttribute('aria-controls') === 'feds-menu-wrapper') {
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      navToggle.setAttribute(
+        'daa-ll',
+        isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
+      );
+    }
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
   });
 

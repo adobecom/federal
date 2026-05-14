@@ -2,7 +2,7 @@ import { Breadcrumbs, parseBreadcrumbs } from "../Components/Breadcrumbs/Parse";
 import { Component, parseComponent } from "../Components/Component";
 import { ProductEntryCTA } from "../Components/CTA/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
-import { parseListAndAccumulateErrors } from "../Utils/Utils";
+import { getMetadata, parseListAndAccumulateErrors } from "../Utils/Utils";
 
 export type GlobalNavigationData = {
   breadcrumbs: Breadcrumbs | null;
@@ -48,7 +48,8 @@ export const parseNavigation = (
   //   .filter((component): boolean =>
   //           component.type === "MegaMenu" &&
   //           component.isSection).length === 1;
-  const localnav = false;
+  const localnav = getMetadata('localnav') === 'true';
+
   const errors = [
     breadcrumbErrors,
     componentErrors,
