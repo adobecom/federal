@@ -1010,6 +1010,13 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 }
 
+@media (max-width: 768px) {
+  .global-navigation .feds-menu-wrapper:not(.feds-menu-active) .feds-primary-cta {
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+
 /* =========================================
    Content Entrance Animations (Desktop Only)
    ========================================= */

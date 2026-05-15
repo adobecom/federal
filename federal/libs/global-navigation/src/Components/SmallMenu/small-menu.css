@@ -17,7 +17,7 @@
     width: auto;
     max-width: none;
     max-height: none;
-    overflow: visible;
+    overflow: auto;
     border: 1px solid var(--s2a-color-transparent-black-12, rgba(0, 0, 0, 0.12));
     border-radius: var(--s2a-spacing-xs);
     box-sizing: border-box;
