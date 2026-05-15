@@ -303,6 +303,45 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
 }
 
 /* =========================================
+   Desktop (>= 1024px) — separator between first and second gnav item
+   =========================================
+   On desktop, when the nav is a localnav, draw the same vertical pipe
+   separator that the breadcrumbs use between adjacent crumbs — but only
+   between the FIRST and SECOND <li> of .feds-gnav-items, nowhere else.
+   The pseudo lives on the second li (via `:first-child + li::before`) so
+   it's drawn exactly once, in the gap between the first two items. Matches
+   the breadcrumb pipe pixel-exactly (1×15px filled box, spacing-sm gutters
+   on each side) and follows the same default/dark-palette state split:
+   white-alpha on the translucent-dark default backdrop, black-alpha when
+   the header is scrolled or a menu/popup is open and the backdrop turns
+   light/gray. See Components/Breadcrumbs/breadcrumbs.css for the source
+   separator the styling mirrors. */
+@media (min-width: 1024px) {
+  /* Make the second li lay out its own children inline-centered (matches the
+     breadcrumb pattern at Components/Breadcrumbs/breadcrumbs.css:35-40), so
+     the ::before pipe and the .feds-link sit on the same baseline rather
+     than stacking as block-level boxes. */
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 15px;
+    margin-inline: var(--s2a-spacing-sm);
+    background-color: var(--s2a-color-transparent-white-16);
+  }
+
+  .global-navigation.site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li:first-child + li::before,
+  .global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li:first-child + li::before {
+    background-color: var(--s2a-color-transparent-black-16);
+  }
+}
+
+/* =========================================
    Small breakpoint (<768px) CTA width
    =========================================
    At narrow screens the CTAs inside the expanded localnav bar take the
