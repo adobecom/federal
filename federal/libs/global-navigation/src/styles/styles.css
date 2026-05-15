@@ -155,6 +155,9 @@ header.feds-header-scrolled nav {
   align-items: center;
   margin-left: auto;
   padding-right: var(--s2a-spacing-md);
+  @media (max-width: 1024px) {
+    display: none;
+  }
 }
 
 [dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta {
