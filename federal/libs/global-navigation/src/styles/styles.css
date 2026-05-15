@@ -278,7 +278,7 @@ header.feds-header-scrolled nav {
    and item 2, and nowhere else along the row. The pipe lives in the
    second item's ::before with symmetric inline margin so it sits in
    the gap between the two items. */
-.global-navigation.site-pivot .feds-gnav-items > li:first-child + li::before {
+.global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
   content: '';
   display: inline-block;
   align-self: center;
