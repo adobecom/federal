@@ -271,23 +271,6 @@ header.feds-header-scrolled nav {
   cursor: pointer;
 }
 
-/* Vertical pipe separator between the first two items of the main nav
-   (.feds-gnav-items). Same visual treatment as the pipe between
-   breadcrumb crumbs — see breadcrumbs.css for the canonical rule.
-   Scoped to li:first-child + li so it only appears between item 1
-   and item 2, and nowhere else along the row. The pipe lives in the
-   second item's ::before with symmetric inline margin so it sits in
-   the gap between the two items. */
-.global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
-  content: '';
-  display: inline-block;
-  align-self: center;
-  width: 1px;
-  height: 15px;
-  margin-inline: var(--s2a-spacing-sm);
-  background-color: var(--s2a-color-transparent-white-16);
-}
-
 /* Scrolled OR any popup/drawer open → backdrop is light/gray, so
    flip the pipe to the black-alpha equivalent for visibility (same
    state split as breadcrumbs.css). */
