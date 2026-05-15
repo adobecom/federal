@@ -408,6 +408,13 @@ header.global-navigation.feds-header-scrolled nav::after {
   text-decoration: underline;
 }
 
+.feds-link__mobile-text { display: none; }
+
+@media (max-width: 1023px) {
+  .feds-link__desktop-text { display: none; }
+  .feds-link__mobile-text { display: inline; }
+}
+
 /* Match `.feds-menu-active` in addition to `.is-open` so the open-state
    styling persists through the close transition. `is-open` is removed
    immediately on close, but `feds-menu-active` is removed on transitionend

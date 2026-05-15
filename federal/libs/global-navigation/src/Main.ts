@@ -152,6 +152,7 @@ mountpoint: HTMLElement
   return mountpoint;
 };
 
+
 export const renderGnavString = ({
   components,
   breadcrumbs,
@@ -203,6 +204,7 @@ export const renderGnavString = ({
       `.trim();
 
       const brandHTML = brandComponent ? component(brandComponent) : "";
+
       const menuItemsHTML = menuComponents
         .map((c, index) => `<li>${component(c, index)}</li>`)
         .join('');
