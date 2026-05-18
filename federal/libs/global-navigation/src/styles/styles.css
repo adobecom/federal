@@ -355,8 +355,11 @@ header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open
 }
 
 @media (max-width: 1023px) {
-  header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+  header.global-navigation nav:has(.feds-popup.is-open)::after {
     height: calc(100dvh + var(--s2a-spacing-xs));
+  }
+  header.global-navigation nav:has(.feds-menu-wrapper.is-open)::after {
+    height: calc(100dvh - 50px);
   }
 }
 
@@ -1004,9 +1007,21 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     }
   }
 
-  header.global-navigation nav:has(.feds-popup.is-open) .feds-backdrop {
+  header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-backdrop {
     background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
+  }
+}
+
+header.global-navigation nav:has(.feds-menu-wrapper.is-open) .feds-backdrop {
+  background-color: rgba(0, 0, 0, 0.60);
+  backdrop-filter: blur(32px);
+}
+
+@media (max-width: 768px) {
+  .global-navigation .feds-menu-wrapper:not(.feds-menu-active) .feds-primary-cta {
+    box-sizing: border-box;
+    width: 100%;
   }
 }
 
