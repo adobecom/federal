@@ -7,6 +7,8 @@ type CleanupFunction = () => void
  *  to cover the nav bar */
 const POPOVER_BG_HEIGHT_OFFSET_PX = 72;
 const BREADCRUMBS_HEIGHT = 48;
+const TOP_OFFSET = 64; // extra offset because when the localnav opens
+                       // the whole nav slides up to hide the main nav
 
 /**
  * Drive the height of `nav::after` (the rounded backdrop frame) by
@@ -124,7 +126,7 @@ const animations = (gnav: HTMLElement): void => {
     const openPopup = gnav.querySelector(popupSelector);
     const fedsMenuWrapper = gnav.querySelector('.feds-menu-wrapper.is-open');
     const openLocalnav = isLocalNav && !!fedsMenuWrapper;
-    if (openLocalnav) {
+    if (openLocalnav && !openPopup) {
       const resetPopoverHeight = fedsMenuWrapper.clientHeight < 1;
       const height = resetPopoverHeight
         ? '100%'
@@ -145,7 +147,7 @@ const animations = (gnav: HTMLElement): void => {
   const resizeObserver = new ResizeObserver(entries => {
     if (entries.length < 1) return;
     const offset = isLocalNav
-                 ? POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT
+                 ? POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT + TOP_OFFSET
                  : POPOVER_BG_HEIGHT_OFFSET_PX;
     popupHeightObserverCallback(`.feds-popup.${IS_OPEN_CLASS}`, offset);
   });
@@ -188,7 +190,7 @@ const animations = (gnav: HTMLElement): void => {
       if (isDesktop.matches) return;
       popupHeightObserverCallback(
         `.feds-menu-wrapper.${IS_OPEN_CLASS} .feds-gnav-items`,
-        POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT
+        POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT + TOP_OFFSET
       );
     });
     localnavResizeObserver.observe(fedsGnavItems);
