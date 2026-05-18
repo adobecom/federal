@@ -994,7 +994,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     transition-delay: 0.15s;
   }
 
-  .global-navigation:has(.feds-localnav-bar) .feds-popup.is-open {
+  .global-navigation:has(.feds-localnav-bar) :not(.small-menu).feds-popup.is-open {
     margin-top: -6px;
     padding-top: var(--s2a-spacing-lg);
     border-top: 1px solid var(--s2a-color-transparent-black-08);

@@ -19,6 +19,10 @@
   margin-bottom: var(--s2a-spacing-sm);
 }
 
+.feds-popup.small-menu .links-card span.links-card-title-span {
+  display: none;
+}
+
 .feds-popup .links-card .links-card-chevron {
   margin-left: auto;
   width: 20px;
@@ -48,7 +52,7 @@
   display: none;
 }
 
-nav.localnav .feds-popup .links-card {
+nav.localnav .feds-popup:not(.small-menu) .links-card {
   margin-bottom: var(--s2a-spacing-xs);
 }
 
