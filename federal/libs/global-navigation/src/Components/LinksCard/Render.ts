@@ -1,7 +1,7 @@
 import { primaryCTA, secondaryCTA } from "../CTA/Render";
 import { link } from "../Link/Render";
 import { LinksCard, LinksCardItem } from "./Parse";
-import { getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
+import { getAnalyticsAttrs, sanitize, icons } from "../../Utils/Utils";
 
 export const linkscard = ({
   card
@@ -14,7 +14,10 @@ const renderCard = ({
 }: LinksCardItem): HTML => `
   <article class="links-card" ${getAnalyticsAttrs(title, '')}>
     <div>
-      <h2 id="links-card-${sanitize(title)}" class="links-card-title" role="heading" aria-level="2">${title}</h2>
+      <span class="links-card-title-span">
+        <h2 id="links-card-${sanitize(title)}" class="links-card-title" role="heading" aria-level="2">${title}</h2>
+        <span class="links-card-chevron" aria-hidden="true">${icons.chevronDown}</span>
+      </span>
       <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
         ${links.map(item => item.description !== undefined && item.description !== ''
           ? `<li class="links-card-links__item--has-description">
@@ -37,3 +40,4 @@ const renderCard = ({
     </div>`}
   </article>
 `.trim();
+

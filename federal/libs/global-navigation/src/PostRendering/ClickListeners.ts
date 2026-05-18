@@ -97,6 +97,10 @@ export const initClickListeners = (
 
   animations(gnav);
 
+  // TODO: Organize this files so that all the components click
+  // listeners aren't in one file
+  linksCardListeners(gnav);
+
   return () => {
     skipLink?.removeEventListener('click', onSkipLinkClick);
     tabButtons.forEach((button, i) => {
@@ -198,3 +202,14 @@ const animations = (gnav: HTMLElement): void => {
     });
   }
 }
+
+const linksCardListeners = (mountpoint: HTMLElement): void => {
+  mountpoint.querySelectorAll<HTMLElement>('article')
+    .forEach(article => {
+      const articleTitle = article.querySelector<HTMLElement>('span.links-card-title-span');
+      articleTitle?.addEventListener('click', () => {
+        if (isDesktop.matches) return;
+        article.classList.toggle('closed');
+      });
+    })
+};
