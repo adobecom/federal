@@ -1,4 +1,4 @@
-import { isDesktop } from "../Utils/Utils";
+import { getMetadata, isDesktop } from "../Utils/Utils";
 import { IS_OPEN_CLASS, closePopup, triggersForPopupId } from "./PopupWiring";
 
 type CleanupFunction = () => void
@@ -6,6 +6,7 @@ type CleanupFunction = () => void
 /** Height in px added to the popover background pseudo-element
  *  to cover the nav bar */
 const POPOVER_BG_HEIGHT_OFFSET_PX = 72;
+const BREADCRUMBS_HEIGHT = 48;
 
 /**
  * Drive the height of `nav::after` (the rounded backdrop frame) by
@@ -114,10 +115,23 @@ export const initClickListeners = (
 const animations = (gnav: HTMLElement): void => {
   const mainMenuButtons = [...gnav.querySelectorAll<HTMLElement>('.feds-gnav-items > li > button')];
   const fedsGnavItems = gnav.querySelector('.feds-gnav-items');
+  const isLocalNav = getMetadata('localnav') === 'true';
 
-  const resizeObserver = new ResizeObserver(entries => {
-    if (entries.length < 1) return;
-    const openPopup = gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`);
+  const popupHeightObserverCallback = (
+    popupSelector: string,
+    offset: number = 0
+  ): void => {
+    const openPopup = gnav.querySelector(popupSelector);
+    const fedsMenuWrapper = gnav.querySelector('.feds-menu-wrapper.is-open');
+    const openLocalnav = isLocalNav && !!fedsMenuWrapper;
+    if (openLocalnav) {
+      const resetPopoverHeight = fedsMenuWrapper.clientHeight < 1;
+      const height = resetPopoverHeight
+        ? '100%'
+        : `${fedsMenuWrapper.clientHeight + offset}px`;
+      setPopoverBgHeight(gnav, height);
+      return;
+    }
     if (!openPopup) {
       setPopoverBgHeight(gnav, '100%');
       return;
@@ -125,8 +139,15 @@ const animations = (gnav: HTMLElement): void => {
     const resetPopoverHeight = openPopup.clientHeight < 1;
     const height = resetPopoverHeight
       ? '100%'
-      : `${openPopup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
+      : `${openPopup.clientHeight + offset}px`;
     setPopoverBgHeight(gnav, height);
+  }
+  const resizeObserver = new ResizeObserver(entries => {
+    if (entries.length < 1) return;
+    const offset = isLocalNav
+                 ? POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT
+                 : POPOVER_BG_HEIGHT_OFFSET_PX;
+    popupHeightObserverCallback(`.feds-popup.${IS_OPEN_CLASS}`, offset);
   });
 
   mainMenuButtons.forEach(button => {
@@ -136,7 +157,7 @@ const animations = (gnav: HTMLElement): void => {
     popup.addEventListener('toggle', (event: Event) => {
       const newState = (event as ToggleEvent).newState;
       if (newState !== 'open' && !gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`)) {
-        setPopoverBgHeight(gnav, '100%');
+        // setPopoverBgHeight(gnav, '100%');
         if (isDesktop.matches) return;
         // Bandaid for using escape for closing the popup in mobile
         fedsGnavItems?.classList.remove('subscreen-opening');
@@ -157,6 +178,20 @@ const animations = (gnav: HTMLElement): void => {
         }
       }
     });
+    // Localnav stuff
+    if (!isLocalNav) return;
+
+    if (!fedsGnavItems) return;
+
+    const localnavResizeObserver = new ResizeObserver(entries => {
+      if (entries.length < 1) return;
+      if (isDesktop.matches) return;
+      popupHeightObserverCallback(
+        `.feds-menu-wrapper.${IS_OPEN_CLASS} .feds-gnav-items`,
+        POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT
+      );
+    });
+    localnavResizeObserver.observe(fedsGnavItems);
   });
 
   // Mobile subscreen animations
@@ -204,7 +239,7 @@ const animations = (gnav: HTMLElement): void => {
 }
 
 const linksCardListeners = (mountpoint: HTMLElement): void => {
-  mountpoint.querySelectorAll<HTMLElement>('article')
+  mountpoint.querySelectorAll<HTMLElement>('.feds-popup:not(.small-menu) article.links-card')
     .forEach(article => {
       const articleTitle = article.querySelector<HTMLElement>('span.links-card-title-span');
       articleTitle?.addEventListener('click', () => {

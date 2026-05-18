@@ -10,13 +10,13 @@
   flex-direction: column;
   justify-content: space-between;
   padding: var(--s2a-spacing-xl) var(--s2a-spacing-lg);
+  margin-bottom: var(--s2a-spacing-sm);
 }
 
 .feds-popup .links-card span.links-card-title-span {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: var(--s2a-spacing-sm);
 }
 
 .feds-popup .links-card .links-card-chevron {
@@ -27,6 +27,10 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.feds-popup.small-menu .links-card .links-card-chevron {
+  display: none;
 }
 
 .feds-popup .links-card .links-card-chevron svg {

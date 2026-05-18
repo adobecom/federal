@@ -262,6 +262,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
        — no need to reserve nav-row height. */
     top: calc(var(--feds-breadcrumbs-height) - 1px);
     max-height: calc(100dvh - var(--feds-breadcrumbs-height));
+    height: fit-content;
   }
 
   nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup {

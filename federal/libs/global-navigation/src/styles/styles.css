@@ -341,7 +341,7 @@ header.global-navigation.feds-header-scrolled nav::after {
    this rule wins over the inline `--feds-popup-bg-height` JS writes
    on <header>, because the variable is being declared on a closer
    ancestor (nav) of the consuming pseudo-element (nav::after). */
-header.global-navigation nav:has(> .feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu))) {
+header.global-navigation nav:has(> .feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) {
   --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
 }
 
@@ -358,8 +358,11 @@ header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open
   header.global-navigation nav:has(.feds-popup.is-open)::after {
     height: calc(100dvh + var(--s2a-spacing-xs));
   }
-  header.global-navigation nav:has(.feds-menu-wrapper.is-open)::after {
-    height: calc(100dvh - 50px);
+  header.global-navigation nav:not(.localnav):has(.feds-menu-wrapper.is-open)::after {
+    height: calc(100dvh + var(--s2a-spacing-64));
+  }
+  header.global-navigation nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+    height: var(--feds-popup-bg-height);
   }
 }
 
@@ -935,6 +938,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
     border-radius: 0;
+  }
+
+  header.global-navigation nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+    border-radius: 0 0 var(--s2a-border-radius-16) var(--s2a-border-radius-16);
   }
 
   .feds-popup .feds-product-card__subtitle {
