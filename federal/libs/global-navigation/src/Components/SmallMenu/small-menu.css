@@ -29,6 +29,7 @@
 
   .feds-popup.small-menu.is-open {
     border-radius: var(--s2a-spacing-xs);
+    overflow-y: hidden;
   }
 
   /* Gnav cards layout */
