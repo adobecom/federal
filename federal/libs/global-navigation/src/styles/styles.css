@@ -1001,6 +1001,12 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     transition-delay: 0.15s;
   }
 
+  .global-navigation:has(.feds-localnav-bar) :not(.small-menu).feds-popup.is-open {
+    margin-top: -6px;
+    padding-top: var(--s2a-spacing-lg);
+    border-top: 1px solid var(--s2a-color-transparent-black-08);
+  }
+
   .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
     max-height: calc(100dvh - var(--s2a-spacing-64));
