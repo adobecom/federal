@@ -146,8 +146,8 @@ const animations = (gnav: HTMLElement): void => {
   }
   const resizeObserver = new ResizeObserver(entries => {
     if (entries.length < 1) return;
-    const offset = isLocalNav
-                 ? POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT + TOP_OFFSET
+    const offset = isLocalNav && !isDesktop.matches
+                 ? POPOVER_BG_HEIGHT_OFFSET_PX + TOP_OFFSET
                  : POPOVER_BG_HEIGHT_OFFSET_PX;
     popupHeightObserverCallback(`.feds-popup.${IS_OPEN_CLASS}`, offset);
   });
@@ -190,7 +190,7 @@ const animations = (gnav: HTMLElement): void => {
       if (isDesktop.matches) return;
       popupHeightObserverCallback(
         `.feds-menu-wrapper.${IS_OPEN_CLASS} .feds-gnav-items`,
-        POPOVER_BG_HEIGHT_OFFSET_PX + BREADCRUMBS_HEIGHT + TOP_OFFSET
+        POPOVER_BG_HEIGHT_OFFSET_PX + TOP_OFFSET
       );
     });
     localnavResizeObserver.observe(fedsGnavItems);
