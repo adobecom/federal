@@ -40,7 +40,7 @@
 }
 
 .global-navigation.site-pivot .feds-breadcrumbs > li > a {
-  font-family: var(--s2a-font-family-label);
+  font-family: var(--feds-font-family);
   font-size: var(--s2a-typography-font-size-label);
   line-height: var(--s2a-typography-line-height-label);
   letter-spacing: var(--s2a-typography-letter-spacing-label);
