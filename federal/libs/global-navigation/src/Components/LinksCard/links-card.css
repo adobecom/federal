@@ -51,9 +51,11 @@
   transform: rotate(0deg);
 }
 
-.feds-popup .links-card.closed span.links-card-title-span ~ *,
-.feds-popup .links-card.closed .links-card-footer {
-  display: none;
+@media (max-width: 1024px) {
+  .feds-popup .links-card.closed span.links-card-title-span ~ *,
+  .feds-popup .links-card.closed .links-card-footer {
+    display: none;
+  }
 }
 
 nav.localnav .feds-popup:not(.small-menu) .links-card {
