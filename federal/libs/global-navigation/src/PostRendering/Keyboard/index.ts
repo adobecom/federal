@@ -32,8 +32,9 @@ const menuWrapperEl = (gnav: HTMLElement): HTMLElement | null =>
 const gnavItemsList = (gnav: HTMLElement): HTMLElement | null =>
   gnav.querySelector<HTMLElement>('#feds-menu-wrapper .feds-gnav-items');
 
-/** Visible (CSS-displayed) Tab-stops inside the open bar. */
-const barTabStops = (gnav: HTMLElement): HTMLElement[] => {
+/** Visible (CSS-displayed) menu items inside the open bar, excluding the
+ *  bar button. Used for the "focus first item on open" path. */
+const barItemStops = (gnav: HTMLElement): HTMLElement[] => {
   const list = gnavItemsList(gnav);
   if (!list) return [];
   const selector
@@ -42,6 +43,15 @@ const barTabStops = (gnav: HTMLElement): HTMLElement[] => {
     + ':scope > li > .feds-secondary-cta';
   return [...list.querySelectorAll<HTMLElement>(selector)]
     .filter((el) => el.offsetParent !== null);
+};
+
+/** All Tab-stops inside the open bar, including the localnav bar button.
+ *  The bar button is prepended so it participates in the trap cycle:
+ *  bar button -> first item -> ... -> last item -> wrap to bar button. */
+const barTabStops = (gnav: HTMLElement): HTMLElement[] => {
+  const items = barItemStops(gnav);
+  const bar = localnavBar(gnav);
+  return bar ? [bar, ...items] : items;
 };
 
 /**
@@ -193,24 +203,16 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
   });
 
   // Localnav bar: drive tabindex on its items via the menu-wrapper's
-  // toggle event, focus the first visible item on open, and return focus
-  // to the bar button on close. All scoped to localnav-mobile.
+  // toggle event and return focus to the bar button on close. All scoped
+  // to localnav-mobile. We deliberately do NOT move focus into the bar on
+  // open — focus stays on the bar button so the user can either Tab into
+  // the now-revealed items or Shift+Tab/Esc out the way they came.
   const wrap = menuWrapperEl(gnav);
   if (wrap) {
     const onWrapToggle = (): void => {
       const open = isPopupOpen(wrap);
       if (isLocalnavMobile(gnav)) {
         applyBarTabIndex(gnav, open);
-      }
-      if (open && isLocalnavMobile(gnav)) {
-        // Bar items live inside an overflow:hidden / max-height container,
-        // not a display:none one, so offsetParent is non-null even while
-        // the bar's open-state transition runs. Focusing synchronously
-        // is correct (and friendlier to test environments where rAF may
-        // be throttled).
-        const stops = barTabStops(gnav);
-        stops[0]?.focus();
-        return;
       }
       if (!open && isLocalnavMobile(gnav)) {
         if (wrap.contains(document.activeElement)) {

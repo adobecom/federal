@@ -203,13 +203,15 @@ describe('Gnav keyboard init', () => {
       expect(gnav.querySelector('#y').hasAttribute('tabindex')).to.equal(false);
     });
 
-    it('removes tabindex on items and focuses the first when the bar opens', () => {
+    it('removes tabindex on items and keeps focus on the bar button when the bar opens', () => {
       forceMobile();
       gnav = buildLocalnavGnav();
       document.body.appendChild(gnav);
       hideFirstTrigger(gnav);
       cleanup = initKeyboardNav(gnav);
 
+      const bar = gnav.querySelector('.feds-localnav-bar');
+      bar.focus();
       const wrap = gnav.querySelector('#feds-menu-wrapper');
       wrap.classList.add(IS_OPEN_CLASS);
       dispatchToggle(wrap, true);
@@ -217,7 +219,8 @@ describe('Gnav keyboard init', () => {
       ['#t-a', '#t-b', '#cta'].forEach((sel) => {
         expect(gnav.querySelector(sel).hasAttribute('tabindex')).to.equal(false);
       });
-      expect(document.activeElement).to.equal(gnav.querySelector('#t-a'));
+      // Focus stays on the bar button; user Tabs from there into the items.
+      expect(document.activeElement).to.equal(bar);
     });
 
     it('returns focus to the bar button when the bar closes', () => {
@@ -241,7 +244,7 @@ describe('Gnav keyboard init', () => {
       expect(gnav.querySelector('#t-a').getAttribute('tabindex')).to.equal('-1');
     });
 
-    it('Tab on the last bar stop wraps to the first', () => {
+    it('Tab on the last bar stop wraps to the bar button', () => {
       forceMobile();
       gnav = buildLocalnavGnav();
       document.body.appendChild(gnav);
@@ -257,10 +260,29 @@ describe('Gnav keyboard init', () => {
       gnav.dispatchEvent(new KeyboardEvent('keydown', {
         key: 'Tab', bubbles: true,
       }));
+      expect(document.activeElement)
+        .to.equal(gnav.querySelector('.feds-localnav-bar'));
+    });
+
+    it('Tab on the bar button moves to the first menu item', () => {
+      forceMobile();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      hideFirstTrigger(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      const wrap = gnav.querySelector('#feds-menu-wrapper');
+      wrap.classList.add(IS_OPEN_CLASS);
+      dispatchToggle(wrap, true);
+
+      gnav.querySelector('.feds-localnav-bar').focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Tab', bubbles: true,
+      }));
       expect(document.activeElement).to.equal(gnav.querySelector('#t-a'));
     });
 
-    it('Shift+Tab on the first bar stop wraps to the last', () => {
+    it('Shift+Tab on the first menu item moves to the bar button', () => {
       forceMobile();
       gnav = buildLocalnavGnav();
       document.body.appendChild(gnav);
@@ -273,6 +295,25 @@ describe('Gnav keyboard init', () => {
 
       const ta = gnav.querySelector('#t-a');
       ta.focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Tab', shiftKey: true, bubbles: true,
+      }));
+      expect(document.activeElement)
+        .to.equal(gnav.querySelector('.feds-localnav-bar'));
+    });
+
+    it('Shift+Tab on the bar button wraps to the last menu item', () => {
+      forceMobile();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      hideFirstTrigger(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      const wrap = gnav.querySelector('#feds-menu-wrapper');
+      wrap.classList.add(IS_OPEN_CLASS);
+      dispatchToggle(wrap, true);
+
+      gnav.querySelector('.feds-localnav-bar').focus();
       gnav.dispatchEvent(new KeyboardEvent('keydown', {
         key: 'Tab', shiftKey: true, bubbles: true,
       }));

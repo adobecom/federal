@@ -14,10 +14,10 @@ const renderCard = ({
 }: LinksCardItem): HTML => `
   <article class="links-card" ${getAnalyticsAttrs(title, '')}>
     <div>
-      <span class="links-card-title-span">
+      <div class="links-card-title-container">
         <h2 id="links-card-${sanitize(title)}" class="links-card-title" role="heading" aria-level="2">${title}</h2>
         <span class="links-card-chevron" aria-hidden="true">${icons.chevronDown}</span>
-      </span>
+      </div>
       <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
         ${links.map(item => item.description !== undefined && item.description !== ''
           ? `<li class="links-card-links__item--has-description">

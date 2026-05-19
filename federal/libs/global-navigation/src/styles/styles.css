@@ -354,6 +354,10 @@ header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open
   backdrop-filter: blur(0px);
 }
 
+header.global-navigation nav.localnav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+  top: 0;
+}
+
 @media (max-width: 1023px) {
   header.global-navigation nav:has(.feds-popup.is-open)::after {
     height: calc(100dvh + var(--s2a-spacing-xs));

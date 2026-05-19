@@ -243,10 +243,49 @@ const animations = (gnav: HTMLElement): void => {
 const linksCardListeners = (mountpoint: HTMLElement): void => {
   mountpoint.querySelectorAll<HTMLElement>('.feds-popup:not(.small-menu) article.links-card')
     .forEach(article => {
-      const articleTitle = article.querySelector<HTMLElement>('span.links-card-title-span');
-      articleTitle?.addEventListener('click', () => {
+      const articleTitle = article.querySelector<HTMLElement>('div.links-card-title-container');
+      if (articleTitle === null) return;
+
+      // The title-container acts as a collapse/expand toggle on mobile only
+      // (the chevron is hidden and the click handler short-circuits on
+      // desktop). To make it keyboard-reachable we expose it as a button
+      // in the tab order while in the mobile viewport, with a matching
+      // `aria-expanded` reflecting the `.closed` class on the article.
+      // On desktop we strip these attributes so the heading reads as a
+      // plain heading (no spurious button role).
+      const updateExpanded = (): void => {
+        articleTitle.setAttribute(
+          'aria-expanded',
+          String(!article.classList.contains('closed')),
+        );
+      };
+
+      const syncMobileAttrs = (): void => {
+        if (isDesktop.matches) {
+          articleTitle.removeAttribute('tabindex');
+          articleTitle.removeAttribute('role');
+          articleTitle.removeAttribute('aria-expanded');
+        } else {
+          articleTitle.setAttribute('tabindex', '0');
+          articleTitle.setAttribute('role', 'button');
+          updateExpanded();
+        }
+      };
+      syncMobileAttrs();
+      isDesktop.addEventListener('change', syncMobileAttrs);
+
+      const toggle = (): void => {
         if (isDesktop.matches) return;
         article.classList.toggle('closed');
+        updateExpanded();
+      };
+
+      articleTitle.addEventListener('click', toggle);
+      articleTitle.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        if (isDesktop.matches) return;
+        event.preventDefault();
+        toggle();
       });
     })
 };
