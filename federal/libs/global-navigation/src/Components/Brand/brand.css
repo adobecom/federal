@@ -47,6 +47,10 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   color: var(--s2a-color-gray-25);
 }
 
+.global-navigation.dark-font .feds-brand-image svg {
+  color: var(--s2a-color-gray-1000);
+}
+
 .feds-brand-image.desktop-brand {
   display: none;
 }
@@ -64,6 +68,12 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   width: 67px;
 }
 
+/* For transparent with dark-font */
+.global-navigation.dark-font .feds-brand-image {
+  & img:nth-child(1) { display: inherit; }
+  & img:nth-child(2) { display: none; }
+}
+
 /* For light background */
 .feds-brand-image {
   & img:nth-child(1) { display: inherit; }
@@ -77,6 +87,8 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
     & img:nth-child(2) { display: inherit; }
   }
 }
+
+
 
 /* same behavior for both "scrolled" and "popup open" states (considering for transparent-white/light background only)*/
 :is(.feds-header-scrolled, .global-navigation:has(.feds-popup.is-open:not(.small-menu))) {

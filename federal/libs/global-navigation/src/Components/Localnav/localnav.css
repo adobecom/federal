@@ -341,6 +341,10 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     background-color: var(--s2a-color-transparent-white-16);
   }
 
+   .global-navigation.dark-font.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
+    background-color: var(--s2a-color-transparent-black-16);
+   }
+
   .global-navigation.site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li:first-child + li::before,
   .global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li:first-child + li::before {
     background-color: var(--s2a-color-transparent-black-16);

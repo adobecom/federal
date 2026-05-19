@@ -224,6 +224,12 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   border-color: var(--s2a-color-gray-25);
 }
 
+.global-navigation.site-pivot.dark-font ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.site-pivot.dark-font .feds-product-entry-cta .feds-secondary-cta {
+   border-color: var(--s2a-color-gray-1000);
+   color: var(--s2a-color-gray-1000);
+}
+
 /* Scrolled (blurred whitish backdrop):
    - primary: filled dark pill with white text (inverse of default)
    - secondary: outlined in dark, transparent fill (matches popup secondary) */
@@ -421,6 +427,10 @@ header.global-navigation.feds-header-scrolled nav::after {
   text-decoration: none;
 }
 
+.global-navigation.dark-font .feds-link {
+  color: var(--s2a-color-gray-1000);
+}
+
 .feds-link:hover {
   text-decoration: underline;
 }
@@ -461,6 +471,10 @@ header.global-navigation.feds-header-scrolled nav::after {
   color: var(--s2a-color-gray-25);
 }
 
+.global-navigation.dark-font .feds-gnav-items > li > .feds-link:hover {
+  color: var(--s2a-color-gray-1000);
+}
+
 .global-navigation.feds-header-scrolled .feds-gnav-items > li > .feds-link:hover {
   color: var(--s2a-color-gray-1000);
 }
@@ -496,6 +510,11 @@ header.global-navigation.feds-header-scrolled nav::after {
   color: var(--s2a-color-gray-25);
 }
 
+.global-navigation.dark-font nav .feds-nav-toggle,
+.global-navigation.dark-font nav .feds-nav-toggle svg {
+  color: var(--s2a-color-gray-1000);
+}
+
 .global-navigation.feds-header-scrolled nav .feds-nav-toggle svg {
   color: var(--s2a-color-gray-1000);
 }
@@ -508,6 +527,12 @@ header.global-navigation.feds-header-scrolled nav::after {
 .global-navigation .unav-comp-external-notifications svg path,
 .global-navigation .unav-comp-cart svg {
   fill: var(--s2a-color-gray-25);
+}
+
+.global-navigation.dark-font .unav-comp-app-switcher.unav-comp-icon svg,
+.global-navigation.dark-font .unav-comp-external-notifications svg path,
+.global-navigation.dark-font .unav-comp-cart svg {
+  fill: var(--s2a-color-gray-1000);
 }
 
 .global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .unav-comp-app-switcher.unav-comp-icon svg,

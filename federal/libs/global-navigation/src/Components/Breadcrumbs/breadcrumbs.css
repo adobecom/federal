@@ -32,6 +32,10 @@
   border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
 }
 
+.global-navigation.site-pivot.dark-font .feds-breadcrumbs {
+  border-top-color: var(--s2a-color-transparent-black-08);
+}
+
 /* .global-navigation.site-pivot:has(.feds-popup.small-menu.is-open) .feds-breadcrumbs {
   border-top-color: var(--s2a-color-transparent-black-08);
 } */
@@ -54,6 +58,10 @@
      the backdrop turns light or gray. */
   color: var(--s2a-color-gray-25);
   text-decoration: none;
+}
+
+.global-navigation.site-pivot.dark-font .feds-breadcrumbs > li > a {
+  color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation.site-pivot .feds-breadcrumbs > li > a:hover {
