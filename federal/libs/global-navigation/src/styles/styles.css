@@ -129,7 +129,8 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   background-color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button {
+.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button,
+.global-navigation.dark-font .universal-nav-container .profile-signed-out button {
   color: inherit;
   border-color: var(--s2a-color-gray-1000);
   background-color: transparent;
