@@ -457,7 +457,7 @@ header.global-navigation.feds-header-scrolled nav::after {
   padding: var(--s2a-spacing-xs) 0;
 }
 
-.global-navigation.site-pivot:has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
+.global-navigation.site-pivot:not(.dark-font):has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
   color: var(--s2a-color-gray-25);
 }
 

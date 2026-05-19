@@ -99,6 +99,10 @@
   background-color: var(--s2a-color-transparent-white-16);
 }
 
+.global-navigation.site-pivot.dark-font .feds-breadcrumbs > li + li::before {
+  background-color: var(--s2a-color-transparent-black-16);
+}
+
 /* Scrolled OR any popup/drawer open → backdrop is light/gray, so
    flip the pipe to the black-alpha equivalent for visibility. */
 .global-navigation.site-pivot.feds-header-scrolled .feds-breadcrumbs > li + li::before,
