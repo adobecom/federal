@@ -305,6 +305,30 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     return true;
   }
 
+  // Arrow-key navigation across the open localnav bar's items. The bar
+  // lays its items out vertically on mobile, so Up/Down feel as natural
+  // as Left/Right. Cycles through all visible bar items (mega-menu
+  // triggers + CTAs), excluding the bar button itself. Scoped to
+  // localnav-mobile with the bar open and no subscreen popup open, so
+  // desktop's `handleTopBar` (horizontal-only) is preserved.
+  function handleBarArrows(
+    el: HTMLElement, key: string, event: KeyboardEvent,
+  ): boolean {
+    if (!ARROW_DELTA[key]) return false;
+    if (!isLocalnavMobile(gnav)) return false;
+    const wrap = menuWrapperEl(gnav);
+    if (!wrap || !isPopupOpen(wrap)) return false;
+    if (openPopup() !== null) return false;
+    const items = barItemStops(gnav);
+    if (items.length === 0) return false;
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+    focusAndPrevent(
+      items[wrapIndex(index, ARROW_DELTA[key], items.length)], event,
+    );
+    return true;
+  }
+
   // Trap Tab inside a bar-opened subscreen popup. Wraps focus within
   // the popup's focusables. Deliberately scoped to the bar flow so the
   // hamburger-opened first-mega-menu popup keeps its existing
@@ -458,6 +482,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     // intra-popup tab/panel navigation, which has its own Tab semantics.
     if (handlePopupTrap(el, event.key, event.shiftKey, event)) return;
     if (handleBarTrap(el, event.key, event.shiftKey, event)) return;
+    if (handleBarArrows(el, event.key, event)) return;
 
     const popup = openPopup();
     if (popup) {

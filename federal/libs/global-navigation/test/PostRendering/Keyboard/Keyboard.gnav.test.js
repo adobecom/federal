@@ -442,5 +442,113 @@ describe('Gnav keyboard init', () => {
       }));
       expect(document.activeElement).to.equal(bar);
     });
+
+    it('ArrowDown on a bar item moves focus to the next item', () => {
+      forceMobile();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      hideFirstTrigger(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      const wrap = gnav.querySelector('#feds-menu-wrapper');
+      wrap.classList.add(IS_OPEN_CLASS);
+      dispatchToggle(wrap, true);
+
+      gnav.querySelector('#t-a').focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowDown', bubbles: true,
+      }));
+      expect(document.activeElement).to.equal(gnav.querySelector('#t-b'));
+    });
+
+    it('ArrowUp on a bar item moves focus to the previous item', () => {
+      forceMobile();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      hideFirstTrigger(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      const wrap = gnav.querySelector('#feds-menu-wrapper');
+      wrap.classList.add(IS_OPEN_CLASS);
+      dispatchToggle(wrap, true);
+
+      gnav.querySelector('#t-b').focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowUp', bubbles: true,
+      }));
+      expect(document.activeElement).to.equal(gnav.querySelector('#t-a'));
+    });
+
+    it('ArrowDown on the last bar item wraps to the first item', () => {
+      forceMobile();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      hideFirstTrigger(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      const wrap = gnav.querySelector('#feds-menu-wrapper');
+      wrap.classList.add(IS_OPEN_CLASS);
+      dispatchToggle(wrap, true);
+
+      gnav.querySelector('#cta').focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowDown', bubbles: true,
+      }));
+      expect(document.activeElement).to.equal(gnav.querySelector('#t-a'));
+    });
+
+    it('ArrowUp on the first bar item wraps to the last item', () => {
+      forceMobile();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      hideFirstTrigger(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      const wrap = gnav.querySelector('#feds-menu-wrapper');
+      wrap.classList.add(IS_OPEN_CLASS);
+      dispatchToggle(wrap, true);
+
+      gnav.querySelector('#t-a').focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowUp', bubbles: true,
+      }));
+      expect(document.activeElement).to.equal(gnav.querySelector('#cta'));
+    });
+
+    it('ArrowDown also cycles to CTAs, not just feds-link items', () => {
+      forceMobile();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      hideFirstTrigger(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      const wrap = gnav.querySelector('#feds-menu-wrapper');
+      wrap.classList.add(IS_OPEN_CLASS);
+      dispatchToggle(wrap, true);
+
+      gnav.querySelector('#t-b').focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowDown', bubbles: true,
+      }));
+      expect(document.activeElement).to.equal(gnav.querySelector('#cta'));
+    });
+
+    it('ArrowDown does NOT engage on desktop (localnav bar arrows are mobile-only)', () => {
+      forceDesktop();
+      gnav = buildLocalnavGnav();
+      document.body.appendChild(gnav);
+      cleanup = initKeyboardNav(gnav);
+
+      // On desktop there is no menu-wrapper open state — handleTopBar
+      // owns horizontal arrows and ArrowDown should not move focus to
+      // CTAs (which aren't .feds-link).
+      const tb = gnav.querySelector('#t-b');
+      tb.focus();
+      gnav.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'ArrowDown', bubbles: true,
+      }));
+      // Focus unchanged.
+      expect(document.activeElement).to.equal(tb);
+    });
   });
 });
