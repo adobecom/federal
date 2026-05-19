@@ -121,6 +121,7 @@ mountpoint: HTMLElement
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
+  if (data.darkFont) mountpoint.classList.add('dark-font');
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
   ]

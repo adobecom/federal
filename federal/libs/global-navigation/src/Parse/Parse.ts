@@ -9,6 +9,7 @@ export type GlobalNavigationData = {
   components: Array<Component>;
   productCTA: ProductEntryCTA | null;
   localnav: boolean;
+  darkFont: boolean;
   errors: Array<RecoverableError>;
   unavEnabled: boolean;
   placeholders: Map<string, string>;
@@ -49,6 +50,7 @@ export const parseNavigation = (
   //           component.type === "MegaMenu" &&
   //           component.isSection).length === 1;
   const localnav = getMetadata('localnav') === 'true';
+  const darkFont = getMetadata('gnav-dark-font') === 'true';
 
   const errors = [
     breadcrumbErrors,
@@ -60,6 +62,7 @@ export const parseNavigation = (
     components,
     productCTA,
     localnav,
+    darkFont,
     errors,
     unavEnabled,
     placeholders,
