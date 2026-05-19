@@ -335,6 +335,7 @@ header.global-navigation nav::after {
 
 header.global-navigation.feds-header-scrolled nav::after {
   backdrop-filter: blur(var(--s2a-blur-sm));
+  box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
 }
 
 /* When breadcrumbs are present they sit absolutely below the nav row.
@@ -609,6 +610,17 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   align-items: center;
   justify-content: space-between;
   padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg);
+}
+
+.global-navigation:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup {
+  .feds-popup-header {
+     padding: var(--s2a-spacing-lg);
+  }
+
+  .feds-gnav-cards {
+    padding: 0 var(--s2a-spacing-lg);
+    margin-bottom: var(--s2a-spacing-xs);
+  }
 }
 
 .feds-popup .feds-popup-header-left {

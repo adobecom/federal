@@ -3,7 +3,7 @@
    ========================================= */
 
 .feds-popup .links-card {
-  border-radius: var(--s2a-border-radius-24);
+  border-radius: var(--s2a-border-radius-16);
   background: var(--s2a-color-gray-25);
   box-sizing: border-box;
   display: flex;
