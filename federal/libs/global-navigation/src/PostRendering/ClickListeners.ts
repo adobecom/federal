@@ -1,4 +1,4 @@
-import { getMetadata, isDesktop } from "../Utils/Utils";
+import { getMetadata, isDesktop, isNavDesktop } from "../Utils/Utils";
 import { IS_OPEN_CLASS, closePopup, triggersForPopupId } from "./PopupWiring";
 
 type CleanupFunction = () => void
@@ -62,7 +62,7 @@ export const initClickListeners = (
       button.setAttribute('aria-selected', 'true');
 
       if (!popup) return;
-      if (!isDesktop.matches) return;
+      if (!isNavDesktop()) return;
 
       const newHeight = popup?.clientHeight ?? 0;
       setPopoverBgHeight(gnav, `${newHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`);
@@ -70,7 +70,7 @@ export const initClickListeners = (
   );
 
   const tabButtonFocusCallbacks = tabButtons.map((button) => (): void => {
-    if (isDesktop.matches) return;
+    if (isNavDesktop()) return;
     if (!button.matches(':focus-visible')) return;
     const firstTabOffsetLeft = tabButtons[0]?.offsetLeft ?? 0;
     requestAnimationFrame(() => {
@@ -89,7 +89,7 @@ export const initClickListeners = (
   const tabList = gnav.querySelector<HTMLElement>('.tabs[role="tablist"]');
   const updateTablistOrientation = (): void => {
     if (!tabList) return;
-    if (isDesktop.matches) {
+    if (isNavDesktop()) {
       tabList.setAttribute('aria-orientation', 'vertical');
     } else {
       tabList.removeAttribute('aria-orientation');
@@ -146,7 +146,7 @@ const animations = (gnav: HTMLElement): void => {
   }
   const resizeObserver = new ResizeObserver(entries => {
     if (entries.length < 1) return;
-    const offset = isLocalNav && !isDesktop.matches
+    const offset = isLocalNav && !isNavDesktop()
                  ? POPOVER_BG_HEIGHT_OFFSET_PX + TOP_OFFSET
                  : POPOVER_BG_HEIGHT_OFFSET_PX;
     popupHeightObserverCallback(`.feds-popup.${IS_OPEN_CLASS}`, offset);
@@ -160,7 +160,7 @@ const animations = (gnav: HTMLElement): void => {
       const newState = (event as ToggleEvent).newState;
       if (newState !== 'open' && !gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`)) {
         // setPopoverBgHeight(gnav, '100%');
-        if (isDesktop.matches) return;
+        if (isNavDesktop()) return;
         // Bandaid for using escape for closing the popup in mobile
         fedsGnavItems?.classList.remove('subscreen-opening');
         fedsGnavItems?.classList.add('subscreen-closing');
@@ -168,7 +168,7 @@ const animations = (gnav: HTMLElement): void => {
         // in case the resize observer fails
         setPopoverBgHeight(gnav, `${popup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`);
         // On mobile (horizontal tabs), scroll active tab to the left edge
-        if (!isDesktop.matches) {
+        if (!isNavDesktop()) {
           const tabsList = popup.querySelector<HTMLElement>('.tabs');
           const activeTab = popup.querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
           const firstTab = tabsList?.querySelector<HTMLElement>('button[role="tab"]');
@@ -187,7 +187,7 @@ const animations = (gnav: HTMLElement): void => {
 
     const localnavResizeObserver = new ResizeObserver(entries => {
       if (entries.length < 1) return;
-      if (isDesktop.matches) return;
+      if (isNavDesktop()) return;
       popupHeightObserverCallback(
         `.feds-menu-wrapper.${IS_OPEN_CLASS} .feds-gnav-items`,
         POPOVER_BG_HEIGHT_OFFSET_PX + TOP_OFFSET
@@ -209,7 +209,7 @@ const animations = (gnav: HTMLElement): void => {
     const triggers = triggersForPopupId(gnav, popup.id);
     triggers.forEach(trigger => {
       trigger.addEventListener('click', () => {
-        if (isDesktop.matches) return;
+        if (isNavDesktop()) return;
         if (!fedsGnavItems) return;
         fedsGnavItems.classList.remove('subscreen-closing');
         fedsGnavItems.classList.add('subscreen-opening');
@@ -261,7 +261,7 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
       };
 
       const syncMobileAttrs = (): void => {
-        if (isDesktop.matches) {
+        if (isNavDesktop()) {
           articleTitle.removeAttribute('tabindex');
           articleTitle.removeAttribute('role');
           articleTitle.removeAttribute('aria-expanded');
@@ -275,7 +275,7 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
       isDesktop.addEventListener('change', syncMobileAttrs);
 
       const toggle = (): void => {
-        if (isDesktop.matches) return;
+        if (isNavDesktop()) return;
         article.classList.toggle('closed');
         updateExpanded();
       };
@@ -283,7 +283,7 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
       articleTitle.addEventListener('click', toggle);
       articleTitle.addEventListener('keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
-        if (isDesktop.matches) return;
+        if (isNavDesktop()) return;
         event.preventDefault();
         toggle();
       });

@@ -265,6 +265,7 @@ export const postRenderingTasks = async (
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
+  initCompactOverflow(input.mountpoint);
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -429,6 +430,44 @@ const initHeaderAnalytics = (
   const header = mountpoint.closest("header");
   if (header === null) return;
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
+};
+
+const initCompactOverflow = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (!header) return;
+
+  const brandWrapper = mountpoint.querySelector<HTMLElement>('.feds-brand-wrapper');
+  const gnavItems = mountpoint.querySelector<HTMLElement>('.feds-gnav-items');
+  const utilities = mountpoint.querySelector<HTMLElement>('.feds-utilities');
+  const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
+
+  const check = (): void => {
+    if (!isDesktop.matches) {
+      header.classList.remove('is-compact');
+      return;
+    }
+    // Temporarily strip is-compact so we measure the natural desktop widths,
+    // then restore via toggle at the end.
+    header.classList.remove('is-compact');
+
+    // Sum individual li widths inside gnav-items — these are not flex-grow so
+    // their offsetWidth reflects their true content width. Brand and utilities
+    // are fixed-size flex items so offsetWidth is correct for them too.
+    const brandWidth = brandWrapper?.offsetWidth ?? 0;
+    const itemsWidth = gnavItems
+      ? [...gnavItems.children].reduce((s, li) => s + (li as HTMLElement).offsetWidth, 0)
+      : 0;
+    const utilitiesWidth = utilities?.offsetWidth ?? 0;
+    const ctaWidth = productCta?.offsetWidth ?? 0;
+    const contentWidth = brandWidth + itemsWidth + utilitiesWidth + ctaWidth + 40;
+
+    header.classList.toggle('is-compact', contentWidth > header.clientWidth);
+  };
+
+  const observer = new ResizeObserver(check);
+  observer.observe(header);
+  isDesktop.addEventListener('change', check);
+  check();
 };
 
 

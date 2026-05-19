@@ -1,4 +1,4 @@
-import { isDesktop } from "../../Utils/Utils";
+import { isDesktop, isNavDesktop } from "../../Utils/Utils";
 import { IS_OPEN_CLASS, triggerForPopupId, closePopup, isPopupOpen } from "../PopupWiring";
 
 function $$(root: Element, selector: string): HTMLElement[] {
@@ -20,7 +20,7 @@ const isLocalnavMobile = (gnav: HTMLElement): boolean => {
   const hasLocalnav
     = gnav.querySelector('nav.localnav') !== null
     || gnav.matches('nav.localnav');
-  return hasLocalnav && !isDesktop.matches;
+  return hasLocalnav && !isNavDesktop();
 };
 
 const localnavBar = (gnav: HTMLElement): HTMLElement | null =>
@@ -191,7 +191,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
         return;
       }
       closePopup(popup);
-      if (!isDesktop.matches) {
+      if (!isNavDesktop()) {
         const gnavItems = popup.closest('.feds-gnav-items');
         gnavItems?.classList.remove('subscreen-opening');
         gnavItems?.classList.add('subscreen-closing');
@@ -229,7 +229,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
   // must always be tab-stops.
   const onBreakpointChange = (): void => {
     if (!gnavItemsList(gnav)) return;
-    if (isDesktop.matches) {
+    if (isNavDesktop()) {
       applyBarTabIndex(gnav, true);
       return;
     }
@@ -375,7 +375,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     if (index < 0) return false;
 
     /** 1->Next, -1->Previous, 0->No movement */
-    const tabArrowDelta: Record<string, 1 | -1 | 0> = isDesktop.matches
+    const tabArrowDelta: Record<string, 1 | -1 | 0> = isNavDesktop()
       ? { ArrowLeft: 0, ArrowRight: 0, ArrowUp: -1, ArrowDown: 1 }
       : { ArrowLeft: -1, ArrowRight: 1, ArrowUp: 0, ArrowDown: 0 };
 
@@ -383,7 +383,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
       const next = items[wrapIndex(index, tabArrowDelta[key], items.length)];
       if (next.matches('[role="tab"]')) {
         next.click();
-        if (!isDesktop.matches) {
+        if (!isNavDesktop()) {
           requestAnimationFrame(() => {
             const container = next.closest<HTMLElement>('.tabs');
             if (container !== null) {

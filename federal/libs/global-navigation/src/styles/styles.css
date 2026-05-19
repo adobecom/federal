@@ -426,6 +426,7 @@ header.global-navigation.feds-header-scrolled nav::after {
   color: var(--s2a-color-gray-25);
   opacity: 1;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .global-navigation.dark-font .feds-link {
@@ -1448,4 +1449,253 @@ ul[role="tabpanel"],
   & > li:nth-child(8) { animation-delay: 0.2s; }
   & > li:nth-child(9) { animation-delay: 0.225s; }
   & > li:nth-child(10) { animation-delay: 0.25s; }
+}
+
+/* =========================================
+   is-compact: mirrors @media (max-width: 1023px) mobile behaviour.
+   Applied by JS when nav items overflow the available space at desktop widths.
+   Must come AFTER all desktop @media (min-width: 1024px) blocks so these
+   rules win the cascade without needing !important.
+   ========================================= */
+
+/* ::after height rules (mirrors lines 372-382) */
+header.global-navigation.is-compact nav:has(.feds-popup.is-open)::after {
+  height: calc(100dvh + var(--s2a-spacing-xs));
+}
+header.global-navigation.is-compact nav:not(.localnav):has(.feds-menu-wrapper.is-open)::after {
+  height: calc(100dvh + var(--s2a-spacing-64));
+}
+header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+  height: var(--feds-popup-bg-height);
+}
+
+/* Show hamburger (overrides desktop display:none) */
+header.global-navigation.is-compact nav .feds-nav-toggle {
+  display: flex;
+}
+
+/* Nav links: mobile font & chevron style (mirrors lines 944-970) */
+header.global-navigation.is-compact .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+}
+
+header.global-navigation.is-compact .global-navigation.site-pivot .feds-gnav-items > li > .feds-link {
+  font-family: var(--feds-heading-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+}
+
+header.global-navigation.is-compact .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  order: 2;
+  margin-left: var(--s2a-spacing-xs);
+  flex-shrink: 0;
+  transform: rotate(-90deg) scale(2.5);
+}
+
+header.global-navigation.is-compact .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
+  stroke-width: 0.5;
+}
+
+/* Popup positioning (mirrors lines 972-981) */
+header.global-navigation.is-compact .feds-popup {
+  inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 0 0;
+}
+
+header.global-navigation.is-compact .feds-popup.is-open {
+  position: fixed;
+  z-index: 3;
+}
+
+/* Undo desktop-only popup styles */
+header.global-navigation.is-compact .feds-popup {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: transparent;
+  opacity: 1;
+  max-height: none;
+  clip-path: none;
+  transition: none;
+}
+
+header.global-navigation.is-compact .feds-popup .feds-popup-header {
+  display: flex;
+}
+
+/* Scroll lock (mirrors line 988-991) */
+body:has(header.global-navigation.is-compact .feds-popup.is-open),
+body:has(header.global-navigation.is-compact .feds-menu-wrapper.is-open) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* ::after border-radius (mirrors lines 993-999) */
+header.global-navigation.is-compact nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+  border-radius: 0;
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+  border-radius: 0 0 var(--s2a-border-radius-16) var(--s2a-border-radius-16);
+}
+
+/* Menu wrapper drawer (mirrors lines 1249-1297) */
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper {
+  position: fixed;
+  top: var(--s2a-spacing-64);
+  left: 0;
+  right: var(--s2a-spacing-20);
+  flex-direction: column;
+  height: calc(100dvh - var(--s2a-spacing-64));
+  border: 0;
+  width: 100%;
+  opacity: 0;
+  display: flex;
+  visibility: hidden;
+  color: var(--s2a-color-gray-1000);
+  background-color: transparent;
+  padding: 0;
+  /* undo desktop flex-grow / static positioning */
+  flex-grow: 0;
+  justify-content: flex-start;
+  translate: unset;
+  transition: unset;
+  outline: 0;
+  box-shadow: none;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.feds-menu-active {
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.is-open {
+  display: flex;
+  opacity: 1;
+  z-index: 2;
+  transition: opacity 0.4s ease, visibility 0s linear 0s;
+  visibility: visible;
+  align-items: flex-start;
+  padding: 0;
+  margin-top: 0;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items,
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.feds-menu-active .feds-gnav-items {
+  align-items: flex-start;
+  padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
+  width: calc(100% - var(--s2a-spacing-3xl));
+}
+
+/* Undo desktop gnav-items flex row */
+header.global-navigation.is-compact nav .feds-gnav-items {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.is-open {
+  & .feds-gnav-items > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
+  }
+  & .feds-gnav-items > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.18s; }
+  & .feds-gnav-items > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.24s; }
+  & .feds-gnav-items > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.30s; }
+  & .feds-gnav-items > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.36s; }
+  & .feds-gnav-items > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.42s; }
+  & .feds-gnav-items > li:nth-child(6) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.48s; }
+  & .feds-gnav-items > li:nth-child(7) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.54s; }
+  & .feds-gnav-items > li:nth-child(8) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.60s; }
+  & .feds-gnav-items > li:nth-child(9) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.66s; }
+  & .feds-gnav-items > li:nth-child(10) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.72s; }
+}
+
+/* Hamburger → X animation (mirrors lines 1322-1336) */
+header.global-navigation.is-compact .feds-nav-toggle path {
+  transform-origin: 7px 3.5px;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
+  height: 11px;
+}
+
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
+  transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
+}
+
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
+  transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
+}
+
+/* Subscreen slide-out / re-enter animations (mirrors lines 1342-1407) */
+header.global-navigation.is-compact > nav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+  &.subscreen-opening {
+    & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+      opacity: 1;
+      transform: translateX(0);
+      animation: main-menu-items-exit 0.5s cubic-bezier(0.42, 0, 0, 1) forwards;
+    }
+    & > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0s; }
+    & > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.025s; }
+    & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.05s; }
+    & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.075s; }
+    & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.1s; }
+  }
+  &.subscreen-closing {
+    & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+      opacity: 0;
+      transform: translateX(-18px);
+      animation: main-menu-items-re-enter 0.26s ease forwards 0.24s;
+    }
+    & > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.24s; }
+    & > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.27s; }
+    & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.30s; }
+    & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.33s; }
+    & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.36s; }
+  }
+}
+
+header.global-navigation.is-compact > nav:has(.feds-gnav-items.subscreen-opening) .feds-popup.is-open {
+  & > :not(.feds-breadcrumbs) {
+    opacity: 0;
+    animation: fade-in 0s linear 0.3s forwards;
+  }
+  & .feds-popup-header {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1) 0.3s;
+  }
+  & .tabs {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+    animation-delay: 0.36s;
+  }
+  & .feds-gnav-cards > li {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+  }
+  & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.36s; }
+  & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.42s; }
+}
+
+header.global-navigation.is-compact > nav:has(.feds-gnav-items.subscreen-closing) .feds-popup.is-open {
+  & .feds-popup-header {
+    opacity: 1;
+    transform: translateX(0px);
+    animation: sub-menu-items-exit 0.2s forwards ease;
+  }
+  & .tabs {
+    opacity: 1;
+    transform: translateX(0px);
+    animation: sub-menu-items-exit 0.2s forwards ease;
+  }
+  & .feds-gnav-cards > li {
+    opacity: 1;
+    transform: translateX(0px);
+    animation: sub-menu-items-exit 0.2s forwards ease;
+  }
+  & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.04s; }
+  & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.08s; }
 }
