@@ -225,6 +225,7 @@ export const renderGnavString = ({
               type="button"
               aria-controls="feds-menu-wrapper"
               aria-expanded="false"
+              daa-ll="localnav-bar|Open"
             ><span class="feds-localnav-bar-label">${localnavBarLabel}</span></button>
           ` : ''}
           <ul class="feds-gnav-items">
