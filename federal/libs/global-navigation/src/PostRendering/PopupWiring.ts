@@ -99,12 +99,15 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
       const open = isPopupOpen(popup);
       triggers.forEach(trigger => {
         const isHamburger = trigger.classList.contains('feds-nav-toggle');
+        const isLocalnavBar = trigger.classList.contains('feds-localnav-bar');
         trigger.setAttribute('aria-expanded', String(open));
         trigger.setAttribute(
           'daa-ll',
           isHamburger
             ? (open ? 'hamburgermenu|close' : 'hamburgermenu|open')
-            : (open ? 'header|Close' : 'header|Open'),
+            : isLocalnavBar
+              ? (open ? 'localnav-bar|Close' : 'localnav-bar|Open')
+              : (open ? 'header|Close' : 'header|Open'),
         );
       });
       if (isMenuWrapper && open) popup.classList.add('feds-menu-active');

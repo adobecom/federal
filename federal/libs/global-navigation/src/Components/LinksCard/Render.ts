@@ -10,7 +10,7 @@ export const linkscard = ({
 const renderCard = ({
   title,
   links,
-  footerCTA
+  footerCTA,
 }: LinksCardItem): HTML => `
   <article class="links-card" ${getAnalyticsAttrs(title, '')}>
     <div>
