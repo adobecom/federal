@@ -618,9 +618,8 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
      padding: var(--s2a-spacing-lg);
   }
 
-  .feds-gnav-cards {
-    padding: 0 var(--s2a-spacing-lg);
-    margin-bottom: var(--s2a-spacing-xs);
+  .links-card {
+    margin-bottom: 0;
   }
 }
 
@@ -1000,6 +999,16 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   .feds-popup .feds-product-card__subtitle {
     margin-top: var(--s2a-spacing-xs);
+  }
+
+  .global-navigation:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup {
+    .feds-gnav-cards {
+      padding: 0 var(--s2a-spacing-lg);
+      margin-bottom: 0;
+    }
+    .links-card {
+      margin-bottom: var(--s2a-spacing-sm);
+    }
   }
 }
 
