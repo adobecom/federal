@@ -159,7 +159,6 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   display: flex;
   align-items: center;
   margin-left: auto;
-  padding-right: var(--s2a-spacing-md);
   @media (max-width: 1024px) {
     display: none;
   }
@@ -168,8 +167,6 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
 [dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta {
   margin-left: 0;
   margin-right: auto;
-  padding-right: 0;
-  padding-left: var(--s2a-spacing-md);
 }
 
 [dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
