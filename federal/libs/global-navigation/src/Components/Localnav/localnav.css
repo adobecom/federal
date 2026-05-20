@@ -149,7 +149,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     width: 100%;
     box-sizing: border-box;
     height: var(--feds-breadcrumbs-height);
-    padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
+    padding: var(--s2a-spacing-md);
     background: transparent;
     border: 0;
     border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
@@ -228,7 +228,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
   .global-navigation nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items,
   .global-navigation nav.localnav > ul > li.feds-menu-wrapper.feds-menu-active > ul.feds-gnav-items {
     overflow-y: auto;
-    padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
+    padding: var(--s2a-spacing-xs) var(--s2a-spacing-md) var(--s2a-spacing-sm);
   }
 
   .global-navigation nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items {
