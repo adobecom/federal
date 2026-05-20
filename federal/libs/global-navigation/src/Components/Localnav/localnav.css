@@ -65,7 +65,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     background-color: #3b63fb;
     color: var(--s2a-color-button-content-primary-solid-default);
     border: none;
-    margin: var(--s2a-spacing-xs) 0;
+    margin-top: var(--s2a-spacing-lg);
     &:hover {
       background-color: #3b63fb;
       color: var(--s2a-color-button-content-primary-solid-default);
