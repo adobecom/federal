@@ -256,6 +256,10 @@ export const postRenderingTasks = async (
   else
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
+  const activeLink = findActiveLink(input.mountpoint);
+  console.log(activeLink);
+  const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
+  activeDropDown?.classList.add('active-element');
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -431,4 +435,13 @@ const initHeaderAnalytics = (
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
 
+const findActiveLink = (
+  mountpoint: HTMLElement
+): HTMLAnchorElement | null => {
+  const url = `${window.location.origin}${window.location.pathname}`;
+  return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
+    .find(a => a.href === url
+            || a.href.startsWith(`${url}?`)
+            || a.href.startsWith(`${url}#`)) ?? null;
+};
 

@@ -845,7 +845,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     flex-direction: row;
     flex-grow: 1;
     width: auto;
-    height: unset;
+    height: inherit;
     border: 0;
     outline: 0;
     box-shadow: none;
@@ -872,6 +872,12 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     padding-left: 0;
     margin: 0;
     display: flex;
+    height: inherit;
+    & > li {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
   }
 
   .global-navigation.site-pivot .feds-gnav-items > li > .feds-link {
@@ -929,6 +935,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     line-height: var(--s2a-typography-line-height-eyebrow);
     letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
     font-family: var(--feds-font-family);
+  }
+
+  header.global-navigation nav.localnav ul.feds-gnav-items > li.active-element {
+    border-bottom: 2px black solid;
   }
 }
 
