@@ -257,7 +257,6 @@ export const postRenderingTasks = async (
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
   const activeLink = findActiveLink(input.mountpoint);
-  console.log(activeLink);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
   activeDropDown?.classList.add('active-element');
   initClickListeners(input.mountpoint);

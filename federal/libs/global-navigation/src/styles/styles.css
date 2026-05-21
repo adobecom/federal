@@ -938,7 +938,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   header.global-navigation nav.localnav ul.feds-gnav-items > li.active-element {
-    border-bottom: 2px black solid;
+    border-bottom: 2px var(--s2a-color-gray-25) solid;
+  }
+  header.global-navigation.feds-header-scrolled nav.localnav ul.feds-gnav-items > li.active-element {
+    border-bottom: 2px var(--s2a-color-gray-1000) solid;
   }
 }
 
