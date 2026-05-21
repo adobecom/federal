@@ -426,6 +426,14 @@ header.global-navigation.feds-header-scrolled nav::after {
   text-decoration: none;
 }
 
+ul.feds-gnav-items {
+  display: flex;
+  gap: var(--s2a-spacing-lg);
+  & > li > .feds-link {
+    padding: 0;
+  }
+}
+
 .global-navigation.dark-font .feds-link {
   color: var(--s2a-color-gray-1000);
 }

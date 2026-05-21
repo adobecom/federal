@@ -206,9 +206,13 @@ export const renderGnavString = ({
 
       const brandHTML = brandComponent ? component(brandComponent) : "";
 
-      const menuItemsHTML = menuComponents
-        .map((c, index) => `<li>${component(c, index)}</li>`)
-        .join('');
+      const menuItemsHTMLList = ((): HTML[] => {
+        const lis = menuComponents
+                       .map((c, index) => `<li>${component(c, index)}</li>`);
+        const [first, ...rest] = lis;
+        return localnav ? [first, '<li class="divider"></li>', ...rest] : lis;
+      })();
+      const menuItemsHTML = menuItemsHTMLList.join('');
 
       return `
         <li class="feds-brand-wrapper">
@@ -368,7 +372,10 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     }
   };
 
-  const updateHeaderState = (scrolledPast: boolean, fromToggle: boolean = false): void => {
+  const updateHeaderState = (
+    scrolledPast: boolean,
+    fromToggle: boolean = false
+  ): void => {
     cancelPendingAdd();
     if (isMenuOpen() || !scrolledPast) {
       header.classList.remove("feds-header-scrolled");
@@ -439,6 +446,7 @@ const findActiveLink = (
 ): HTMLAnchorElement | null => {
   const url = `${window.location.origin}${window.location.pathname}`;
   return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
+    .filter(a => !a.closest('.feds-breadcrumbs'))
     .find(a => a.href === url
             || a.href.startsWith(`${url}?`)
             || a.href.startsWith(`${url}#`)) ?? null;
