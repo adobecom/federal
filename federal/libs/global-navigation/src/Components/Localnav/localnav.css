@@ -489,43 +489,44 @@ header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs 
    =========================================
    On desktop, when the nav is a localnav, draw the same vertical pipe
    separator that the breadcrumbs use between adjacent crumbs — but only
-   between the FIRST and SECOND <li> of .feds-gnav-items, nowhere else.
-   The pseudo lives on the second li (via `:first-child + li::before`) so
-   it's drawn exactly once, in the gap between the first two items. Matches
-   the breadcrumb pipe pixel-exactly (1×15px filled box, spacing-sm gutters
-   on each side) and follows the same default/dark-palette state split:
-   white-alpha on the translucent-dark default backdrop, black-alpha when
-   the header is scrolled or a menu/popup is open and the backdrop turns
-   light/gray. See Components/Breadcrumbs/breadcrumbs.css for the source
-   separator the styling mirrors. */
+   on <li> elements explicitly tagged with the `.divider` class in
+   .feds-gnav-items. Authoring opts in per-item rather than relying on
+   structural position, so dividers can appear wherever they're needed
+   (and never where they aren't). The pseudo lives on the tagged li (via
+   `li.divider::before`) and is drawn once per such item. Matches the
+   breadcrumb pipe pixel-exactly (1×15px filled box) and follows the same
+   default/dark-palette state split: white-alpha on the translucent-dark
+   default backdrop, black-alpha when the header is scrolled or a
+   menu/popup is open and the backdrop turns light/gray. See
+   Components/Breadcrumbs/breadcrumbs.css for the source separator the
+   styling mirrors. */
 @media (min-width: 1024px) {
-  /* Make the second li lay out its own children inline-centered (matches the
+  /* Make the tagged li lay out its own children inline-centered (matches the
      breadcrumb pattern at Components/Breadcrumbs/breadcrumbs.css:35-40), so
      the ::before pipe and the .feds-link sit on the same baseline rather
      than stacking as block-level boxes. */
-  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li,
-  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li:first-child + li {
+  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li.divider,
+  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li.divider {
     display: inline-flex;
     align-items: center;
   }
 
-  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before,
-  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
+  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li.divider::before,
+  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li.divider::before {
     content: '';
     display: inline-block;
     width: 1px;
     height: 15px;
-    margin-inline: var(--s2a-spacing-sm);
     background-color: var(--s2a-color-transparent-white-16);
   }
 
-  header.global-navigation:not(.is-compact) .global-navigation.dark-font.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before,
-  header.global-navigation:not(.is-compact).dark-font.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
+  header.global-navigation:not(.is-compact) .global-navigation.dark-font.site-pivot nav.localnav .feds-gnav-items > li.divider::before,
+  header.global-navigation:not(.is-compact).dark-font.site-pivot nav.localnav .feds-gnav-items > li.divider::before {
     background-color: var(--s2a-color-transparent-black-16);
   }
 
-  header.global-navigation:not(.is-compact).site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li:first-child + li::before,
-  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li:first-child + li::before {
+  header.global-navigation:not(.is-compact).site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li.divider::before,
+  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li.divider::before {
     background-color: var(--s2a-color-transparent-black-16);
   }
 }
