@@ -428,7 +428,7 @@ header.global-navigation.feds-header-scrolled nav::after {
 }
 
 @media (min-width: 1024px) {
-  header.global-navigation.site-pivot ul.feds-gnav-items {
+  header.global-navigation.site-pivot:not(.is-compact) ul.feds-gnav-items {
     display: flex;
     gap: var(--s2a-spacing-lg);
     & > li > .feds-link {
@@ -950,13 +950,13 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     font-family: var(--feds-font-family);
   }
 
-  header.global-navigation nav.localnav ul.feds-gnav-items > li.active-element {
+  header.global-navigation:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
     border-bottom: 2px var(--s2a-color-gray-25) solid;
   }
-  header.global-navigation.feds-header-scrolled nav.localnav ul.feds-gnav-items > li.active-element {
+  header.global-navigation.feds-header-scrolled:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
     border-bottom: 2px var(--s2a-color-gray-1000) solid;
   }
-  header.global-navigation.dark-font nav.localnav ul.feds-gnav-items > li.active-element {
+  header.global-navigation.dark-font:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
     border-bottom: 2px var(--s2a-color-gray-1000) solid;
   }
 }
