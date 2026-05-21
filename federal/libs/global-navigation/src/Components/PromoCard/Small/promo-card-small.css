@@ -94,13 +94,13 @@
    ========================================= */
 
 @media (min-width: 1024px) {
-  .feds-gnav-cards .promo-card-small {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card-small {
     height: 100%;
     min-height: 420px;
     border-radius: var(--s2a-border-radius-md);
   }
 
-  .feds-gnav-cards .promo-card-small__bg-image {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card-small__bg-image {
     border-radius: var(--s2a-border-radius-md);
   }
 }
@@ -110,12 +110,12 @@
    ========================================= */
 
 @media (min-width: 1280px) {
-  .feds-gnav-cards .promo-card-small {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card-small {
     min-height: auto;
     border-radius: var(--s2a-border-radius-12);
   }
 
-  .feds-gnav-cards .promo-card-small__bg-image {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card-small__bg-image {
     border-radius: var(--s2a-border-radius-12);
   }
 }

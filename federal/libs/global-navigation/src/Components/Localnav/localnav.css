@@ -315,6 +315,176 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
 }
 
 /* =========================================
+   is-compact: mirrors @media (max-width: 1023px) localnav mobile behaviour
+   ========================================= */
+
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li:first-child > .feds-link {
+  display: none;
+}
+
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
+  margin: 0;
+}
+
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta {
+  background-color: #3b63fb;
+  color: var(--s2a-color-button-content-primary-solid-default);
+  border: none;
+  margin-top: var(--s2a-spacing-lg);
+  &:hover {
+    background-color: #3b63fb;
+    color: var(--s2a-color-button-content-primary-solid-default);
+    border: none;
+  }
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {
+  opacity: 1;
+  visibility: visible;
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: auto;
+  width: 100%;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  color: inherit;
+  z-index: 2;
+  /* undo off-canvas drawer styles */
+  flex-grow: 0;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+header.global-navigation.is-compact:has(nav.localnav) {
+  transition: top 0.3s ease;
+}
+
+header.global-navigation.is-compact:has(nav.localnav > ul > li.feds-menu-wrapper.is-open) {
+  top: calc(0px - var(--s2a-spacing-64));
+}
+
+header.global-navigation.is-compact nav.localnav .feds-localnav-bar {
+  display: flex;
+  position: relative;
+  overflow: visible;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  height: var(--feds-breadcrumbs-height);
+  padding: var(--s2a-spacing-md);
+  background: transparent;
+  border: 0;
+  border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
+  color: var(--s2a-color-gray-25);
+  cursor: pointer;
+  font-family: var(--feds-font-family);
+  font-weight: 700;
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  text-align: left;
+}
+
+header.global-navigation.is-compact.dark-font nav.localnav .feds-localnav-bar {
+  color: var(--s2a-color-gray-1000);
+  border-top-color: var(--s2a-color-transparent-black-08);
+}
+
+header.global-navigation.is-compact.feds-header-scrolled nav.localnav .feds-localnav-bar,
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
+  border-top-color: rgba(0, 0, 0, 0.12);
+  color: var(--s2a-color-content-default);
+}
+
+header.global-navigation.is-compact nav.localnav .feds-localnav-bar::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.3s ease;
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open .feds-localnav-bar::after {
+  transform: translateY(2px) rotate(225deg);
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open .feds-localnav-bar::before {
+  content: '';
+  position: absolute;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  bottom: 0;
+  border-bottom: var(--s2a-border-width-sm) solid rgba(0, 0, 0, 0.12);
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;
+  transition: max-height 0.3s ease;
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items,
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.feds-menu-active > ul.feds-gnav-items {
+  overflow-y: auto;
+  padding: var(--s2a-spacing-xs) var(--s2a-spacing-md) var(--s2a-spacing-sm);
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items {
+  max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-breadcrumbs-height));
+  transition: max-height 0.4s ease;
+}
+
+header.global-navigation.is-compact nav.localnav .feds-gnav-items.subscreen-opening > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+  animation-delay: 0s !important;
+}
+
+header.global-navigation.is-compact nav.localnav .feds-gnav-items.subscreen-closing > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+  animation-delay: 0.24s !important;
+}
+
+header.global-navigation.is-compact nav.localnav .feds-popup {
+  top: calc(var(--feds-breadcrumbs-height) - 1px);
+  max-height: calc(100dvh - var(--feds-breadcrumbs-height));
+  height: fit-content;
+  overflow-x: hidden;
+}
+
+header.global-navigation.is-compact nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup {
+  top: var(--s2a-spacing-64);
+  max-height: calc(100dvh - var(--s2a-spacing-64));
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-popup.is-open):not(:has(.feds-menu-wrapper.is-open)) .feds-localnav-bar {
+  display: none;
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-popup.is-open):not(:has(.feds-menu-wrapper.is-open)) .feds-popup.is-open > ul.feds-breadcrumbs {
+  border-top: 0;
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup.is-open > ul.feds-breadcrumbs {
+  display: none;
+}
+
+header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs {
+  display: none;
+}
+
+/* =========================================
    Desktop (>= 1024px) — separator between first and second gnav item
    =========================================
    On desktop, when the nav is a localnav, draw the same vertical pipe
@@ -333,12 +503,14 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
      breadcrumb pattern at Components/Breadcrumbs/breadcrumbs.css:35-40), so
      the ::before pipe and the .feds-link sit on the same baseline rather
      than stacking as block-level boxes. */
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li {
+  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li,
+  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li:first-child + li {
     display: inline-flex;
     align-items: center;
   }
 
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
+  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before,
+  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
     content: '';
     display: inline-block;
     width: 1px;
@@ -347,12 +519,13 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     background-color: var(--s2a-color-transparent-white-16);
   }
 
-   .global-navigation.dark-font.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
+  header.global-navigation:not(.is-compact) .global-navigation.dark-font.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before,
+  header.global-navigation:not(.is-compact).dark-font.site-pivot nav.localnav .feds-gnav-items > li:first-child + li::before {
     background-color: var(--s2a-color-transparent-black-16);
-   }
+  }
 
-  .global-navigation.site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li:first-child + li::before,
-  .global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li:first-child + li::before {
+  header.global-navigation:not(.is-compact).site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li:first-child + li::before,
+  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li:first-child + li::before {
     background-color: var(--s2a-color-transparent-black-16);
   }
 }
@@ -373,3 +546,4 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     text-align: center;
   }
 }
+

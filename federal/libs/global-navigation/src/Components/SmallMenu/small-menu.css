@@ -4,12 +4,12 @@
 
 @media (min-width: 1024px) {
   /* Anchor the li so top:100% works */
-  .feds-gnav-items > li:has(.feds-popup.small-menu) {
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li:has(.feds-popup.small-menu) {
     position: relative;
   }
 
   /* Popup overrides — position as a dropdown below the trigger */
-  .feds-popup.small-menu {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu {
     position: absolute;
     inset: auto;
     top: 100%;
@@ -27,13 +27,13 @@
     }
   }
 
-  .feds-popup.small-menu.is-open {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open {
     border-radius: var(--s2a-spacing-xs);
     overflow-y: hidden;
   }
 
   /* Gnav cards layout */
-  .feds-popup.small-menu .feds-gnav-cards {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards {
     display: flex;
     flex-direction: column;
     gap: var(--s2a-spacing-xs);
@@ -43,47 +43,47 @@
     border-color: var(--s2a-color-transparent-black-12);
   }
 
-  .feds-popup.small-menu .feds-gnav-cards > li {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards > li {
     width: auto;
     flex: none;
   }
 
-  .feds-popup.small-menu .feds-gnav-cards > li:has(> :nth-child(2)) {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards > li:has(> :nth-child(2)) {
     flex-direction: column;
   }
 
-  .feds-popup.small-menu .links-card-title {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-title {
     display: none;
   }
 
-  .feds-popup.small-menu .links-card-links {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links {
     display: flex;
     flex-direction: column;
     gap: 0;
   }
 
-  .feds-popup.small-menu .links-card-links li {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links li {
     display: flex;
     height: 34px;
     align-items: center;
     padding: var(--s2a-spacing-xs, 8px) 0;
   }
 
-  .feds-popup.small-menu .links-card-links .feds-link {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links .feds-link {
     color: var(--s2a-color-content-body-strong, #131313);
     white-space: nowrap;
     text-decoration: none;
   }
 
-  .feds-popup.small-menu .links-card-links .feds-link:hover {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links .feds-link:hover {
     text-decoration: underline;
   }
 
-.feds-popup.small-menu .links-card-footer {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-footer {
     margin-top: 0;
   }
 
-  .feds-popup.small-menu .links-card-footer .feds-secondary-cta {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-footer .feds-secondary-cta {
     font-family: var(--s2a-font-family-label, 'Adobe_Clean', sans-serif);
     font-size: var(--s2a-typography-font-size-body-sm, 14px);
     font-weight: var(--s2a-font-weight-adobe-clean-black, 700);
@@ -102,32 +102,28 @@
     text-decoration: none;
   }
 
-  .feds-popup.small-menu .links-card-footer .feds-secondary-cta:hover {
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-footer .feds-secondary-cta:hover {
     text-decoration: underline;
     background: none;
     color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
   }
 
   /* When only a small menu is open: suppress backdrop, nav::after expansion */
-  header.global-navigation nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu))) .feds-backdrop {
+  header.global-navigation:not(.is-compact) nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu))) .feds-backdrop {
     display: none;
   }
 
-  /* header.global-navigation nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu))) {
-    inset: 0;
-  } */
-
-  header.global-navigation nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+  header.global-navigation:not(.is-compact) nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
     height: 64px;
     border-radius: 0 0 0 0;
     top: 0;
   }
 
-  header.global-navigation nav:has(.small-menu.is-open):has(.feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+  header.global-navigation:not(.is-compact) nav:has(.small-menu.is-open):has(.feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
     height: var(--feds-popup-bg-height);
   }
 
-  header.global-navigation.feds-header-scrolled nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+  header.global-navigation:not(.is-compact).feds-header-scrolled nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
     width: 100%;
     left: 0;
     top: 0;

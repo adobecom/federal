@@ -145,3 +145,17 @@
     }
   }
 }
+
+/* =========================================
+   is-compact: mirrors @media (max-width: 1023px) mobile behaviour
+   ========================================= */
+
+header.global-navigation.is-compact.site-pivot nav:has(.feds-menu-wrapper.is-open) > .feds-breadcrumbs {
+  display: none;
+}
+
+header.global-navigation.is-compact.site-pivot nav .feds-popup.is-open:not(.small-menu) > ul.feds-breadcrumbs {
+  display: flex;
+  position: static;
+  padding: 0 var(--s2a-spacing-lg);
+}
