@@ -6,7 +6,6 @@ type CleanupFunction = () => void
 /** Height in px added to the popover background pseudo-element
  *  to cover the nav bar */
 const POPOVER_BG_HEIGHT_OFFSET_PX = 72;
-const BREADCRUMBS_HEIGHT = 48;
 const TOP_OFFSET = 64; // extra offset because when the localnav opens
                        // the whole nav slides up to hide the main nav
 
@@ -124,13 +123,13 @@ const animations = (gnav: HTMLElement): void => {
     offset: number = 0
   ): void => {
     const openPopup = gnav.querySelector(popupSelector);
-    const fedsMenuWrapper = gnav.querySelector('.feds-menu-wrapper.is-open');
-    const openLocalnav = isLocalNav && !!fedsMenuWrapper;
+    const localnav = gnav.querySelector('.feds-menu-wrapper.is-open .feds-gnav-items');
+    const openLocalnav = isLocalNav && !!localnav;
     if (openLocalnav && !openPopup) {
-      const resetPopoverHeight = fedsMenuWrapper.clientHeight < 1;
+      const resetPopoverHeight = localnav.clientHeight < 1;
       const height = resetPopoverHeight
         ? '100%'
-        : `${fedsMenuWrapper.clientHeight + offset}px`;
+        : `${localnav.clientHeight + offset}px`;
       setPopoverBgHeight(gnav, height);
       return;
     }
