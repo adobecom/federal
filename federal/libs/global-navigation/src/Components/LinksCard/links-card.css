@@ -145,6 +145,13 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   margin-top: var(--s2a-spacing-sm);
 }
 
+.feds-popup .links-card .links-card-footer .feds-secondary-cta {
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0);
+    justify-content: center;
+    width: 100%;
+}
+
 /* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */

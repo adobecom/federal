@@ -256,26 +256,26 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
 
 /* Hover. In the non-scrolled state the resting color of the secondary CTA
    is white (over a transparent gnav), so on hover we darken the text as
-   well so it remains legible against the gray-75 hover fill. The primary
-   CTA already resolves to dark text on hover in both states. */
+   well so it remains legible against the hover fill. The primary
+   CTA already resolves to white text on hover in both states. */
 .global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta:hover,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta:hover {
-  background-color: var(--s2a-color-gray-75);
+  background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
   color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta:hover,
 .global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta:hover {
-  background-color: var(--s2a-color-gray-75);
-  color: var(--s2a-color-gray-1000);
-  border-color: var(--s2a-color-gray-75);
+  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
 }
 
 .global-navigation.site-pivot.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
 .global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
-  background-color: var(--s2a-color-gray-75);
-  color: var(--s2a-color-gray-1000);
-  border-color: var(--s2a-color-gray-75);
+  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
 }
 
 .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
@@ -811,12 +811,15 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   color: var(--s2a-color-gray-25);
   text-decoration: none;
   background-color: rgba(59, 99, 251, 1);
+}
 
-  /* &:hover {
-    background: var(--s2a-color-gray-75);
-    color: var(--s2a-color-gray-25);
-    border-color: var(--s2a-color-gray-75);
-  } */
+.feds-popup .feds-primary-cta {
+  &:hover {
+    background-color: var(--s2a-color-button-background-accent-solid-on-light-hover, #274dea);
+  }
+  &:active {
+    background-color: var(--s2a-color-button-background-accent-solid-on-light-active, #1e3bb8);
+  }
 }
 
 /* =========================================
@@ -840,7 +843,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 }
 
 .feds-popup .feds-secondary-cta:hover {
-  background: var(--s2a-color-gray-75);
+  background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
 }
 
 /* =========================================
