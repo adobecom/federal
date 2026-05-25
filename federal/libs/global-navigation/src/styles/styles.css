@@ -1133,6 +1133,12 @@ header.global-navigation nav:has(.feds-menu-wrapper.is-open) .feds-backdrop {
     box-sizing: border-box;
     width: 100%;
   }
+
+  .feds-popup .feds-popup-back-button .feds-popup-title {
+    font-size: var(--s2a-typography-font-size-heading-2);
+    line-height: var(--s2a-typography-line-height-heading-2);
+    letter-spacing: var(--s2a-typography-letter-spacing-heading-2);
+  }
 }
 
 /* is-compact equivalent of @media (max-width: 768px) primary CTA width */
