@@ -110,7 +110,7 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
               : (open ? 'header|Close' : 'header|Open'),
         );
       });
-      if (isMenuWrapper && open) popup.classList.add('feds-menu-active');
+      popup.classList.toggle('feds-menu-active');
     });
 
     if (isMenuWrapper) {
