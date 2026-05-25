@@ -436,7 +436,8 @@ header.global-navigation.feds-header-scrolled nav::after {
       padding: 0;
     }
   }
-  header.global-navigation.site-pivot:has(.feds-popup.is-open):not(.is-compact) ul.feds-gnav-items > li .feds-link {
+
+  header.global-navigation.site-pivot:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li .feds-link {
     padding: 0;
   }
 }
@@ -662,9 +663,9 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 }
 
 .feds-popup .feds-popup-back-button .feds-popup-title {
-  font-size: var(--s2a-typography-font-size-heading-2);
-  line-height: var(--s2a-typography-line-height-heading-2);
-  letter-spacing: var(--s2a-typography-letter-spacing-heading-2);
+  font-size: var(--s2a-typography-font-size-heading-3);
+  line-height: var(--s2a-typography-line-height-heading-3);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-3);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-family: var(--feds-heading-font-family);
   color: var(--s2a-color-content-default);

@@ -70,12 +70,6 @@
     padding: var(--s2a-spacing-xs, 8px) 0;
   }
 
-  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links .feds-link {
-    color: var(--s2a-color-content-body-strong, #131313);
-    white-space: nowrap;
-    text-decoration: none;
-  }
-
   header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links .feds-link:hover {
     text-decoration: underline;
   }

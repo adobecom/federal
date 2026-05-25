@@ -122,6 +122,7 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   line-height: var(--s2a-typography-line-height-body-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-regular);
   letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  white-space: break-spaces;
 }
 
 .feds-popup .links-card .links-card-links .feds-link--highlight {
