@@ -17,6 +17,7 @@
 @import "../../consonant/dist/packages/tokens/css/dev/tokens.primitives.css";
 @import "../../consonant/dist/packages/tokens/css/dev/tokens.semantic.css";
 @import "../../consonant/dist/packages/tokens/css/dev/tokens.semantic.light.css";
+@import "../../consonant/dist/packages/tokens/css/min/tokens.min.css";
 
 /* Component styles */
 @import "../Components/Brand/brand.css";
