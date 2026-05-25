@@ -263,6 +263,7 @@ export const postRenderingTasks = async (
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
   activeDropDown?.classList.add('active-element');
+  initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -478,14 +479,61 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   check();
 };
 
+const isCurrentPageHref = (href: string): boolean => {
+  const url = `${window.location.origin}${window.location.pathname}`;
+  return href === url
+      || href.startsWith(`${url}?`)
+      || href.startsWith(`${url}#`);
+};
+
 const findActiveLink = (
   mountpoint: HTMLElement
 ): HTMLAnchorElement | null => {
-  const url = `${window.location.origin}${window.location.pathname}`;
   return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
     .filter(a => !a.closest('.feds-breadcrumbs'))
-    .find(a => a.href === url
-            || a.href.startsWith(`${url}?`)
-            || a.href.startsWith(`${url}#`)) ?? null;
+    .find(a => isCurrentPageHref(a.href)) ?? null;
+};
+
+/**
+ * In localnav mode, clicking a TOP-LEVEL localnav link whose href points to
+ * the current page (the very same URL, with optional ?query) is redundant —
+ * the page is already loaded. Instead of triggering a no-op navigation, we
+ * suppress the default and close the localnav so the user sees the page
+ * they're already on. Scope is strictly limited to
+ * `nav.localnav ul.feds-gnav-items > li > a`; nested links (mega-menu
+ * popups, links-card, CTAs, breadcrumbs, etc.) are left untouched and
+ * continue to navigate normally. Hash-only same-page links also navigate
+ * normally (so in-page anchor jumps still work) while still closing the
+ * localnav.
+ */
+const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => {
+  const localnav = mountpoint.querySelector('nav.localnav');
+  if (localnav === null) return;
+  const topLevelAnchors = localnav.querySelectorAll<HTMLAnchorElement>(
+    'ul.feds-gnav-items > li > a'
+  );
+  topLevelAnchors.forEach(anchor => {
+    if (!isCurrentPageHref(anchor.href)) return;
+    anchor.addEventListener('click', (event) => {
+      // Defensive: ensure DOM still matches the structural contract at
+      // click-time (guards against late mutations broadening scope).
+      const target = event.currentTarget as HTMLAnchorElement;
+      if (!target.matches('ul.feds-gnav-items > li > a')) return;
+      if (target.closest('nav')?.classList.contains('localnav') !== true) return;
+
+      const href = target.href;
+      const url = `${window.location.origin}${window.location.pathname}`;
+      const isHashOnly = href.startsWith(`${url}#`);
+      if (!isHashOnly) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      closePopovers(mountpoint);
+      const focusTarget
+        = mountpoint.querySelector<HTMLElement>('.feds-localnav-bar')
+        ?? mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
+      focusTarget?.focus();
+    });
+  });
 };
 
