@@ -546,7 +546,7 @@ header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs 
    full container width. From 768-1315px they keep their default
    content-sized width (see the .feds-primary-cta / .feds-secondary-cta
    rules in the mobile block above). */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
   .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
     width: 100%;
