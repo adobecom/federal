@@ -275,7 +275,21 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
 
       const toggle = (): void => {
         if (isNavDesktop()) return;
+        const wasClosed = article.classList.contains('closed');
         article.classList.toggle('closed');
+        if (wasClosed) {
+          // Card is being opened. Add a transient `.opening` class so the
+          // CSS keyframe animations on the list items + footer (a staggered
+          // slide-in mirroring the subscreen entrance) only fire when the
+          // user explicitly expands a previously-collapsed card, never on
+          // initial render. Cleared after the longest delay + duration so
+          // the animation runs to its `forwards` resting state and the
+          // class doesn't accumulate between toggles.
+          article.classList.add('opening');
+          window.setTimeout(() => {
+            article.classList.remove('opening');
+          }, 900);
+        }
         updateExpanded();
       };
 

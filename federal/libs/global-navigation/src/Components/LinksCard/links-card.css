@@ -45,6 +45,7 @@
   width: 16px;
   height: 16px;
   transform: rotate(180deg);
+  transition: transform 0.3s ease;
 }
 
 .feds-popup .links-card .links-card-chevron svg path {
@@ -55,10 +56,49 @@
   transform: rotate(0deg);
 }
 
+/* =========================================
+   Mobile open/close animation
+   The collapsible content (links list + footer) animates its max-height
+   between 0 and a value large enough to accommodate any realistic card.
+   When `.opening` is briefly set by JS on the closed → open transition,
+   the list items and footer fade + slide in with a staggered delay,
+   mirroring the subscreen entrance animation.
+   ========================================= */
+
 @media (max-width: 1024px) {
+  .feds-popup .links-card .links-card-title-container ~ *,
+  .feds-popup .links-card .links-card-footer {
+    overflow: hidden;
+    max-height: 1000px;
+    transition: max-height 0.4s ease;
+  }
+
   .feds-popup .links-card.closed .links-card-title-container ~ *,
   .feds-popup .links-card.closed .links-card-footer {
-    display: none;
+    max-height: 0;
+  }
+
+  .feds-popup .links-card.opening .links-card-links > li {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+  }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(1)  { animation-delay: 0.08s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(2)  { animation-delay: 0.12s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(3)  { animation-delay: 0.16s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(4)  { animation-delay: 0.20s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(5)  { animation-delay: 0.24s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(6)  { animation-delay: 0.28s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(7)  { animation-delay: 0.32s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(8)  { animation-delay: 0.36s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(9)  { animation-delay: 0.40s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(10) { animation-delay: 0.44s; }
+
+  .feds-popup .links-card.opening .links-card-footer {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+    animation-delay: 0.32s;
   }
 }
 
@@ -66,9 +106,39 @@
    is-compact: mirrors @media (max-width: 1024px) mobile behaviour
    ========================================= */
 
+header.global-navigation.is-compact .feds-popup .links-card .links-card-title-container ~ *,
+header.global-navigation.is-compact .feds-popup .links-card .links-card-footer {
+  overflow: hidden;
+  max-height: 1000px;
+  transition: max-height 0.4s ease;
+}
+
 header.global-navigation.is-compact .feds-popup .links-card.closed .links-card-title-container ~ *,
 header.global-navigation.is-compact .feds-popup .links-card.closed .links-card-footer {
-  display: none;
+  max-height: 0;
+}
+
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li {
+  opacity: 0;
+  transform: translateX(18px);
+  animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+}
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(1)  { animation-delay: 0.08s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(2)  { animation-delay: 0.12s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(3)  { animation-delay: 0.16s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(4)  { animation-delay: 0.20s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(5)  { animation-delay: 0.24s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(6)  { animation-delay: 0.28s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(7)  { animation-delay: 0.32s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(8)  { animation-delay: 0.36s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(9)  { animation-delay: 0.40s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(10) { animation-delay: 0.44s; }
+
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-footer {
+  opacity: 0;
+  transform: translateX(18px);
+  animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+  animation-delay: 0.32s;
 }
 
 nav.localnav .feds-popup:not(.small-menu) .links-card {
@@ -84,6 +154,13 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   color: var(--s2a-color-gray-1000);
   font-family: var(--feds-heading-font-family);
   margin-bottom: var(--s2a-spacing-sm);
+  /* Sync the bottom-margin collapse with the content's max-height
+     transition (mobile + is-compact) so the title doesn't jump abruptly
+     between its open- and closed-state spacing while the rest of the
+     card is still mid-animation. The transition is harmless on desktop
+     since the rule that toggles margin-bottom only fires when
+     aria-expanded is present, which JS only sets on mobile. */
+  transition: margin-bottom 0.4s ease;
 }
 
 /* =========================================
