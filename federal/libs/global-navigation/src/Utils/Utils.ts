@@ -206,7 +206,8 @@ export const [setLocalizeLink, getLocalizeLink] =
 
 export const localizeHref = (href: string): string => {
   try {
-    return getLocalizeLink()(href);
+    const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
+    return getLocalizeLink()(absoluteHref);
   } catch {
     return href;
   }
