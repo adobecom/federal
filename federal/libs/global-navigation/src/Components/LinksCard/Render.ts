@@ -1,7 +1,7 @@
 import { primaryCTA, secondaryCTA } from "../CTA/Render";
 import { link } from "../Link/Render";
 import { LinksCard, LinksCardItem } from "./Parse";
-import { getAnalyticsAttrs, sanitize, icons } from "../../Utils/Utils";
+import { getAnalyticsAttrs, sanitize, icons, localizeHref } from "../../Utils/Utils";
 
 export const linkscard = ({
   card
@@ -21,7 +21,7 @@ const renderCard = ({
       <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
         ${links.map(item => item.description !== undefined && item.description !== ''
           ? `<li class="links-card-links__item--has-description">
-               <a class="feds-link links-card-links__item-link ${item.highlight ?? false ? 'feds-link--highlight' : ''}" href="${item.href}">
+               <a class="feds-link links-card-links__item-link ${item.highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(item.href)}">
                  <span class="links-card-links__item-title">${item.text}</span>
                  <span class="links-card-links__item-description">${item.description}</span>
                </a>
