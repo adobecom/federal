@@ -5,6 +5,7 @@
 .feds-gnav-cards .promo-card {
   position: relative;
   height: 199px;
+  margin-bottom: var(--s2a-spacing-sm);
 }
 
 .feds-gnav-cards .promo-card__bg {
