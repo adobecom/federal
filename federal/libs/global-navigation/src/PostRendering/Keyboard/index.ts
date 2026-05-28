@@ -474,9 +474,20 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     return true;
   }
 
+  function handleCtaSpace(
+    el: HTMLElement, key: string, event: KeyboardEvent,
+  ): boolean {
+    if (key !== ' ') return false;
+    if (!el.matches('.feds-primary-cta, .feds-secondary-cta, .feds-link')) return false;
+    event.preventDefault();
+    el.click();
+    return true;
+  }
+
   function onKeydown(event: KeyboardEvent): void {
     const el = (document.activeElement ?? event.target) as HTMLElement;
     if (event.key === 'Escape') { handleEscape(event); return; }
+    if (handleCtaSpace(el, event.key, event)) return;
 
     // Localnav-mobile traps run first so they take precedence over the
     // intra-popup tab/panel navigation, which has its own Tab semantics.
