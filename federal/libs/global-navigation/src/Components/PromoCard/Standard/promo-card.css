@@ -5,6 +5,7 @@
 .feds-gnav-cards .promo-card {
   position: relative;
   height: 199px;
+  margin-bottom: var(--s2a-spacing-sm);
 }
 
 .feds-gnav-cards .promo-card__bg {
@@ -63,9 +64,9 @@
 
 .feds-gnav-cards .promo-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-size: var(--s2a-typography-font-size-title-5);
-  line-height: var(--s2a-typography-line-height-title-5-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
+  font-size: var(--s2a-typography-font-size-heading-5);
+  line-height: var(--s2a-typography-line-height-heading-5);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-5);
   font-family: var(--feds-heading-font-family);
 }
 
@@ -102,16 +103,16 @@
    ========================================= */
 
 @media (min-width: 1024px) {
-  .feds-gnav-cards .promo-card {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card {
     height: 100%;
     min-height: 420px;
   }
 
-  .feds-gnav-cards .promo-card__bg-image {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card__bg-image {
     border-radius: var(--s2a-border-radius-md);
   }
 
-  .feds-gnav-cards .promo-card__cta {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card__cta {
     margin-top: var(--s2a-spacing-md);
   }
 }
@@ -121,27 +122,27 @@
    ========================================= */
 
 @media (min-width: 1280px) {
-  .feds-gnav-cards .promo-card {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card {
     min-height: auto;
   }
 
-  .feds-gnav-cards .promo-card__bg-image {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card__bg-image {
     border-radius: var(--s2a-border-radius-12);
   }
 
-  .feds-gnav-cards .promo-card__icon {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card__icon {
     position: absolute;
     top: var(--s2a-spacing-lg);
     left: var(--s2a-spacing-lg);
   }
 
-  .feds-gnav-cards .promo-card__text-content {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card__text-content {
     width: 100%;
     box-sizing: border-box;
     padding: var(--s2a-spacing-lg);
   }
 
-  .feds-gnav-cards .promo-card__cta {
+  header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card__cta {
     position: absolute;
     bottom: var(--s2a-spacing-lg);
     right: var(--s2a-spacing-lg);
