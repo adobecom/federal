@@ -10,10 +10,14 @@ export type ProductCardHeader = {
   daaLh: string | null;
 };
 
-export type ProductCardLink = {
-  type: "ProductCardLink";
+type ProductCardIcons = {
   iconHref: string | null;
   iconAlt: string | null;
+};
+
+export type ProductCardLink = {
+  type: "ProductCardLink";
+  icons: ProductCardIcons[];
   title: string;
   href: string;
   subtitle: string;
@@ -64,7 +68,7 @@ export const parseProductCard = (
 *     </div>
 *   </div>
 * </div>
-*  
+*
 * Sometimes it's slightly different
 * <div class="product-card gray-gradient bold header">
     <div>
@@ -128,17 +132,18 @@ const parseProductCardLink = (
     };
   });
 
-  const [iconHref, iconAlt = null] = (element
-    .firstElementChild
-    ?.firstElementChild
-    ?.textContent
-    ?.split("|") ?? []).map(x => x.trim());
+  const iconAnchors = element.querySelectorAll('a[href$=".svg"]');
+  const icons: ProductCardIcons[] = Array.from(iconAnchors).map((a) => {
+    const [iconHref = null, iconAlt = null] = (a.textContent ?? "")
+      .split("|")
+      .map((x) => x.trim());
+    return { iconHref, iconAlt };
+  });
 
   return [
     {
       type: "ProductCardLink",
-      iconHref,
-      iconAlt,
+      icons,
       title,
       href,
       subtitle,
@@ -155,7 +160,7 @@ const parseProductCardHeader = (
 ): Parsed<ProductCard, RecoverableError> => {
   if (!element)
     throw new IrrecoverableError(ERRORS.elementNull);
-  
+
   const classes = [...element.classList];
 
   if(!classes.includes('header'))
