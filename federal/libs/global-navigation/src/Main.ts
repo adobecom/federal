@@ -411,23 +411,25 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     }
   };
 
-  // A 20px sentinel placed at the top of the document body. When it scrolls
-  // out of the viewport the page has passed the threshold.
-  const sentinel = document.createElement("div");
-  sentinel.style.cssText = "position:absolute;top:20px;height:1px;width:1px;pointer-events:none;visibility:hidden;";
-  sentinel.setAttribute("aria-hidden", "true");
-  sentinel.setAttribute("tabindex", "-1");
-  document.body.prepend(sentinel);
+  const SCROLL_THRESHOLD = 20;
+  let scrolledPast = window.scrollY > SCROLL_THRESHOLD;
+  let scrollRafId: number | null = null;
 
-  let scrolledPast = false;
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      scrolledPast = !entry.isIntersecting;
+  // Set the initial state synchronously before the first paint.
+  updateHeaderState(scrolledPast);
+
+  const onScroll = (): void => {
+    if (scrollRafId !== null) return;
+    scrollRafId = requestAnimationFrame(() => {
+      scrollRafId = null;
+      const next = window.scrollY > SCROLL_THRESHOLD;
+      if (next === scrolledPast) return;
+      scrolledPast = next;
       updateHeaderState(scrolledPast);
-    },
-    { threshold: 0 }
-  );
-  observer.observe(sentinel);
+    });
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   menuWrapper?.addEventListener("toggle", () =>
     updateHeaderState(scrolledPast, true)
@@ -496,18 +498,6 @@ const findActiveLink = (
 };
 
 /**
- * In localnav mode, clicking a TOP-LEVEL localnav link whose href points to
- * the current page (the very same URL, with optional ?query) is redundant —
- * the page is already loaded. Instead of triggering a no-op navigation, we
- * suppress the default and close the localnav so the user sees the page
- * they're already on. Scope is strictly limited to
- * `nav.localnav ul.feds-gnav-items > li > a`; nested links (mega-menu
- * popups, links-card, CTAs, breadcrumbs, etc.) are left untouched and
- * continue to navigate normally. Hash-only same-page links also navigate
- * normally (so in-page anchor jumps still work) while still closing the
- * localnav.
- */
-/**
  * Sets a `--i` CSS custom property on each top-level `<li>` inside every
  * `ul.feds-gnav-items`, indexed from 0. This drives the staggered
  * open/close animations in `styles.css` via
@@ -525,6 +515,18 @@ const initGnavItemsStaggerIndex = (mountpoint: HTMLElement): void => {
   });
 };
 
+/**
+ * In localnav mode, clicking a TOP-LEVEL localnav link whose href points to
+ * the current page (the very same URL, with optional ?query) is redundant —
+ * the page is already loaded. Instead of triggering a no-op navigation, we
+ * suppress the default and close the localnav so the user sees the page
+ * they're already on. Scope is strictly limited to
+ * `nav.localnav ul.feds-gnav-items > li > a`; nested links (mega-menu
+ * popups, links-card, CTAs, breadcrumbs, etc.) are left untouched and
+ * continue to navigate normally. Hash-only same-page links also navigate
+ * normally (so in-page anchor jumps still work) while still closing the
+ * localnav.
+ */
 // eslint-disable-next-line max-len
 const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => {
   const localnav = mountpoint.querySelector('nav.localnav');
