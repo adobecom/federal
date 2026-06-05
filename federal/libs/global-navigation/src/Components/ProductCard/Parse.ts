@@ -99,7 +99,9 @@ const parseProductCardLink = (
   if (!element)
     throw new IrrecoverableError(ERRORS.elementNull);
 
-  const titleElement = element.querySelector("p a") ?? element.querySelector('div ~ div > a');
+  const titleElement
+    = element.querySelector('p a:not([href$=".svg"])')
+    ?? element.querySelector('div ~ div > a:not([href$=".svg"])');
   if (!titleElement)
     throw new IrrecoverableError(ERRORS.noTitleAnchor);
 
