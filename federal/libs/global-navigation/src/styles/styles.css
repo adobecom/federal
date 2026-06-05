@@ -128,6 +128,8 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   color: var(--s2a-color-gray-1000);
   border: 1px solid var(--s2a-color-gray-25);
   background-color: var(--s2a-color-gray-25);
+  border-radius: var(--s2a-border-radius-round);
+  height: 40px;
 }
 
 .global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button,
@@ -160,13 +162,14 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   display: flex;
   align-items: center;
   margin-left: auto;
+  margin-right: var(--s2a-spacing-sm);
   @media (max-width: 1024px) {
     display: none;
   }
 }
 
 [dir="rtl"] .global-navigation .feds-product-entry-cta {
-  margin-left: 0;
+  margin-left: var(--s2a-spacing-sm);
   margin-right: auto;
 }
 
@@ -387,7 +390,6 @@ header.global-navigation.feds-header-scrolled nav::after {
 .global-navigation nav > ul {
   display: flex;
   width: 100%;
-  max-width: 1200px;
   height: inherit;
   align-items: center;
   padding-left: 0;
