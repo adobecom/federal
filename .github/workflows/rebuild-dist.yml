@@ -1,0 +1,80 @@
+name: Rebuild global-navigation dist
+
+# After a PR is merged into `main` or `stage`, the merge commit may contain a
+# stale `dist/` (the `merge=ours` attribute in .gitattributes intentionally
+# avoids blocking the merge on the giant minified blobs). This workflow
+# rebuilds `dist/` from the merged source and, if it differs from what was
+# committed, pushes a follow-up commit so the branch tip always carries an
+# artifact that matches its source.
+#
+# Loop avoidance:
+#   * `paths-ignore` skips runs triggered by changes confined to dist/.
+#   * Pushes made with the default GITHUB_TOKEN do not trigger further
+#     workflow runs, so the bot's own rebuild commit cannot re-trigger this
+#     job. (See GitHub docs: "Triggering a workflow from a workflow".)
+
+on:
+  push:
+    branches:
+      - main
+      - stage
+    paths:
+      - 'federal/libs/global-navigation/src/**'
+      - 'federal/libs/global-navigation/build.js'
+      - 'federal/libs/global-navigation/build-plugins/**'
+      - 'federal/libs/global-navigation/package.json'
+      - 'federal/libs/global-navigation/package-lock.json'
+      - 'federal/libs/global-navigation/tsconfig.json'
+
+concurrency:
+  # Serialize per branch so two rapid merges can't race each other into a
+  # non-fast-forward push.
+  group: rebuild-dist-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  rebuild-dist:
+    runs-on: ubuntu-latest
+    permissions:
+      # Required for the bot to push the rebuilt dist back to the branch.
+      contents: write
+    defaults:
+      run:
+        working-directory: federal/libs/global-navigation
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # We need write access via GITHUB_TOKEN for the push step below.
+          persist-credentials: true
+          # Fetch full ref so we can push a follow-up commit onto it.
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.16.0
+          cache: npm
+          cache-dependency-path: federal/libs/global-navigation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit rebuilt dist if it changed
+        run: |
+          # `git diff --quiet` exits 0 when there is no change, 1 when there
+          # is. We only push when the rebuild actually produced something
+          # different from what the merge commit landed.
+          if git diff --quiet -- dist/; then
+            echo "dist/ matches the committed artifact — nothing to push."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/
+          git commit -m "ci(global-navigation): rebuild dist for ${GITHUB_SHA::7}"
+          git push origin "HEAD:${GITHUB_REF#refs/heads/}"
