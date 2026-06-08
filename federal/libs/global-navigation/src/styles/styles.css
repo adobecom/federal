@@ -640,7 +640,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   line-height: var(--s2a-typography-line-height-heading-3);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-3);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-family: var( --s2a-font-family-heading);
+  font-family: var( --heading-font-family);
   color: var(--s2a-color-content-default);
 }
 
@@ -690,7 +690,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   font-size: var(--s2a-typography-font-size-heading-4);
   line-height: var(--s2a-typography-line-height-heading-4);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
-  font-family: var( --s2a-font-family-heading);
+  font-family: var( --heading-font-family);
 }
 
 .feds-popup .feds-product-card__badges {
@@ -973,7 +973,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   .global-navigation .feds-gnav-items > li > .feds-link {
-    font-family: var( --s2a-font-family-heading);
+    font-family: var( --heading-font-family);
     font-weight: var(--s2a-font-weight-adobe-clean-black);
   }
 
@@ -1530,7 +1530,7 @@ header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link
 }
 
 header.global-navigation.is-compact .feds-gnav-items > li > .feds-link {
-  font-family: var( --s2a-font-family-heading);
+  font-family: var( --heading-font-family);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
 
