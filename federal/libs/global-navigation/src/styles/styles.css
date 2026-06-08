@@ -432,10 +432,6 @@ header.global-navigation.feds-header-scrolled nav::after {
   header.global-navigation:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li .feds-link {
     padding: 0;
   }
-
-  header.global-navigation nav {
-    margin: var(--s2a-spacing-2xs) auto;
-  }
 }
 .global-navigation.dark-font .feds-link {
   color: var(--s2a-color-gray-1000);
@@ -1099,10 +1095,11 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     opacity: 1;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transition-delay: 0.15s;
+    margin-top: var(--s2a-spacing-xs);
   }
 
   header.global-navigation:not(.is-compact):has(.feds-localnav-bar) :not(.small-menu).feds-popup.is-open {
-    margin-top: -2px;
+    margin-top: 1px;
     padding-top: var(--s2a-spacing-lg);
     border-top: 1px solid var(--s2a-color-transparent-black-08);
   }
