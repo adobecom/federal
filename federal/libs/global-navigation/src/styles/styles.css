@@ -1102,6 +1102,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   header.global-navigation:not(.is-compact):has(.feds-localnav-bar) :not(.small-menu).feds-popup.is-open {
+    margin-top: -2px;
     padding-top: var(--s2a-spacing-lg);
     border-top: 1px solid var(--s2a-color-transparent-black-08);
   }
