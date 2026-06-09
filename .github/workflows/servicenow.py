@@ -171,7 +171,7 @@ if __name__ == "__main__":
       "changeReason": [ "New Features", "Bug Fixes", "Enhancement", "Maintenance", "Security" ],
       "preProductionTestingType": [ "End-to-End", "Functional", "Integrations", "QA", "Regression", "UAT", "Unit Test" ],
       "backoutPlanType": "Roll back",
-      "approvedBy": [ "asdeshmu@adobe.com", "venkatas@adobe.com", "bbalakrishna@adobe.com"],
+      "approvedBy": [ "sann@adobe.com", "asdeshmu@adobe.com", "venkatas@adobe.com", "bbalakrishna@adobe.com"],
       "testPlan": "Test plan is documented in the PR link in the Federal repository above. See the PR's merge checks to see Unit testing.",
       "implementationPlan": "The change will be released as part of the continuous deployment of Federal's production branch, i.e., \"main\"",
       "backoutPlan": "Revert merge to the Federal production branch by creating a revert commit.",
