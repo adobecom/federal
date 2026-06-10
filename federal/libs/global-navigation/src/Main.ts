@@ -1,5 +1,6 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
 import { component } from "./Components/Component";
+import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
@@ -89,7 +90,7 @@ export const main = async (
     lanaLog(initial.message);
     throw initial;
   }
-  const { mainNav, aside: _aside } = initial;
+  const { mainNav, aside: _aside, promoBarEl } = initial;
   if (mainNav instanceof IrrecoverableError) {
     lanaLog(mainNav.message);
     throw mainNav;
@@ -98,7 +99,8 @@ export const main = async (
   const gnavData = parseNavigation(
     mainNav,
     unavEnabled,
-    await getPlaceholders()
+    await getPlaceholders(),
+    promoBarEl,
   );
   if (gnavData instanceof IrrecoverableError) {
     lanaLog(gnavData.message);
@@ -157,6 +159,7 @@ export const renderGnavString = ({
   components,
   breadcrumbs,
   productCTA,
+  promoBar,
   unavEnabled,
   placeholders,
   localnav,
@@ -176,6 +179,7 @@ export const renderGnavString = ({
       ? lastBreadcrumb
       : lastBreadcrumb.text;
   return `
+${promoBar === null ? '' : renderPromoBar(promoBar)}
 <nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
@@ -270,6 +274,7 @@ export const postRenderingTasks = async (
   activeDropDown?.classList.add('active-element');
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
+  initPromoBarDismiss(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -562,6 +567,15 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
         ?? mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
       focusTarget?.focus();
     });
+  });
+};
+
+const initPromoBarDismiss = (mountpoint: HTMLElement): void => {
+  const promoBar = mountpoint.querySelector<HTMLElement>('.feds-promo-bar');
+  if (!promoBar) return;
+  const closeBtn = promoBar.querySelector<HTMLButtonElement>('.feds-promo-bar-close');
+  closeBtn?.addEventListener('click', () => {
+    promoBar.classList.add('is-hidden');
   });
 };
 

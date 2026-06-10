@@ -1,0 +1,234 @@
+/* =========================================
+   Promo Bar
+   Full-width promotional banner rendered above the global navigation.
+   ========================================= */
+
+.feds-promo-bar {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: var(--s2a-spacing-md) var(--s2a-spacing-64);
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+}
+
+.feds-promo-bar--dark {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+}
+
+/* =========================================
+   Inner layout
+   ========================================= */
+
+.feds-promo-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2a-spacing-xl);
+  width: 100%;
+  max-width: 1312px;
+}
+
+/* =========================================
+   Left column: eyebrow + headline
+   ========================================= */
+
+.feds-promo-bar-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2a-spacing-xs);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.feds-promo-bar-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s2a-spacing-xs);
+}
+
+.feds-promo-bar-eyebrow-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.feds-promo-bar-eyebrow-text {
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  font-weight: var(--s2a-font-weight-adobe-clean-regular);
+  color: inherit;
+  opacity: 0.72;
+}
+
+.feds-promo-bar--dark .feds-promo-bar-eyebrow-text {
+  opacity: 0.8;
+}
+
+.feds-promo-bar-headline-left {
+  margin: 0;
+  font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  color: inherit;
+}
+
+/* =========================================
+   Right column: sub-headline + body + CTA
+   ========================================= */
+
+.feds-promo-bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--s2a-spacing-lg);
+  flex-shrink: 0;
+}
+
+.feds-promo-bar-headline-right {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-regular);
+  color: inherit;
+  max-width: 385px;
+}
+
+.feds-promo-bar-body {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  color: inherit;
+  opacity: 0.8;
+}
+
+/* =========================================
+   CTA button
+   ========================================= */
+
+.feds-promo-bar-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 var(--s2a-spacing-lg);
+  border-radius: var(--s2a-border-radius-round);
+  border: var(--s2a-border-width-sm) solid transparent;
+  background-color: var(--s2a-color-blue-900);
+  color: var(--s2a-color-gray-25);
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.feds-promo-bar-cta:hover {
+  background-color: var(--s2a-color-blue-1000);
+}
+
+.feds-promo-bar-cta:active {
+  background-color: var(--s2a-color-blue-1100);
+}
+
+/* =========================================
+   Dismiss button
+   ========================================= */
+
+.feds-promo-bar-close {
+  position: absolute;
+  top: 50%;
+  right: var(--s2a-spacing-md);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--s2a-border-radius-round);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.feds-promo-bar-close:hover {
+  background-color: var(--s2a-color-transparent-black-08);
+}
+
+.feds-promo-bar--dark .feds-promo-bar-close:hover {
+  background-color: var(--s2a-color-transparent-white-16);
+}
+
+.feds-promo-bar-close:focus-visible {
+  outline: 2px solid var(--s2a-color-blue-800);
+  outline-offset: 2px;
+}
+
+/* =========================================
+   Mobile layout (< 1024px)
+   ========================================= */
+
+@media (max-width: 1023px) {
+  .feds-promo-bar {
+    padding: var(--s2a-spacing-xl) var(--s2a-spacing-lg);
+    min-height: auto;
+  }
+
+  .feds-promo-bar-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--s2a-spacing-md);
+  }
+
+  .feds-promo-bar-left {
+    align-items: center;
+  }
+
+  .feds-promo-bar-eyebrow {
+    justify-content: center;
+  }
+
+  .feds-promo-bar-headline-left {
+    font-size: 1.25rem;
+  }
+
+  .feds-promo-bar-right {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s2a-spacing-md);
+  }
+
+  .feds-promo-bar-headline-right {
+    max-width: none;
+    text-align: center;
+  }
+
+  .feds-promo-bar-close {
+    top: var(--s2a-spacing-xs);
+    right: var(--s2a-spacing-xs);
+    transform: none;
+  }
+}
+
+/* =========================================
+   Dismissed state
+   ========================================= */
+
+.feds-promo-bar.is-hidden {
+  display: none;
+}

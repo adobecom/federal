@@ -1,6 +1,7 @@
 import { Breadcrumbs, parseBreadcrumbs } from "../Components/Breadcrumbs/Parse";
 import { Component, parseComponent } from "../Components/Component";
 import { ProductEntryCTA } from "../Components/CTA/Parse";
+import { PromoBar, parsePromoBar } from "../Components/PromoBar/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
 import { getMetadata, parseListAndAccumulateErrors } from "../Utils/Utils";
 
@@ -8,6 +9,7 @@ export type GlobalNavigationData = {
   breadcrumbs: Breadcrumbs | null;
   components: Array<Component>;
   productCTA: ProductEntryCTA | null;
+  promoBar: PromoBar | null;
   localnav: boolean;
   darkFont: boolean;
   errors: Array<RecoverableError>;
@@ -19,6 +21,7 @@ export const parseNavigation = (
   mainNav: HTMLElement,
   unavEnabled: boolean,
   placeholders: Map<string, string> = new Map(),
+  promoBarEl: HTMLElement | null = null,
 ): GlobalNavigationData | IrrecoverableError => {
   // Breadcrumbs are authored in the page body, not in the gnav source,
   // and they're optional. If the block is missing we silently skip
@@ -30,6 +33,16 @@ export const parseNavigation = (
   ] = breadcrumbsEl === null
     ? [null, []]
     : parseBreadcrumbs(breadcrumbsEl);
+
+  // Promo bar is fetched from the URL in the gnav-promo-source metadata
+  // and passed in as a pre-fetched HTMLElement. Optional — null skips it.
+  const [promoBar, promoBarErrors]: [
+    PromoBar | null,
+    Array<RecoverableError>
+  ] = promoBarEl === null
+    ? [null, []]
+    : parsePromoBar(promoBarEl);
+
   const [parsedComponents, componentErrors]
     = parseListAndAccumulateErrors(
       [...mainNav.children],
@@ -54,6 +67,7 @@ export const parseNavigation = (
 
   const errors = [
     breadcrumbErrors,
+    promoBarErrors,
     componentErrors,
   ].flat();
 
@@ -61,6 +75,7 @@ export const parseNavigation = (
     breadcrumbs,
     components,
     productCTA,
+    promoBar,
     localnav,
     darkFont,
     errors,
