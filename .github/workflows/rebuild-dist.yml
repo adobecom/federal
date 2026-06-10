@@ -49,6 +49,52 @@ jobs:
           persist-credentials: true
           # Fetch full ref so we can push a follow-up commit onto it.
           fetch-depth: 1
+          # The `consonant` submodule supplies the design-token CSS files
+          # imported by `src/styles/styles.css`. Without this the build fails
+          # at the lightning-css @import resolution step. Using `true` (not
+          # `recursive`) keeps the checkout to direct submodules only —
+          # consonant has its own `milo` submodule we don't need.
+          submodules: true
+
+      - name: Verify build inputs are present
+        # Fail fast with a clear message if anything the build relies on is
+        # missing. Otherwise the user sees a confusing lightningcss ENOENT
+        # buried inside esbuild's plugin output. Every check here corresponds
+        # to a real failure we've hit in CI.
+        run: |
+          set -euo pipefail
+
+          # 1) Direct submodules properly initialized. `git submodule status`
+          #    prefixes uninitialized entries with `-` and out-of-sync entries
+          #    with `+`; a clean line starts with a space. We deliberately do
+          #    *not* recurse — consonant has its own (very large) `milo`
+          #    submodule that we don't check out and don't need.
+          bad_submodules=$(git -C "${GITHUB_WORKSPACE}" submodule status | grep -E '^[-+]' || true)
+          if [ -n "$bad_submodules" ]; then
+            echo "::error::One or more submodules are not properly checked out:"
+            echo "$bad_submodules"
+            exit 1
+          fi
+
+          # 2) The specific design-token files styles.css imports. If the
+          #    consonant submodule's layout changes upstream this surfaces
+          #    immediately instead of corrupting the bundle.
+          required_files=(
+            consonant/dist/packages/tokens/css/dev/tokens.primitives.css
+            consonant/dist/packages/tokens/css/dev/tokens.semantic.css
+            consonant/dist/packages/tokens/css/dev/tokens.semantic.light.css
+            consonant/dist/packages/tokens/css/min/tokens.min.css
+          )
+          missing=0
+          for f in "${required_files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "::error file=federal/libs/global-navigation/$f::required build input missing"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+
+          echo "All build inputs present."
 
       - name: Setup Node
         uses: actions/setup-node@v4
