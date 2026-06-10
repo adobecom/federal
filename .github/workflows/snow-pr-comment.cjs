@@ -1,5 +1,5 @@
 // Run from the root of the project for local testing: node --env-file=.env .github/workflows/pr-reminders.js
-const { getLocalConfigs } = require('./helpers.js');
+const { getLocalConfigs } = require('./helpers.cjs');
 const fs = require('fs');
 const SNOW_TRANSACTION_ID_COMMENT = "SNOW Change Request Transaction ID";
 
