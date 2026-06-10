@@ -4,6 +4,7 @@
  */
 
 import { RecoverableError } from '../../Error/Error';
+import { lanaLog } from '../../Utils/Log';
 import {
   loadScript,
   loadStyles,
@@ -164,6 +165,7 @@ export const loadUnav = async (
 
     // Fetch visitor GUID for analytics
     const visitorGuid = await getVisitorGuid();
+    const isArpEnabled = config?.unav?.isArpEnabled ?? true;
 
     // ========================================================================
     // Step 5: Load UNAV assets from CDN
@@ -176,7 +178,7 @@ export const loadUnav = async (
 
     // Validate version format (e.g., '1.5' or '2')
     if (!/^\d+(\.\d+)?$/.test(unavVersion ?? '')) {
-      unavVersion = '1.5';
+      unavVersion = '1.6';
     }
 
     // Load JS and CSS in parallel
@@ -189,6 +191,15 @@ export const loadUnav = async (
         true
       ),
     ]);
+
+    //Early-load AUP SDK for signed-in users
+    if (window.adobeIMS?.isSignedInUser() === true) {
+      void loadScript(
+        `https://shared-components.${environment}.adobe.com/aup-sdk/1.0.756/main.js`,
+        undefined,
+        { mode: 'async' },
+      );
+    }
 
     // ========================================================================
     // Step 6: Build component children array
@@ -251,6 +262,47 @@ export const loadUnav = async (
       children: getChildren(),
       isSectionDividerRequired: config?.unav?.showSectionDivider === true,
       showTrayExperience: !isDesktop.matches,
+      isArpEnabled,
+      ...(isArpEnabled && {
+        arpConfig: Promise.resolve({
+          sessionId: visitorGuid,
+          tokenCallback: (token: string): void => {
+            window.adobeArp = window.adobeArp ?? {};
+            window.adobeArp.sessionToken = token;
+            window.dispatchEvent(new CustomEvent('arp:tokenReady', { detail: { token } }));
+          },
+          successCallback: (): void => {},
+          errorCallback: (error: unknown): void => {
+            lanaLog(`ARP error: ${String(error)}`, 'universalnav');
+          },
+          ...config?.unav?.arpConfig,
+          metadata: {
+            source: 'universal-navigation',
+            version: unavVersion ?? '1.6',
+            ...config?.unav?.arpConfig?.metadata,
+          },
+        }),
+        fetchAUPSDKInstance: async (): Promise<unknown> => {
+          await loadScript(
+            `https://shared-components.${environment}.adobe.com/aup-sdk/1.0.756/main.js`,
+            undefined,
+            { mode: 'async' },
+          );
+          window.aupsdk = window.aupsdk ?? await window.AUPSDK?.preloadSDK('adobe-com-stable', {
+            appId: 'adobe_com',
+            apiKey: (window as WindowWithAdobeId)?.adobeid?.client_id,
+            getAccessToken: (): Promise<string | undefined> =>
+              Promise.resolve(window.adobeIMS?.getAccessToken()?.token),
+            getProfile: () => window.adobeIMS?.getProfile(),
+            environment,
+            cdnEnvironment: environment,
+            appName: 'adobecom',
+            appVersion: '1.0',
+            colorScheme: 'light',
+          });
+          return window.aupsdk;
+        },
+      }),
     });
 
     // ========================================================================

@@ -25,6 +25,8 @@ declare global {
     adobeIMS?: {
       signIn: (context: object) => void;
       isSignedInUser: () => boolean;
+      getAccessToken: () => { token?: string } | null;
+      getProfile: () => Promise<unknown>;
     };
     
     /** IMS Client Configuration */
@@ -43,6 +45,22 @@ declare global {
       reload: (config: UnavConfig) => void;
       changeTheme?: (theme: 'light' | 'dark') => void;
     };
+
+    /** ARP session token after tokenCallback */
+    adobeArp?: {
+      sessionToken?: string;
+    };
+
+    /** AUP SDK constructor loaded from CDN */
+    AUPSDK?: {
+      preloadSDK: (
+        env: string,
+        config: Record<string, unknown>,
+      ) => Promise<unknown>;  
+    };
+
+    /** Initialized AUP SDK instance */
+    aupsdk?: unknown;
   }
 }
 

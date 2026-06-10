@@ -711,6 +711,10 @@ type UnavConfig = {
   uncAppId?: string;
   uncConfig?: Record<string, unknown>;
   showSectionDivider?: boolean;
+  isArpEnabled?: boolean;
+  arpConfig?: {
+    metadata?: Record<string, string>;
+  };
 }
 
 type JarvisConfig = {
