@@ -46,7 +46,7 @@ if (isWatch) {
         name: 'type-check',
         setup(build) {
           build.onStart(() => {
-            execSync('npx tsc --noEmit', { stdio: 'inherit' });
+            execSync('tsc --noEmit', { stdio: 'inherit' });
           });
         },
       },
@@ -55,7 +55,7 @@ if (isWatch) {
   });
   await context.watch();
 } else {
-  execSync('npx tsc --noEmit', { stdio: 'inherit' });
+  execSync('tsc --noEmit', { stdio: 'inherit' });
 
   await esbuild.build(buildOptions);
   console.log('Build complete - CSS inlined into main.js');
