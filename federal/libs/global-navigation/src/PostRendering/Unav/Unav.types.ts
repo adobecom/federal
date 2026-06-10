@@ -102,6 +102,7 @@ export type Profile = {
         enableLocalSection: boolean;
         enableProfileSwitcher: boolean;
         miniAppContext: {
+          enableManagePeople?: boolean;
           logger: {
             trace: (_: string) => void;
             debug: (_: string) => void;
@@ -109,6 +110,11 @@ export type Profile = {
             warn: (_: string) => void;
             error: (_: string) => void;
           };
+        };
+        managePeopleConfig?: {
+          enableWorkflow?: boolean;
+          params?: Record<string, string>;
+          [key: string]: unknown;
         };
         complexConfig: Record<string, unknown> | null;
       };

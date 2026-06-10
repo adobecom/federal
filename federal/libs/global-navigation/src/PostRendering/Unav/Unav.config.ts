@@ -9,7 +9,7 @@ import type {
   UserProfile,
   HelpItem,
 } from './Unav.types';
-import { setUserProfile } from './Unav.utils';
+import { setUserProfile, getUniversalNavLocale } from './Unav.utils';
 import { getMiloConfig, getMetadata } from '../../Utils/Utils';
 
 // ============================================================================
@@ -121,6 +121,7 @@ export const getUnavComponents = (): UnavComponents => {
             enableLocalSection: true,
             enableProfileSwitcher: true,
             miniAppContext: {
+              enableManagePeople: config?.unav?.profile?.enableManagePeople ?? true,
               logger: {
                 trace: (): void => {},
                 debug: (): void => {},
@@ -140,6 +141,14 @@ export const getUnavComponents = (): UnavComponents => {
                 warn: (): void => {},
                 error: (): void => {},
               },
+            },
+            managePeopleConfig: {
+              enableWorkflow: true,
+              params: {
+                enableinlineoverlay: 's2-compat',
+                locale: getUniversalNavLocale(config.locale),
+              },
+              ...config?.unav?.profile?.managePeopleConfig,
             },
             complexConfig: config?.unav?.profile?.complexConfig || null,
             ...config?.unav?.profile?.config,

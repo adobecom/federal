@@ -24,8 +24,15 @@ import {
   getVisitorGuid,
   getDevice,
   getUniversalNavLocale,
+  showAupDialog,
 } from './Unav.utils';
 import { getUnavComponents } from './Unav.config';
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const AUP_SDK_VERSION = '1.0.756';
 
 // ============================================================================
 // Types
@@ -182,7 +189,7 @@ export const loadUnav = async (
     }
 
     // Load JS and CSS in parallel
-    await Promise.all([
+    const loadPromises = [
       loadScript(
         `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.js`
       ),
@@ -190,16 +197,18 @@ export const loadUnav = async (
         `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.css`,
         true
       ),
-    ]);
-
+    ];
+    
     //Early-load AUP SDK for signed-in users
     if (window.adobeIMS?.isSignedInUser() === true) {
-      void loadScript(
-        `https://shared-components.${environment}.adobe.com/aup-sdk/1.0.756/main.js`,
+      loadPromises.push(loadScript(
+        `https://shared-components.${environment}.adobe.com/aup-sdk/${AUP_SDK_VERSION}/main.js`,
         undefined,
         { mode: 'async' },
-      );
+      ));
     }
+
+    await Promise.all(loadPromises);
 
     // ========================================================================
     // Step 6: Build component children array
@@ -283,11 +292,6 @@ export const loadUnav = async (
           },
         }),
         fetchAUPSDKInstance: async (): Promise<unknown> => {
-          await loadScript(
-            `https://shared-components.${environment}.adobe.com/aup-sdk/1.0.756/main.js`,
-            undefined,
-            { mode: 'async' },
-          );
           window.aupsdk = window.aupsdk ?? await window.AUPSDK?.preloadSDK('adobe-com-stable', {
             appId: 'adobe_com',
             apiKey: (window as WindowWithAdobeId)?.adobeid?.client_id,
@@ -296,10 +300,13 @@ export const loadUnav = async (
             getProfile: () => window.adobeIMS?.getProfile(),
             environment,
             cdnEnvironment: environment,
+            locale: locale.split('_')[0],
             appName: 'adobecom',
             appVersion: '1.0',
             colorScheme: 'light',
+            showDialog: showAupDialog,
           });
+          await window.aupsdk?.updateConfig({ miniAppContext: { features: ['useToasts'] } });
           return window.aupsdk;
         },
       }),

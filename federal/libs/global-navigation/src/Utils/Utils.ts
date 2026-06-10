@@ -703,6 +703,8 @@ type UnavProfileConfig = {
   complexConfig?: Record<string, unknown> | null;
   config?: Record<string, unknown>;
   signInCtaStyle?: 'primary' | 'secondary';
+  enableManagePeople?: boolean;
+  managePeopleConfig?: Record<string, unknown>;
 }
 
 type UnavConfig = {
