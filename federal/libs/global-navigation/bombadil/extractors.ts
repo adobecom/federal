@@ -199,6 +199,7 @@ export const ariaControlsTargets = extract((state) => {
   const nav = state.document.querySelector(NAV_SEL);
   if (nav === null) return [];
   return [...nav.querySelectorAll<HTMLElement>("[aria-controls]")]
+    .filter(el => !el.closest('.universal-nav-container'))
     .map((el) => {
       const id = el.getAttribute("aria-controls") ?? "";
       return { id, exists: id !== "" && state.document.getElementById(id) !== null };
