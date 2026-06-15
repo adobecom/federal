@@ -1,20 +1,123 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
-import { Link, parseLink } from "../Link/Parse";
+import {
+  PrimaryCTA,
+  SecondaryCTA,
+  parsePrimaryCTA,
+  parseSecondaryCTA,
+} from "../CTA/Parse";
+import { alternative } from "../../Utils/Utils";
+
+export type PromoBarVariant = 'minimized' | 'maximized' | 'maximized-release';
+
+export type PromoBarContent = {
+  icon: string | null;
+  iconAlt: string | null;
+  productName: string | null;
+  headline: string | null;
+  body: string | null;
+  cta: PrimaryCTA | SecondaryCTA | null;
+  bgImage: string | null;
+};
 
 export type PromoBar = {
   type: 'PromoBar';
-  eyebrowIcon: string | null;
-  eyebrowText: string | null;
-  headlineLeft: string;
-  headlineRight: string | null;
-  bodyCopy: string | null;
-  cta: Link | null;
+  variant: PromoBarVariant;
   theme: 'light' | 'dark';
+  bgColor: string | null;
+  columns: PromoBarContent[];
 };
 
 const ERRORS = {
   elementNull: "Error when parsing PromoBar. Element is null",
-  noHeadline: "Error when parsing PromoBar. No headline found",
+};
+
+const parseVariant = (classList: DOMTokenList): PromoBarVariant => {
+  if (classList.contains('maximized-release')) return 'maximized-release';
+  if (classList.contains('maximized')) return 'maximized';
+  return 'minimized';
+};
+
+const parseIconLink = (cell: Element): { icon: string | null; iconAlt: string | null } => {
+  // Icon is authored as <p><a href="...svg">https://...svg | Alt Text</a></p>
+  // The pipe separates the full URL from the alt text in the link text.
+  const iconAnchor = [...cell.querySelectorAll(':scope > p > a')].find((a) => {
+    const href = a.getAttribute('href') ?? '';
+    return /\.(svg|png|jpg|jpeg|webp)(\?.*)?$/i.test(href);
+  }) ?? null;
+  if (iconAnchor === null) return { icon: null, iconAlt: null };
+
+  const href = iconAnchor.getAttribute('href') ?? null;
+  const linkText = iconAnchor.textContent ?? '';
+  const pipeIdx = linkText.indexOf(' | ');
+  const iconAlt = pipeIdx !== -1 ? linkText.slice(pipeIdx + 3).trim() : null;
+  return { icon: href, iconAlt };
+};
+
+const parseContent = (cell: Element): PromoBarContent => {
+  const { icon, iconAlt } = parseIconLink(cell);
+
+  const pictures = [...cell.querySelectorAll('picture')];
+  // Last <picture> is a bg image only when there are 2+ pictures;
+  // with just one it is the icon.
+  const bgPicture = pictures.length > 1
+    ? pictures[pictures.length - 1]
+    : null;
+  const bgImg = bgPicture?.querySelector('img') ?? null;
+  const bgImage = bgImg?.getAttribute('src')
+    ?? bgImg?.getAttribute('srcset')?.split('?')[0]
+    ?? null;
+
+  const productName = cell.querySelector('h5')?.textContent?.trim() ?? null;
+
+  // Headline: first <p> with a <strong> that isn't a pure CTA row.
+  // Pure CTA: <p><strong><a>…</a></strong></p> with no surrounding text.
+  const headlineEl = [...cell.querySelectorAll(':scope > p')].find((p) => {
+    if (p.querySelector('strong') === null) return false;
+    if (p.querySelector('em > a') !== null) return false;
+    // Exclude pure-CTA rows: <strong> contains only an <a> and no other text.
+    const strong = p.querySelector('strong');
+    const isCtaRow = strong !== null
+      && strong.querySelector('a') !== null
+      && (strong.textContent ?? '').trim()
+        === (strong.querySelector('a')?.textContent ?? '').trim();
+    return !isCtaRow;
+  }) ?? null;
+  const headline = headlineEl?.innerHTML?.trim() ?? null;
+
+  // Body <p>: has visible text, not the icon row, not the CTA row,
+  // not the tracking-header row, and not a headline-only strong.
+  const bodyEl = [...cell.querySelectorAll('p')].find((p) => {
+    if (
+      p.querySelector('picture') !== null
+      && (p.textContent?.trim() ?? '') === ''
+    ) return false;
+    if (p.querySelector('em > a') !== null) return false;
+    if (p.querySelector('strong > a') !== null) return false;
+    if (p.querySelector('strong.tracking-header') !== null) return false;
+    if (
+      p.querySelector('strong') !== null
+      && p.querySelector('a') === null
+    ) return false;
+    if (p.closest('h5') !== null) return false;
+    return (p.textContent?.trim() ?? '').length > 0;
+  }) ?? null;
+  const body = bodyEl?.innerHTML?.trim() ?? null;
+
+  // CTA row: a <p> whose only content is <strong><a> or <em><a>.
+  const ctaP = [...cell.querySelectorAll(':scope > p')].find((p) =>
+    p.querySelector('strong > a') !== null || p.querySelector('em > a') !== null
+  ) ?? null;
+  let cta: PrimaryCTA | SecondaryCTA | null = null;
+  try {
+    const [parsed] = alternative(parsePrimaryCTA)
+      .or(parseSecondaryCTA)
+      .eval(ctaP);
+    cta = parsed;
+  } catch (_) {
+    cta = null;
+  }
+
+  return { icon, iconAlt, productName, headline, body, cta, bgImage };
 };
 
 export const parsePromoBar = (
@@ -23,90 +126,22 @@ export const parsePromoBar = (
   if (element === null)
     throw new IrrecoverableError(ERRORS.elementNull);
 
-  const errors: RecoverableError[] = [];
+  const variant = parseVariant(element.classList);
+  const theme: 'light' | 'dark' = element.classList.contains('dark')
+    ? 'dark'
+    : 'light';
 
-  // Theme: if the block has a 'dark' class variant
-  const theme: 'light' | 'dark' = element.classList.contains('dark') ? 'dark' : 'light';
+  const bgColor = element
+    .querySelector(':scope > div:first-child > div')
+    ?.textContent?.trim() ?? null;
 
-  // The block is authored as rows of <div>s inside the block container.
-  // Row 0 (optional): eyebrow — icon src | eyebrow text
-  // Row 1: left headline | right sub-headline
-  // Row 2 (optional): body copy
-  // Row 3 (optional): CTA link
-  const rows = [...element.querySelectorAll(':scope > div')];
-
-  let eyebrowIcon: string | null = null;
-  let eyebrowText: string | null = null;
-  let headlineLeft = '';
-  let headlineRight: string | null = null;
-  let bodyCopy: string | null = null;
-  let cta: Link | null = null;
-
-  // Determine row mapping by inspecting content
-  let rowIndex = 0;
-
-  // Check for eyebrow row: contains an image or icon src
-  const firstRowCells = rows[rowIndex]
-    ? [...rows[rowIndex].querySelectorAll(':scope > div')]
-    : [];
-
-  const hasIcon = firstRowCells.some(
-    cell => cell.querySelector('img') !== null || cell.textContent?.trim().startsWith('http')
-  );
-
-  if (hasIcon && rows.length > 1) {
-    const iconCell = firstRowCells[0];
-    const textCell = firstRowCells[1];
-    const img = iconCell?.querySelector('img');
-    eyebrowIcon = img?.getAttribute('src') ?? iconCell?.textContent?.trim() ?? null;
-    eyebrowText = textCell?.textContent?.trim() ?? null;
-    rowIndex++;
-  }
-
-  // Headline row
-  if (rows[rowIndex]) {
-    const headlineCells = [...rows[rowIndex].querySelectorAll(':scope > div')];
-    headlineLeft = headlineCells[0]?.innerHTML?.trim() ?? '';
-    headlineRight = headlineCells[1]?.innerHTML?.trim() ?? null;
-    rowIndex++;
-  }
-
-  if (!headlineLeft) {
-    errors.push(new RecoverableError(ERRORS.noHeadline));
-  }
-
-  // Body copy row (optional — single cell with no anchor)
-  if (rows[rowIndex]) {
-    const cells = [...rows[rowIndex].querySelectorAll(':scope > div')];
-    const hasAnchor = cells.some(c => c.querySelector('a') !== null);
-    if (!hasAnchor) {
-      bodyCopy = cells[0]?.innerHTML?.trim() ?? null;
-      rowIndex++;
-    }
-  }
-
-  // CTA row
-  if (rows[rowIndex]) {
-    const cells = [...rows[rowIndex].querySelectorAll(':scope > div')];
-    const anchor = cells[0]?.querySelector('a') ?? null;
-    if (anchor !== null) {
-      const [parsedLink, linkErrors] = parseLink(anchor);
-      cta = parsedLink;
-      errors.push(...linkErrors);
-    }
-  }
+  const contentCells = [
+    ...element.querySelectorAll(':scope > div + div > div'),
+  ];
+  const columns = contentCells.map(parseContent);
 
   return [
-    {
-      type: 'PromoBar',
-      eyebrowIcon,
-      eyebrowText,
-      headlineLeft,
-      headlineRight,
-      bodyCopy,
-      cta,
-      theme,
-    },
-    errors,
+    { type: 'PromoBar', variant, theme, bgColor, columns },
+    [],
   ];
 };

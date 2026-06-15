@@ -29,7 +29,6 @@ type GlobalNavigation = {
 
 export type Input = {
   gnavSource: URL;
-  asideSource: URL | null;
   gnavTop?: number;
   mepMartech?: string;
   isLocalNav: boolean;
@@ -90,7 +89,7 @@ export const main = async (
     lanaLog(initial.message);
     throw initial;
   }
-  const { mainNav, aside: _aside, promoBarEl } = initial;
+  const { mainNav, promoBarEl } = initial;
   if (mainNav instanceof IrrecoverableError) {
     lanaLog(mainNav.message);
     throw mainNav;
@@ -107,7 +106,6 @@ export const main = async (
     throw gnavData;
   }
 
-  // TODO: Implement Aside
   await renderGnav(gnavData)(mountpoint);
 
   return postRenderingTasks(input);
@@ -122,6 +120,14 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
+  if (data.promoBar !== null) {
+    const promoWrapper = document.querySelector<HTMLElement>(
+      '.feds-promo-aside-wrapper',
+    );
+    if (promoWrapper !== null) {
+      promoWrapper.innerHTML = renderPromoBar(data.promoBar);
+    }
+  }
   if (data.darkFont) mountpoint.classList.add('dark-font');
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
@@ -159,7 +165,6 @@ export const renderGnavString = ({
   components,
   breadcrumbs,
   productCTA,
-  promoBar,
   unavEnabled,
   placeholders,
   localnav,
@@ -179,7 +184,6 @@ export const renderGnavString = ({
       ? lastBreadcrumb
       : lastBreadcrumb.text;
   return `
-${promoBar === null ? '' : renderPromoBar(promoBar)}
 <nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
@@ -274,7 +278,7 @@ export const postRenderingTasks = async (
   activeDropDown?.classList.add('active-element');
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
-  initPromoBarDismiss(input.mountpoint);
+  initPromoBarHeight(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -570,12 +574,40 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
-const initPromoBarDismiss = (mountpoint: HTMLElement): void => {
-  const promoBar = mountpoint.querySelector<HTMLElement>('.feds-promo-bar');
-  if (!promoBar) return;
-  const closeBtn = promoBar.querySelector<HTMLButtonElement>('.feds-promo-bar-close');
-  closeBtn?.addEventListener('click', () => {
-    promoBar.classList.add('is-hidden');
-  });
+const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
+  const promoBar = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar',
+  );
+  if (promoBar === null) return;
+
+  let naturalHeight = promoBar.offsetHeight;
+  let rafId: number | null = null;
+
+  const update = (): void => {
+    // How much of the promo bar is still above the viewport top.
+    // Clamp to [0, naturalHeight] so nav never goes negative or overshoots.
+    const visible = Math.max(0, naturalHeight - window.scrollY);
+    document.documentElement.style.setProperty(
+      '--feds-promo-bar-height',
+      `${visible}px`,
+    );
+  };
+
+  // Re-measure on resize in case the promo bar reflows (e.g. mobile wrap).
+  new ResizeObserver(() => {
+    naturalHeight = promoBar.offsetHeight;
+    update();
+  }).observe(promoBar);
+
+  const onScroll = (): void => {
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      update();
+    });
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  update();
 };
 

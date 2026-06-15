@@ -80,6 +80,9 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
+  /* Height of the promo bar; measured after render and set via JS so
+     the fixed <nav> can offset itself below the promo bar. */
+  --feds-promo-bar-height: 0px;
 }
 
 
@@ -93,9 +96,6 @@ header.global-navigation {
   top: 0;
   left: 0;
   z-index: 10;
-  /* right: 0;
-  max-width: var(--grid-max-width-default);
-  margin: auto; */
   /* Drives the height of `nav::after` (the rounded backdrop frame).
      Default value covers the nav row; the JS in
      PostRendering/ClickListeners.ts mutates this property when a
@@ -298,6 +298,7 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
+  top: var(--feds-promo-bar-height);
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
   margin: var(--s2a-spacing-xs) auto;

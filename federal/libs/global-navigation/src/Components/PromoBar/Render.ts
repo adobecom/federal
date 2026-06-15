@@ -1,64 +1,100 @@
-import { localizeHref } from "../../Utils/Utils";
-import { PromoBar } from "./Parse";
+import { primaryCTA, secondaryCTA } from "../CTA/Render";
+import { PrimaryCTA, SecondaryCTA } from "../CTA/Parse";
+import { PromoBar, PromoBarContent } from "./Parse";
+import { federateUrl } from "../../Utils/Utils";
 
-const eyebrowHTML = (
-  icon: string | null,
-  text: string | null,
-): HTML => {
-  if (!icon && !text) return '';
-  const iconEl = icon
-    ? icon.startsWith('http') || icon.startsWith('/')
-      ? `<img class="feds-promo-bar-eyebrow-icon" src="${icon}" alt="" aria-hidden="true" width="24" height="24">`
-      : `<span class="feds-promo-bar-eyebrow-icon" aria-hidden="true">${icon}</span>`
-    : '';
-  const textEl = text ? `<span class="feds-promo-bar-eyebrow-text">${text}</span>` : '';
-  return `<div class="feds-promo-bar-eyebrow">${iconEl}${textEl}</div>`;
+const iconHTML = (
+  src: string | null,
+  alt: string | null,
+): HTML => src !== null
+  ? `<img class="feds-promo-bar-icon" src="${federateUrl(src)}" alt="${alt ?? ''}" width="40" height="40" aria-hidden="true">`
+  : '';
+
+const ctaHTML = (cta: PrimaryCTA | SecondaryCTA | null): HTML => {
+  if (cta === null) return '';
+  return cta.type === 'PrimaryCTA' ? primaryCTA(cta) : secondaryCTA(cta);
 };
 
-export const promoBar = ({
-  eyebrowIcon,
-  eyebrowText,
-  headlineLeft,
-  headlineRight,
-  bodyCopy,
-  cta,
-  theme,
-}: PromoBar): HTML => {
-  const ctaHTML = cta
-    ? `<a href="${localizeHref(cta.href)}" class="feds-promo-bar-cta" daa-ll="promo-bar|${cta.text}">${cta.text}</a>`
-    : '';
+const bgStyle = (bgColor: string | null): string =>
+  bgColor !== null ? ` style="background-color:${bgColor}"` : '';
 
-  const bodyHTML = bodyCopy
-    ? `<p class="feds-promo-bar-body">${bodyCopy}</p>`
-    : '';
-
-  const rightColHTML = (headlineRight || ctaHTML)
-    ? `<div class="feds-promo-bar-right">
-        ${headlineRight ? `<p class="feds-promo-bar-headline-right">${headlineRight}</p>` : ''}
-        ${bodyHTML}
-        ${ctaHTML}
-      </div>`
-    : '';
-
+// ─── Minimized ──────────────────────────────────────────────────────────
+const renderMinimized = ({ theme, bgColor, columns }: PromoBar): HTML => {
+  const col = columns[0];
+  if (col === undefined) return '';
   return `
-<div class="feds-promo-bar feds-promo-bar--${theme}" role="region" aria-label="Promotion">
+<div
+  class="feds-promo-bar feds-promo-bar--minimized feds-promo-bar--${theme}"
+  ${bgStyle(bgColor)}
+  role="region"
+  aria-label="Promotion"
+  daa-lh="promo-bar"
+>
   <div class="feds-promo-bar-inner">
-    <div class="feds-promo-bar-left">
-      ${eyebrowHTML(eyebrowIcon, eyebrowText)}
-      <p class="feds-promo-bar-headline-left">${headlineLeft}</p>
-    </div>
-    ${rightColHTML}
+    ${iconHTML(col.icon, col.iconAlt)}
+    <p class="feds-promo-bar-text">${col.headline ?? ''}</p>
+    ${ctaHTML(col.cta)}
   </div>
-  <button
-    class="feds-promo-bar-close"
-    type="button"
-    aria-label="Dismiss promotion"
-    daa-ll="promo-bar|dismiss"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" fill="currentColor" width="10" height="10" aria-hidden="true">
-      <path d="M9.7071 1.7071a1 1 0 0 0-1.4142-1.4142L5 3.5858 1.7071.2929A1 1 0 0 0 .2929 1.7071L3.5858 5 .2929 8.2929a1 1 0 1 0 1.4142 1.4142L5 6.4142l3.2929 3.2929a1 1 0 0 0 1.4142-1.4142L6.4142 5l3.2929-3.2929Z"/>
-    </svg>
-  </button>
-</div>
-`.trim();
+</div>`.trim();
+};
+
+// ─── Maximized ──────────────────────────────────────────────────────────
+const renderMaximized = ({ theme, bgColor, columns }: PromoBar): HTML => {
+  const col = columns[0];
+  if (col === undefined) return '';
+  return `
+<div
+  class="feds-promo-bar feds-promo-bar--maximized feds-promo-bar--${theme}"
+  ${bgStyle(bgColor)}
+  role="region"
+  aria-label="Promotion"
+  daa-lh="promo-bar"
+>
+  <div class="feds-promo-bar-inner">
+    ${iconHTML(col.icon, col.iconAlt)}
+    ${col.productName !== null ? `<p class="feds-promo-bar-product">${col.productName}</p>` : ''}
+    ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
+    ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
+    ${ctaHTML(col.cta)}
+  </div>
+</div>`.trim();
+};
+
+// ─── Maximized-release ──────────────────────────────────────────────────
+const renderColumn = (col: PromoBarContent): HTML => {
+  const colBgStyle = col.bgImage !== null
+    ? ` style="background-image:url('${col.bgImage}')"`
+    : '';
+  return `
+<div class="feds-promo-bar-column"${colBgStyle}>
+  ${iconHTML(col.icon, col.iconAlt)}
+  ${col.productName !== null ? `<p class="feds-promo-bar-product">${col.productName}</p>` : ''}
+  ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
+  ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
+  ${ctaHTML(col.cta)}
+</div>`.trim();
+};
+
+const renderMaximizedRelease = (
+  { theme, bgColor, columns }: PromoBar,
+): HTML => `
+<div
+  class="feds-promo-bar feds-promo-bar--maximized-release feds-promo-bar--${theme}"
+  ${bgStyle(bgColor)}
+  role="region"
+  aria-label="Promotion"
+  daa-lh="promo-bar"
+>
+  <div class="feds-promo-bar-inner">
+    ${columns.map(renderColumn).join('')}
+  </div>
+</div>`.trim();
+
+// ─── Entry point ────────────────────────────────────────────────────────
+export const promoBar = (data: PromoBar): HTML => {
+  switch (data.variant) {
+    case 'maximized':         return renderMaximized(data);
+    case 'maximized-release': return renderMaximizedRelease(data);
+    default:                  return renderMinimized(data);
+  }
 };

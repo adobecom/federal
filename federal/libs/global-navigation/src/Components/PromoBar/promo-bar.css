@@ -1,17 +1,19 @@
 /* =========================================
-   Promo Bar
-   Full-width promotional banner rendered above the global navigation.
+   Promo Bar — shared base
    ========================================= */
 
+body:has(.feds-menu-active) .feds-promo-bar,
+body:has(.feds-popup.is-open) .feds-promo-bar {
+  display: none;
+}
+
 .feds-promo-bar {
+  position: relative;
   width: 100%;
   box-sizing: border-box;
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 64px;
-  padding: var(--s2a-spacing-md) var(--s2a-spacing-64);
   background-color: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);
 }
@@ -21,57 +23,131 @@
   color: var(--s2a-color-gray-25);
 }
 
+.feds-promo-aside-wrapper .feds-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 14px var(--s2a-spacing-lg);
+  border-radius: var(--s2a-border-radius-round);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  color: var(--s2a-color-gray-25);
+  text-decoration: none;
+  background-color: rgba(59, 99, 251, 1);
+}
+
 /* =========================================
-   Inner layout
+   CTA link — shared
    ========================================= */
 
-.feds-promo-bar-inner {
+.feds-promo-bar-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 var(--s2a-spacing-md);
+  border-radius: var(--s2a-border-radius-round);
+  border: var(--s2a-border-width-sm) solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.feds-promo-bar-cta:hover {
+  background-color: var(--s2a-color-transparent-black-08);
+}
+
+.feds-promo-bar--dark .feds-promo-bar-cta:hover {
+  background-color: var(--s2a-color-transparent-white-16);
+}
+
+/* =========================================
+   Minimized
+   Single-line: icon + text (with optional inline link) + CTA
+   ========================================= */
+
+.feds-promo-bar--minimized {
+  min-height: 48px;
+  padding: var(--s2a-spacing-md);
+}
+
+.feds-promo-bar--minimized .feds-promo-bar-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--s2a-spacing-xl);
+  justify-content: center;
+  gap: var(--s2a-spacing-md);
   width: 100%;
   max-width: 1312px;
+  flex-wrap: wrap;
 }
 
-/* =========================================
-   Left column: eyebrow + headline
-   ========================================= */
-
-.feds-promo-bar-left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s2a-spacing-xs);
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.feds-promo-bar-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--s2a-spacing-xs);
-}
-
-.feds-promo-bar-eyebrow-icon {
-  flex-shrink: 0;
+.feds-promo-bar--minimized .feds-promo-bar-icon {
   width: 24px;
   height: 24px;
+  flex-shrink: 0;
   object-fit: contain;
 }
 
-.feds-promo-bar-eyebrow-text {
-  font-size: var(--s2a-typography-font-size-label);
-  line-height: var(--s2a-typography-line-height-label);
-  font-weight: var(--s2a-font-weight-adobe-clean-regular);
+.feds-promo-bar--minimized .feds-promo-bar-text {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
   color: inherit;
-  opacity: 0.72;
 }
 
-.feds-promo-bar--dark .feds-promo-bar-eyebrow-text {
+.feds-promo-bar--minimized .feds-promo-bar-text a {
+  color: inherit;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+}
+
+/* =========================================
+   Maximized
+   Stacked: icon + product name + headline + body + CTA
+   ========================================= */
+
+.feds-promo-bar--maximized {
+  padding: var(--s2a-spacing-xl) calc(var(--s2a-spacing-xl) + 40px) var(--s2a-spacing-xl) var(--s2a-spacing-xl);
+}
+
+.feds-promo-bar--maximized .feds-promo-bar-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2a-spacing-xs);
+  width: 100%;
+  max-width: 640px;
+}
+
+.feds-promo-bar--maximized .feds-promo-bar-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-bottom: var(--s2a-spacing-xs);
+}
+
+.feds-promo-bar--maximized .feds-promo-bar-product {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  color: inherit;
   opacity: 0.8;
 }
 
-.feds-promo-bar-headline-left {
+.feds-promo-bar--maximized .feds-promo-bar-headline {
   margin: 0;
   font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
   font-size: 1.5rem;
@@ -80,28 +156,7 @@
   color: inherit;
 }
 
-/* =========================================
-   Right column: sub-headline + body + CTA
-   ========================================= */
-
-.feds-promo-bar-right {
-  display: flex;
-  align-items: center;
-  gap: var(--s2a-spacing-lg);
-  flex-shrink: 0;
-}
-
-.feds-promo-bar-headline-right {
-  margin: 0;
-  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
-  font-size: var(--s2a-typography-font-size-body-sm);
-  line-height: var(--s2a-typography-line-height-body-sm);
-  font-weight: var(--s2a-font-weight-adobe-clean-regular);
-  color: inherit;
-  max-width: 385px;
-}
-
-.feds-promo-bar-body {
+.feds-promo-bar--maximized .feds-promo-bar-body {
   margin: 0;
   font-family: var(--body-font-family, "Adobe Clean", sans-serif);
   font-size: var(--s2a-typography-font-size-body-sm);
@@ -110,125 +165,102 @@
   opacity: 0.8;
 }
 
+.feds-promo-bar--maximized .feds-promo-bar-body a {
+  color: inherit;
+}
+
+.feds-promo-bar--maximized .feds-promo-bar-cta {
+  margin-top: var(--s2a-spacing-sm);
+}
+
 /* =========================================
-   CTA button
+   Maximized-release
+   Two columns on desktop, each with image background
    ========================================= */
 
-.feds-promo-bar-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.feds-promo-bar--maximized-release {
+  padding: 0;
+  overflow: hidden;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2a-spacing-xs);
+  padding: var(--s2a-spacing-xl);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-icon {
+  width: 40px;
   height: 40px;
-  padding: 0 var(--s2a-spacing-lg);
-  border-radius: var(--s2a-border-radius-round);
-  border: var(--s2a-border-width-sm) solid transparent;
-  background-color: var(--s2a-color-blue-900);
-  color: var(--s2a-color-gray-25);
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-bottom: var(--s2a-spacing-xs);
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-product {
+  margin: 0;
   font-family: var(--body-font-family, "Adobe Clean", sans-serif);
   font-size: var(--s2a-typography-font-size-label);
   line-height: var(--s2a-typography-line-height-label);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background-color 0.3s ease;
-}
-
-.feds-promo-bar-cta:hover {
-  background-color: var(--s2a-color-blue-1000);
-}
-
-.feds-promo-bar-cta:active {
-  background-color: var(--s2a-color-blue-1100);
-}
-
-/* =========================================
-   Dismiss button
-   ========================================= */
-
-.feds-promo-bar-close {
-  position: absolute;
-  top: 50%;
-  right: var(--s2a-spacing-md);
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  border-radius: var(--s2a-border-radius-round);
-  background: transparent;
   color: inherit;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  opacity: 0.8;
 }
 
-.feds-promo-bar-close:hover {
-  background-color: var(--s2a-color-transparent-black-08);
+.feds-promo-bar--maximized-release .feds-promo-bar-headline {
+  margin: 0;
+  font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  color: inherit;
 }
 
-.feds-promo-bar--dark .feds-promo-bar-close:hover {
-  background-color: var(--s2a-color-transparent-white-16);
+.feds-promo-bar--maximized-release .feds-promo-bar-body {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  color: inherit;
+  opacity: 0.8;
 }
 
-.feds-promo-bar-close:focus-visible {
-  outline: 2px solid var(--s2a-color-blue-800);
-  outline-offset: 2px;
+.feds-promo-bar--maximized-release .feds-promo-bar-body a {
+  color: inherit;
 }
+
+.feds-promo-bar--maximized-release .feds-promo-bar-cta {
+  margin-top: var(--s2a-spacing-sm);
+}
+
 
 /* =========================================
-   Mobile layout (< 1024px)
+   Mobile (< 1024px)
    ========================================= */
 
 @media (max-width: 1023px) {
-  .feds-promo-bar {
-    padding: var(--s2a-spacing-xl) var(--s2a-spacing-lg);
-    min-height: auto;
+  .feds-promo-bar--minimized {
+    padding: var(--s2a-spacing-lg);
+    padding-bottom: var(--s2a-spacing-3xl);
   }
 
-  .feds-promo-bar-inner {
+  .feds-promo-bar--minimized .feds-promo-bar-inner {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: var(--s2a-spacing-md);
   }
 
-  .feds-promo-bar-left {
-    align-items: center;
-  }
-
-  .feds-promo-bar-eyebrow {
-    justify-content: center;
-  }
-
-  .feds-promo-bar-headline-left {
-    font-size: 1.25rem;
-  }
-
-  .feds-promo-bar-right {
-    flex-direction: column;
-    align-items: center;
-    gap: var(--s2a-spacing-md);
-  }
-
-  .feds-promo-bar-headline-right {
-    max-width: none;
-    text-align: center;
-  }
-
-  .feds-promo-bar-close {
-    top: var(--s2a-spacing-xs);
-    right: var(--s2a-spacing-xs);
-    transform: none;
+  .feds-promo-bar--maximized-release .feds-promo-bar-inner {
+    grid-template-columns: 1fr;
   }
 }
 
-/* =========================================
-   Dismissed state
-   ========================================= */
-
-.feds-promo-bar.is-hidden {
-  display: none;
-}
