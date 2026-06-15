@@ -51,11 +51,17 @@ const renderMaximized = ({ theme, bgColor, columns }: PromoBar): HTML => {
   daa-lh="promo-bar"
 >
   <div class="feds-promo-bar-inner">
-    ${iconHTML(col.icon, col.iconAlt)}
-    ${col.productName !== null ? `<p class="feds-promo-bar-product">${col.productName}</p>` : ''}
-    ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
-    ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
-    ${ctaHTML(col.cta)}
+    <div class="feds-promo-bar-left">
+      <div class="feds-promo-product-container">
+        ${iconHTML(col.icon, col.iconAlt)}
+        ${col.productName !== null ? `<p class="feds-promo-bar-product">${col.productName}</p>` : ''}
+      </div>
+        ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
+      </div>
+    <div class="feds-promo-bar-right">
+      ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
+      ${ctaHTML(col.cta)}
+    </div>
   </div>
 </div>`.trim();
 };

@@ -84,21 +84,12 @@ const parseContent = (cell: Element): PromoBarContent => {
   }) ?? null;
   const headline = headlineEl?.innerHTML?.trim() ?? null;
 
-  // Body <p>: has visible text, not the icon row, not the CTA row,
-  // not the tracking-header row, and not a headline-only strong.
-  const bodyEl = [...cell.querySelectorAll('p')].find((p) => {
-    if (
-      p.querySelector('picture') !== null
-      && (p.textContent?.trim() ?? '') === ''
-    ) return false;
+  // Body: the first <p> after the headline that has no <strong>.
+  const allPs = [...cell.querySelectorAll(':scope > p')];
+  const headlineIdx = headlineEl !== null ? allPs.indexOf(headlineEl) : -1;
+  const bodyEl = allPs.slice(headlineIdx + 1).find((p) => {
+    if (p.querySelector('strong') !== null) return false;
     if (p.querySelector('em > a') !== null) return false;
-    if (p.querySelector('strong > a') !== null) return false;
-    if (p.querySelector('strong.tracking-header') !== null) return false;
-    if (
-      p.querySelector('strong') !== null
-      && p.querySelector('a') === null
-    ) return false;
-    if (p.closest('h5') !== null) return false;
     return (p.textContent?.trim() ?? '').length > 0;
   }) ?? null;
   const body = bodyEl?.innerHTML?.trim() ?? null;
