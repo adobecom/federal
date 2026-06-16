@@ -170,7 +170,7 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
   }
 
   .feds-promo-bar-product {
-    color: var(--s2a-color-content-body-subtle);
+    color: var(--s2a-color-transparent-white-64);
     font-family: var(--body-font-family);
     font-size: var(--s2a-typography-font-size-label);
     font-weight: var(--s2a-font-weight-adobe-clean-bold);
@@ -277,6 +277,39 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
   margin-top: var(--s2a-spacing-sm);
 }
 
+
+/* =========================================
+   Responsive slots
+   Each slot carries the viewport classes it serves.
+   All slots start hidden; media queries reveal the
+   correct one for each breakpoint.
+   ========================================= */
+
+.feds-promo-bar-slot {
+  display: none;
+  width: 100%;
+}
+
+/* Mobile (< 768px): show slots that include --mobile */
+@media (max-width: 767px) {
+  .feds-promo-bar-slot--mobile {
+    display: contents;
+  }
+}
+
+/* Tablet (768px – 1023px): show slots that include --tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .feds-promo-bar-slot--tablet {
+    display: contents;
+  }
+}
+
+/* Desktop (≥ 1024px): show slots that include --desktop */
+@media (min-width: 1024px) {
+  .feds-promo-bar-slot--desktop {
+    display: contents;
+  }
+}
 
 /* =========================================
    Mobile (< 1024px)

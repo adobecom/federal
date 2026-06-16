@@ -19,12 +19,19 @@ export type PromoBarContent = {
   bgImage: string | null;
 };
 
+export type PromoBarViewport = 'mobile' | 'tablet' | 'desktop';
+
+export type PromoBarSlot = {
+  viewports: PromoBarViewport[];
+  content: PromoBarContent;
+};
+
 export type PromoBar = {
   type: 'PromoBar';
   variant: PromoBarVariant;
   theme: 'light' | 'dark';
   bgColor: string | null;
-  columns: PromoBarContent[];
+  slots: PromoBarSlot[];
 };
 
 const ERRORS = {
@@ -59,14 +66,9 @@ const parseContent = (cell: Element): PromoBarContent => {
   const pictures = [...cell.querySelectorAll('picture')];
   // Last <picture> is a bg image only when there are 2+ pictures;
   // with just one it is the icon.
-  const bgPicture = pictures.length > 1
-    ? pictures[pictures.length - 1]
-    : null;
+  const bgPicture = pictures[0] ?? null;
   const bgImg = bgPicture?.querySelector('img') ?? null;
-  const bgImage = bgImg?.getAttribute('src')
-    ?? bgImg?.getAttribute('srcset')?.split('?')[0]
-    ?? null;
-
+  const bgImage = bgImg?.getAttribute('src') ?? bgImg?.getAttribute('srcset')?.split('?')[0] ?? null;
   const productName = cell.querySelector('h5')?.textContent?.trim() ?? null;
 
   // Headline: first <p> with a <strong> that isn't a pure CTA row.
@@ -129,10 +131,30 @@ export const parsePromoBar = (
   const contentCells = [
     ...element.querySelectorAll(':scope > div + div > div'),
   ];
-  const columns = contentCells.map(parseContent);
+  const parsed = contentCells.map(parseContent);
+
+  // Map parsed cells to viewport slots based on count:
+  // 1 cell  → all viewports
+  // 2 cells → [0] mobile+tablet, [1] desktop
+  // 3 cells → [0] mobile, [1] tablet, [2] desktop
+  const slots: PromoBarSlot[] = parsed.length === 3
+    ? [
+        { viewports: ['mobile'], content: parsed[0] },
+        { viewports: ['tablet'], content: parsed[1] },
+        { viewports: ['desktop'], content: parsed[2] },
+      ]
+    : parsed.length === 2
+    ? [
+        { viewports: ['mobile', 'tablet'], content: parsed[0] },
+        { viewports: ['desktop'], content: parsed[1] },
+      ]
+    : parsed.map((content) => ({
+        viewports: ['mobile', 'tablet', 'desktop'] as PromoBarViewport[],
+        content,
+      }));
 
   return [
-    { type: 'PromoBar', variant, theme, bgColor, columns },
+    { type: 'PromoBar', variant, theme, bgColor, slots },
     [],
   ];
 };
