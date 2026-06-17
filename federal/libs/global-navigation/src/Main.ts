@@ -51,7 +51,6 @@ export type Input = {
   localizeLink?: LocalizeLink;
   convertStageLinks?: (args: {
     anchors: HTMLAnchorElement[];
-    config: unknown;
     hostname: string;
     href: string;
   }) => void;
@@ -115,7 +114,6 @@ export const main = async (
 
   input.convertStageLinks?.({
     anchors: [...mountpoint.querySelectorAll('a')],
-    config: miloConfig,
     hostname: window.location.hostname,
     href: window.location.href,
   });
