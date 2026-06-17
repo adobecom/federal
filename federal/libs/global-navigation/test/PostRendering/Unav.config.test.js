@@ -1,26 +1,21 @@
 import { expect } from '@esm-bundle/chai';
 import { getUnavComponents } from '../../src/PostRendering/Unav/Unav.config';
 import { setMiloConfig, getMetadata } from '../../src/Utils/Utils';
+import { __resetMiloConfigForTests } from '../../src/state/MiloConfig';
 
 describe('UNAV Config', () => {
   let originalAdobeIMS;
   let originalAdobeProfile;
   let createdMetaTags = [];
 
-  before(() => {
-    // Initialize MiloConfig once for all tests (singleton pattern)
-    const config = {
+  beforeEach(() => {
+    // Reset and re-initialize MiloConfig for test isolation
+    __resetMiloConfigForTests();
+    setMiloConfig({
       env: { name: 'stage' },
       locale: { prefix: '' },
-    };
-    try {
-      setMiloConfig(config);
-    } catch (e) {
-      // Already initialized, that's okay
-    }
-  });
+    });
 
-  beforeEach(() => {
     // Store originals
     originalAdobeIMS = window.adobeIMS;
     originalAdobeProfile = window.adobeProfile;

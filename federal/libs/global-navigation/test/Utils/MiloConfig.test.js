@@ -1,58 +1,52 @@
 import { expect } from '@esm-bundle/chai';
 import { setMiloConfig, getMiloConfig } from '../../src/Utils/Utils';
+import { __resetMiloConfigForTests } from '../../src/state/MiloConfig';
 
 /**
  * MiloConfig Unit Tests
- * 
+ *
  * SCOPE: Tests configuration management singleton (setMiloConfig, getMiloConfig)
- * 
+ *
  * Tests validate:
  * - Singleton initialization behavior
  * - Runtime validation of config structure
  * - Required and optional property handling
  * - Error handling for invalid configs
  * - Type safety and structure preservation
- * 
+ *
  * SINGLETON PATTERN NOTE:
- * MiloConfig can only be initialized once per test run. Tests are organized
- * to work with this constraint using shared initialization in before() hook.
+ * Each test gets a fresh MiloConfig via __resetMiloConfigForTests() +
+ * setMiloConfig() in beforeEach. This replaces the previous try/catch
+ * idiom that worked around the once-only init.
  */
-describe('MiloConfig', () => {
-  let testConfig;
-
-  before(() => {
-    // Initialize MiloConfig once for all tests (singleton pattern)
-    // This config will be used by all tests that call getMiloConfig()
-    testConfig = {
-      env: { 
-        name: 'stage',
-        ims: 'stg1',
-        adobeIO: 'https://adobeio-stage.adobe.io'
-      },
-      locale: { 
-        prefix: '',
-        ietf: 'en-US',
-        language: 'en'
-      },
-      unav: {
-        showSectionDivider: true,
-        profile: {
-          signInCtaStyle: 'secondary',
-          config: { test: 'value' }
-        }
-      },
-      jarvis: {
-        id: 'test-jarvis-id'
-      },
-      signInContext: { contextKey: 'contextValue' }
-    };
-
-    try {
-      setMiloConfig(testConfig);
-    } catch (e) {
-      // Already initialized by another test file - that's okay
-      // Tests will use whatever config was set first
+const testConfig = {
+  env: {
+    name: 'stage',
+    ims: 'stg1',
+    adobeIO: 'https://adobeio-stage.adobe.io'
+  },
+  locale: {
+    prefix: '',
+    ietf: 'en-US',
+    language: 'en'
+  },
+  unav: {
+    showSectionDivider: true,
+    profile: {
+      signInCtaStyle: 'secondary',
+      config: { test: 'value' }
     }
+  },
+  jarvis: {
+    id: 'test-jarvis-id'
+  },
+  signInContext: { contextKey: 'contextValue' }
+};
+
+describe('MiloConfig', () => {
+  beforeEach(() => {
+    __resetMiloConfigForTests();
+    setMiloConfig(testConfig);
   });
 
   // ==========================================================================
@@ -497,24 +491,6 @@ describe('MiloConfig', () => {
   // ==========================================================================
 
   describe('integration patterns', () => {
-    it('should work with try-catch pattern used in other tests', () => {
-      let didCatch = false;
-      
-      try {
-        setMiloConfig({
-          env: { name: 'prod' },
-          locale: { prefix: '/de' }
-        });
-      } catch (e) {
-        // Expected - already initialized
-        didCatch = true;
-      }
-      
-      // Should either succeed silently or be caught
-      const config = getMiloConfig();
-      expect(config).to.exist;
-    });
-
     it('should provide config that can be used for UNAV initialization', () => {
       const config = getMiloConfig();
       

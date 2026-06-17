@@ -2,6 +2,7 @@ import { expect } from '@esm-bundle/chai';
 import { loadUnav } from '../../src/PostRendering/Unav/Unav.loader';
 import { RecoverableError } from '../../src/Error/Error';
 import { setMiloConfig } from '../../src/Utils/Utils';
+import { __resetMiloConfigForTests } from '../../src/state/MiloConfig';
 
 /**
  * UNAV Loader Integration Tests
@@ -108,7 +109,8 @@ describe('UNAV Loader Integration Tests', () => {
     // ========================================================================
     // Setup: MiloConfig Initialization
     // ========================================================================
-    
+
+    __resetMiloConfigForTests();
     setMiloConfig({
       env: { name: 'stage' },
       locale: { prefix: '' }  // Empty prefix = en_US (default)
