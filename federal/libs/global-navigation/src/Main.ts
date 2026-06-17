@@ -126,6 +126,11 @@ mountpoint: HTMLElement
     );
     if (promoWrapper !== null) {
       promoWrapper.innerHTML = renderPromoBar(data.promoBar);
+      const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
+      const barBgColor = promoBarEl?.style.backgroundColor ?? '';
+      if (barBgColor !== '') {
+        promoWrapper.style.backgroundColor = barBgColor;
+      }
     }
   }
   if (data.darkFont) mountpoint.classList.add('dark-font');

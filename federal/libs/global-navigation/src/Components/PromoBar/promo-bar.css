@@ -16,6 +16,8 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
   justify-content: center;
   background-color: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);
+  max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
+  margin: auto;
 }
 
 .feds-promo-bar--dark {
@@ -218,8 +220,20 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
 
 .feds-promo-bar--maximized-release .feds-promo-bar-inner {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto 1fr;
   width: 100%;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-bg {
+  display: block;
+  overflow: hidden;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .feds-promo-bar--maximized-release .feds-promo-bar-column {
@@ -227,10 +241,12 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--s2a-spacing-xs);
-  padding: var(--s2a-spacing-xl);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  padding: var(--s2a-spacing-4xl);
+  padding-right: var(--s2a-spacing-2xl);
+  width: 480px;
 }
 
 .feds-promo-bar--maximized-release .feds-promo-bar-icon {
