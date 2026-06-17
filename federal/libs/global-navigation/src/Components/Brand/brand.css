@@ -198,7 +198,7 @@ header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .f
     display: none;
   }
 
-  .feds-brand {
+  header.global-navigation:not(.is-compact) .feds-brand {
     margin: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
   }
 }
