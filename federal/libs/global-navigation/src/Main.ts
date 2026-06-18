@@ -472,8 +472,13 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     }
   };
 
-  const SCROLL_THRESHOLD = 20;
-  let scrolledPast = window.scrollY > SCROLL_THRESHOLD;
+  const promoBarEl = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar',
+  );
+  const getScrollThreshold = (): number =>
+    promoBarEl !== null ? promoBarEl.offsetHeight : 20;
+
+  let scrolledPast = window.scrollY > getScrollThreshold();
   let scrollRafId: number | null = null;
 
   // Set the initial state synchronously before the first paint.
@@ -483,7 +488,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     if (scrollRafId !== null) return;
     scrollRafId = requestAnimationFrame(() => {
       scrollRafId = null;
-      const next = window.scrollY > SCROLL_THRESHOLD;
+      const next = window.scrollY > getScrollThreshold();
       if (next === scrolledPast) return;
       scrolledPast = next;
       updateHeaderState(scrolledPast);
