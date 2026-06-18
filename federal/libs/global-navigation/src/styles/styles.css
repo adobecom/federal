@@ -508,6 +508,12 @@ header.global-navigation.feds-header-scrolled nav::after {
   color: var(--s2a-color-gray-1000);
 }
 
+/* THIN GNAV */
+
+header.global-navigation.thin nav .feds-nav-toggle {
+  display: none;
+}
+
 /* =========================================
    Utilities (App Switcher, Profile)
    ========================================= */
@@ -954,6 +960,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   header.global-navigation.dark-font:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
     border-bottom: 2px var(--s2a-color-gray-1000) solid;
   }
+
+   header.global-navigation.is-compact .unav-comp-app-switcher-popover {
+    z-index: 4;
+   }
 }
 
 /* =========================================
@@ -1773,3 +1783,4 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   animation: none;
   color: var(--s2a-color-gray-1000);
 }
+

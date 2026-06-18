@@ -82,11 +82,13 @@ const maximizedReleaseSlot = (
 <div class="feds-promo-bar-slot ${viewportClass(viewports)}">
   <div class="feds-promo-bar-inner">
     <div class="feds-promo-bar-column">
+       <div class="feds-promo-product-container">
       ${iconHTML(col.icon, col.iconAlt)}
       ${col.productName !== null ? `<p class="feds-promo-bar-product">${col.productName}</p>` : ''}
-      ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
-      ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
-      ${ctaHTML(col.cta)}
+    </div>
+    ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
+    ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
+    ${ctaHTML(col.cta)}
     </div>
     ${col.bgImage !== null ? `<picture class="feds-promo-bar-bg"><img loading="lazy" src="${federateUrl(col.bgImage)}" alt=""></picture>` : ''}
   </div>
