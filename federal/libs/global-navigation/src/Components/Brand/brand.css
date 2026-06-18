@@ -11,6 +11,7 @@ li.feds-brand-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
+  flex-shrink: 0;
 }
 
 header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav .feds-brand-image svg,
