@@ -23,6 +23,7 @@ type GlobalNavigation = {
   reloadUnav: () => void;
   getGnavTopPosition: () => number;
   setGnavTopPosition: (_: number) => void;
+  getGnavHeight: () => number;
   errors: Set<RecoverableError>;
 };
 
@@ -36,8 +37,6 @@ export type Input = {
   unavEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
-  getStageDomainMap: (domainmap: unknown[], env: string) =>
-    { [key: string]: string }
   // for now we only support inBlock commands.
   // Since MEP on gnav is relatively rare we'll
   // keep it at this and see if any problems crop up.
@@ -50,6 +49,11 @@ export type Input = {
   // later date.
   personalization: PersonalizationConfig;
   localizeLink?: LocalizeLink;
+  convertStageLinks?: (args: {
+    anchors: HTMLAnchorElement[];
+    hostname: string;
+    href: string;
+  }) => void;
 };
 
 export const main = async (
@@ -113,9 +117,14 @@ export const main = async (
   // TODO: Implement Aside
   await renderGnav(gnavData)(mountpoint);
 
+  input.convertStageLinks?.({
+    anchors: [...mountpoint.querySelectorAll('a')],
+    hostname: window.location.hostname,
+    href: window.location.href,
+  });
+
   return postRenderingTasks(input);
 };
-
 
 export const renderGnav = (
   data: GlobalNavigationData
@@ -125,6 +134,7 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
+  if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');
   if (data.darkFont) mountpoint.classList.add('dark-font');
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
@@ -257,7 +267,6 @@ export const renderGnavString = ({
 `;
 };
 
-
 export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
@@ -296,12 +305,44 @@ export const postRenderingTasks = async (
     ? (): void => {}
     : unav.reloadUnav;
 
+  const localnavMarginTop = 8;
+  const breadcrumbs = input.mountpoint.querySelector('nav > ul.feds-breadcrumbs');
+  const mobileLocalnav = input.mountpoint.querySelector('li.feds-menu-wrapper');
+  type NavType = "Default" | "DefaultCompact" | "Localnav" | "LocalnavCompact";
+  const getGnavHeight = (): number => {
+    const nav = input.mountpoint.firstElementChild;
+    if (!nav) return 0;
+    const navType = ((): NavType => {
+      const isCompact = input.mountpoint.classList.contains('is-compact') || !isDesktop.matches;
+      const defaultOrLocalnav = nav.classList.contains('localnav')
+        ? "Localnav"
+        : "Default";
+      return `${defaultOrLocalnav}${isCompact ? "Compact" : ""}`;
+    })();
+    const breadcrumbsHeight = breadcrumbs
+      ? (breadcrumbs as HTMLElement).offsetHeight
+      : 0;
+    const navHeight = (nav as HTMLElement).offsetHeight;
+    const mobileLocalnavHeight = mobileLocalnav
+      ? (mobileLocalnav as HTMLElement).offsetHeight
+      : 0;
+    switch (navType) {
+      case "Default":
+      case "DefaultCompact":
+      case "Localnav": return navHeight + breadcrumbsHeight + localnavMarginTop;
+      case "LocalnavCompact": return navHeight + mobileLocalnavHeight + localnavMarginTop;
+      default: navType satisfies never;
+    }
+    return 0;
+  };
+
   return {
     closeEverything: () => closePopovers(input.mountpoint),
     reloadUnav,
     errors,
     setGnavTopPosition: (_): void => {},
     getGnavTopPosition: (): number => 0,
+    getGnavHeight,
   };
 };
 
@@ -569,4 +610,3 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
     });
   });
 };
-
