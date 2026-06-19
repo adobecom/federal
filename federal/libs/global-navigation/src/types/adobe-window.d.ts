@@ -71,6 +71,19 @@ declare global {
       start: () => void;
       stop: () => void;
     };
+
+    /** Adobe Launch: Properties set for all outgoing analytics events. */
+    alloy_all?: {
+      data?: {
+        _adobe_corpnew?: {
+          digitalData?: {
+            custom?: {
+              arp_token?: string;
+            };
+          };
+        };
+      };
+    };
   }
 }
 
