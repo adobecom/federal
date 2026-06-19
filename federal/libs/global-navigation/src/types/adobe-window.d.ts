@@ -56,7 +56,9 @@ declare global {
       preloadSDK: (
         env: string,
         config: Record<string, unknown>,
-      ) => Promise<{ updateConfig: (config: Record<string, unknown>) => Promise<void> }>;
+      ) => Promise<{
+        updateConfig: (config: Record<string, unknown>) => Promise<void>;
+      }>;
     };
 
     /** Initialized AUP SDK instance */
@@ -68,6 +70,19 @@ declare global {
     lenis?: {
       start: () => void;
       stop: () => void;
+    };
+
+    /** Adobe Launch: Properties set for all outgoing analytics events. */
+    alloy_all?: {
+      data?: {
+        _adobe_corpnew?: {
+          digitalData?: {
+            custom?: {
+              arp_token?: string;
+            };
+          };
+        };
+      };
     };
   }
 }
