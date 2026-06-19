@@ -7,7 +7,7 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
-import { loadUnav } from "./PostRendering/Unav/Unav";
+import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
@@ -83,6 +83,11 @@ export const main = async (
 
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
+
+  // Kick off AUP SDK init in parallel with gnav fetch/parse/render and the
+  // UniversalNav.js download. Bails internally if prerequisites aren't met;
+  // loadUnav() retries defensively for the late-IMS case.
+  if (unavEnabled) preloadAupSdk();
 
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError) {

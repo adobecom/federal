@@ -9,8 +9,8 @@ import type {
   UserProfile,
   HelpItem,
 } from './Unav.types';
-import { setUserProfile, getUniversalNavLocale } from './Unav.utils';
-import { getMiloConfig, getMetadata } from '../../Utils/Utils';
+import { setUserProfile } from './Unav.utils';
+import { getMiloConfig, getMetadata, isBEEnabled } from '../../Utils/Utils';
 
 // ============================================================================
 // Helper functions
@@ -111,6 +111,7 @@ function getHelpChildren(): HelpItem[] {
  */
 export const getUnavComponents = (): UnavComponents => {
   const config = getMiloConfig();
+  const beEnabled = isBEEnabled();
   const uncAppId = config?.unav?.uncAppId;
   return {
     profile: {
@@ -121,7 +122,10 @@ export const getUnavComponents = (): UnavComponents => {
             enableLocalSection: true,
             enableProfileSwitcher: true,
             miniAppContext: {
-              enableManagePeople: config?.unav?.profile?.enableManagePeople ?? true,
+              ...(beEnabled && {
+                enableManagePeople:
+                  config?.unav?.profile?.enableManagePeople ?? true,
+              }),
               logger: {
                 trace: (): void => {},
                 debug: (): void => {},
@@ -142,14 +146,15 @@ export const getUnavComponents = (): UnavComponents => {
                 error: (): void => {},
               },
             },
-            managePeopleConfig: {
-              enableWorkflow: true,
-              params: {
-                enableinlineoverlay: 's2-compat',
-                locale: getUniversalNavLocale(config.locale),
+            ...(beEnabled && {
+              managePeopleConfig: {
+                enableWorkflow: true,
+                params: {
+                  enableinlineoverlay: 's2-compat',
+                },
+                ...config?.unav?.profile?.managePeopleConfig,
               },
-              ...config?.unav?.profile?.managePeopleConfig,
-            },
+            }),
             complexConfig: config?.unav?.profile?.complexConfig || null,
             ...config?.unav?.profile?.config,
           },

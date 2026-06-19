@@ -63,6 +63,12 @@ declare global {
     aupsdk?: {
       updateConfig: (config: Record<string, unknown>) => Promise<void>;
     };
+
+    /** Smooth-scroll controller used by manage-people modal flow */
+    lenis?: {
+      start: () => void;
+      stop: () => void;
+    };
   }
 }
 

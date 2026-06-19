@@ -271,8 +271,10 @@ export const getVisitorGuid = async (): Promise<string | undefined> => {
  * and invokes the closeCallback on cancel or backdrop click.
  *
  * @param element - The element to render inside the dialog
- * @param _ - Unused second argument(attributes) from the AUP SDK callback signature
- * @param closeCallback - Called with `{ type: 'close' }` when the dialog is dismissed
+ * @param _ - Unused second argument (attributes) from the AUP SDK
+ * callback signature
+ * @param closeCallback - Called with `{ type: 'close' }` when the dialog
+ * is dismissed
  */
 export const showAupDialog = async (
   element: HTMLElement,
@@ -285,6 +287,7 @@ export const showAupDialog = async (
   document.body.appendChild(dialog);
   dialog.addEventListener('cancel', () => {
     closeCallback({ type: 'close' });
+    dialog.close();
     dialog.remove();
     document.documentElement.classList.remove('manage-people-disable-scroll');
   });
@@ -292,9 +295,12 @@ export const showAupDialog = async (
     if (e.target === dialog) {
       closeCallback({ type: 'close' });
       dialog.close();
+      dialog.remove();
+      window.lenis?.start();
       document.documentElement.classList.remove('manage-people-disable-scroll');
     }
   });
+  window.lenis?.stop();
   document.documentElement.classList.add('manage-people-disable-scroll');
   dialog.showModal();
 };

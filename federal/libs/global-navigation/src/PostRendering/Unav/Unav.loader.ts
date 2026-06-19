@@ -11,6 +11,7 @@ import {
   isDesktop,
   getMiloConfig,
   getMiloLocaleSettings,
+  isBEEnabled,
   MiloConfig
 } from '../../Utils/Utils';
 import type {
@@ -33,6 +34,87 @@ import { getUnavComponents } from './Unav.config';
 // ============================================================================
 
 const AUP_SDK_VERSION = '1.0.756';
+
+// ============================================================================
+// AUP SDK eager initialization
+// ============================================================================
+
+/**
+ * Module-scoped single-flight promise for AUP SDK readiness.
+ *
+ * Kicked off from main() at IMS-ready time so script load + preloadSDK +
+ * updateConfig run in parallel with gnav fetch/parse/render and the
+ * UniversalNav.js download, instead of blocking inside Unav-Time.
+ */
+let aupSdkPromise: Promise<unknown> | undefined;
+
+/**
+ * Starts AUP SDK initialization if it hasn't been started yet.
+ *
+ * Safe to call multiple times. Intentionally bails (without setting the
+ * promise) when prerequisites aren't met — signed-out, MiloConfig not ready,
+ * or ARP disabled — so a later call can retry. The defensive call inside
+ * loadUnav() covers the late-IMS case.
+ */
+export const preloadAupSdk = (): void => {
+  if (aupSdkPromise) return;
+
+  if (window.adobeIMS?.isSignedInUser() !== true) return;
+
+  let config: MiloConfig;
+  try {
+    config = getMiloConfig();
+  } catch (_error) {
+    return;
+  }
+
+  const isArpEnabled = config?.unav?.isArpEnabled ?? true;
+  if (!isArpEnabled) return;
+
+  const environment = config.env.name === 'prod' ? 'prod' : 'stage';
+  const clientId = (window as WindowWithAdobeId)?.adobeid?.client_id;
+  const beEnabled = isBEEnabled();
+
+  aupSdkPromise = loadScript(
+    `https://shared-components.${environment}.adobe.com/aup-sdk/${AUP_SDK_VERSION}/main.js`,
+    undefined,
+    { mode: 'async' },
+  ).then(async (): Promise<unknown> => {
+    window.aupsdk = window.aupsdk ?? await window.AUPSDK?.preloadSDK('adobe-com-stable', {
+      appId: 'adobe_com',
+      apiKey: clientId,
+      getAccessToken: (): Promise<string | undefined> =>
+        Promise.resolve(window.adobeIMS?.getAccessToken()?.token),
+      getProfile: () => Promise.resolve(window.adobeIMS?.getProfile()),
+      environment,
+      cdnEnvironment: environment,
+      locale: config?.locale?.ietf ?? 'en-US',
+      appName: 'adobecom',
+      appVersion: '1.0',
+      colorScheme: 'light',
+      ...(beEnabled && { showDialog: showAupDialog }),
+    });
+    if (beEnabled) {
+      await window.aupsdk?.updateConfig({ miniAppContext: { features: ['useToasts'] } });
+    }
+    return window.aupsdk;
+  });
+
+  // Suppress unhandled-rejection noise without losing the rejection for the
+  // real consumer (fetchAUPSDKInstance → UNav). Attaching a no-op .catch
+  // marks the rejection handled while leaving aupSdkPromise itself rejected.
+  aupSdkPromise.catch((): void => {});
+};
+
+/** Returns the in-flight or resolved AUP SDK promise, if any. */
+export const getAupSdkInstance = (): Promise<unknown> | undefined =>
+  aupSdkPromise;
+
+/** Test-only: resets cached promise and window state. */
+export const __resetAupSdkForTests = (): void => {
+  aupSdkPromise = undefined;
+  delete window.aupsdk;
+};
 
 // ============================================================================
 // Types
@@ -188,8 +270,14 @@ export const loadUnav = async (
       unavVersion = '1.6';
     }
 
-    // Load JS and CSS in parallel
-    const loadPromises = [
+    // Defensive: covers the late-IMS case where main() bailed because
+    // adobeIMS wasn't signed-in yet. Called before Promise.all so the AUP
+    // script still races UniversalNav.js even in the fallback path.
+    preloadAupSdk();
+
+    // Load JS and CSS in parallel. AUP SDK was already kicked off above
+    // (or from main() at IMS-ready time); see preloadAupSdk above.
+    await Promise.all([
       loadScript(
         `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.js`
       ),
@@ -197,18 +285,7 @@ export const loadUnav = async (
         `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.css`,
         true
       ),
-    ];
-    
-    //Early-load AUP SDK for signed-in users
-    if (window.adobeIMS?.isSignedInUser() === true) {
-      loadPromises.push(loadScript(
-        `https://shared-components.${environment}.adobe.com/aup-sdk/${AUP_SDK_VERSION}/main.js`,
-        undefined,
-        { mode: 'async' },
-      ));
-    }
-
-    await Promise.all(loadPromises);
+    ]);
 
     // ========================================================================
     // Step 6: Build component children array
@@ -291,24 +368,10 @@ export const loadUnav = async (
             ...config?.unav?.arpConfig?.metadata,
           },
         }),
-        fetchAUPSDKInstance: async (): Promise<unknown> => {
-          window.aupsdk = window.aupsdk ?? await window.AUPSDK?.preloadSDK('adobe-com-stable', {
-            appId: 'adobe_com',
-            apiKey: (window as WindowWithAdobeId)?.adobeid?.client_id,
-            getAccessToken: (): Promise<string | undefined> =>
-              Promise.resolve(window.adobeIMS?.getAccessToken()?.token),
-            getProfile: () => window.adobeIMS?.getProfile(),
-            environment,
-            cdnEnvironment: environment,
-            locale: locale.split('_')[0],
-            appName: 'adobecom',
-            appVersion: '1.0',
-            colorScheme: 'light',
-            showDialog: showAupDialog,
-          });
-          await window.aupsdk?.updateConfig({ miniAppContext: { features: ['useToasts'] } });
-          return window.aupsdk;
-        },
+        ...(!signedOut && {
+          fetchAUPSDKInstance: (): Promise<unknown> =>
+            getAupSdkInstance() ?? Promise.resolve(undefined),
+        }),
       }),
     });
 
