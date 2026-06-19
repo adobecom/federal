@@ -85,7 +85,9 @@ export const main = async (
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
-  setLingoLocaleConfig(input.lingoRegion);
+  // Normalize null → undefined so the stored state matches the
+  // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
+  setLingoLocaleConfig(input.lingoRegion ?? undefined);
 
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
