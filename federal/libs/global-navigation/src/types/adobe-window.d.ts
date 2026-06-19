@@ -56,7 +56,9 @@ declare global {
       preloadSDK: (
         env: string,
         config: Record<string, unknown>,
-      ) => Promise<{ updateConfig: (config: Record<string, unknown>) => Promise<void> }>;
+      ) => Promise<{
+        updateConfig: (config: Record<string, unknown>) => Promise<void>;
+      }>;
     };
 
     /** Initialized AUP SDK instance */

@@ -11,6 +11,7 @@ import {
   isDesktop,
   getMiloConfig,
   getMiloLocaleSettings,
+  getLingoLocaleConfig,
   isBEEnabled,
   MiloConfig
 } from '../../Utils/Utils';
@@ -88,7 +89,9 @@ export const preloadAupSdk = (): void => {
       getProfile: () => Promise.resolve(window.adobeIMS?.getProfile()),
       environment,
       cdnEnvironment: environment,
-      locale: config?.locale?.ietf ?? 'en-US',
+      locale: getLingoLocaleConfig()?.ietf
+        ?? config?.locale?.ietf
+        ?? 'en-US',
       appName: 'adobecom',
       appVersion: '1.0',
       colorScheme: 'light',
@@ -249,7 +252,10 @@ export const loadUnav = async (
       throw new Error('MiloConfig not available for UNAV initialization');
     }
 
-    const locale = getUniversalNavLocale(config.locale);
+    // Lingo ietf (e.g. 'fr-LU') overrides milo locale when provided.
+    // UNav expects underscore form ('fr_LU'), so convert hyphens.
+    const locale = getLingoLocaleConfig()?.ietf?.replace('-', '_')
+      ?? getUniversalNavLocale(config.locale);
     const environment = config.env.name === 'prod' ? 'prod' : 'stage';
 
     // Fetch visitor GUID for analytics

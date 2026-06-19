@@ -229,6 +229,34 @@ export const localizeHref = (href: string): string => {
   }
 };
 
+/**
+ * Lingo locale config — federal-specific locale data (currently just `ietf`,
+ * e.g. `'fr-LU'`) that may override the milo config locale for downstream
+ * consumers (AUP SDK, UNav). Optional; consumers must fall back to
+ * `getMiloConfig().locale.ietf` when `getLingoLocaleConfig()` returns
+ * `undefined`.
+ */
+export type LingoLocaleConfig = {
+  ietf: string;
+};
+
+type LingoLocaleConfigStateFunctions = [
+  (config: LingoLocaleConfig | undefined) => void,
+  () => LingoLocaleConfig | undefined,
+];
+
+export const [setLingoLocaleConfig, getLingoLocaleConfig] =
+  ((): LingoLocaleConfigStateFunctions => {
+    let lingoLocaleConfig: LingoLocaleConfig | undefined;
+
+    return [
+      (config: LingoLocaleConfig | undefined): void => {
+        lingoLocaleConfig = config;
+      },
+      (): LingoLocaleConfig | undefined => lingoLocaleConfig,
+    ];
+  })();
+
 export const fetchAndProcessPlainHTML = async (
   source: URL | null
 ): Promise<HTMLElement | IrrecoverableError> => {

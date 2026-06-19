@@ -9,7 +9,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -37,6 +37,7 @@ export type Input = {
   unavEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
+  lingoRegion?: LingoLocaleConfig;
   // for now we only support inBlock commands.
   // Since MEP on gnav is relatively rare we'll
   // keep it at this and see if any problems crop up.
@@ -84,6 +85,7 @@ export const main = async (
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
+  setLingoLocaleConfig(input.lingoRegion);
 
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
