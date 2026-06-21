@@ -18,10 +18,15 @@
     "typecheck": "tsc --noEmit",
     "test": "web-test-runner 'test/**/*.test.{js,ts}' --node-resolve",
     "test:watch": "npm test -- --watch",
-    "test:coverage": "npm test -- --coverage"
+    "test:coverage": "npm test -- --coverage",
+    "bombadil:desktop": "bombadil test --output-path .bombadil-out/desktop --chrome-grant-permissions \"\" --width 1280 --height 720 --time-limit 90s \"${BOMBADIL_URL:-https://www.adobe.com}\" bombadil/spec.ts",
+    "bombadil:compact": "bombadil test --output-path .bombadil-out/compact --chrome-grant-permissions \"\" --width 1100 --height 720 --time-limit 90s \"${BOMBADIL_URL:-https://www.adobe.com}\" bombadil/spec.ts",
+    "bombadil:mobile": "bombadil test --output-path .bombadil-out/mobile --chrome-grant-permissions \"\" --width 414 --height 896 --time-limit 90s \"${BOMBADIL_URL:-https://www.adobe.com}\" bombadil/spec.ts",
+    "bombadil": "npm run bombadil:desktop && npm run bombadil:compact && npm run bombadil:mobile"
   },
   "license": "ISC",
   "devDependencies": {
+    "@antithesishq/bombadil": "^0.5.0",
     "@eslint/js": "^9.29.0",
     "@esm-bundle/chai": "^4.3.4-fix.0",
     "@web/dev-server-esbuild": "^1.0.5",
