@@ -83,6 +83,7 @@
 
 header.global-navigation:not(.is-compact) .product-list .tabs button.tab:focus-visible {
   box-shadow: inset 0 0 0 2px var(--s2a-color-blue-800);
+  outline: none;
 }
 
 /* =========================================

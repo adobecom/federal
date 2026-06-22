@@ -1300,8 +1300,8 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     max-height: calc(100dvh - var(--s2a-spacing-64));
   }
 
-  .feds-gnav-items > li > .feds-link:focus-visible {
-    outline-offset: 0;
+  .feds-gnav-items > li > .feds-link:first-child {
+    outline-offset: var(--s2a-spacing-sm);
   }
 
   @starting-style {
