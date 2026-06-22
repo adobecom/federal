@@ -262,13 +262,17 @@ version="1.0" encoding="UTF-8"?>
 </div>`.trim(),Ir=(e,a)=>`
 <div class="feds-promo-bar-slot ${Ie(a)}">
   <div class="feds-promo-bar-inner">
-    <div class="feds-promo-product-container">
-      ${_e(e.icon,e.iconAlt)}
-      ${e.productName!==null?`<p class="feds-promo-bar-product">${e.productName}</p>`:""}
+    <div class="feds-promo-bar-left">
+      <div class="feds-promo-product-container">
+        ${_e(e.icon,e.iconAlt)}
+        ${e.productName!==null?`<p class="feds-promo-bar-product">${e.productName}</p>`:""}
+      </div>
+      ${e.headline!==null?`<p class="feds-promo-bar-headline">${e.headline}</p>`:""}
     </div>
-    ${e.headline!==null?`<p class="feds-promo-bar-headline">${e.headline}</p>`:""}
-    ${e.body!==null?`<p class="feds-promo-bar-body">${e.body}</p>`:""}
-    ${He(e.cta)}
+   <div class="feds-promo-bar-right">
+      ${e.body!==null?`<p class="feds-promo-bar-body">${e.body}</p>`:""}
+      ${He(e.cta)}
+    </div>
   </div>
 </div>`.trim(),Rr=({theme:e,bgColor:a,slots:r})=>`
 <div
