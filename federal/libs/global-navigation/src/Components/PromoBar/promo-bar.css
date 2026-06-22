@@ -2,23 +2,23 @@
    Promo Bar — shared base
    ========================================= */
 
-body:has(.feds-menu-active) .feds-promo-bar,
-body:has(.feds-popup.is-open) .feds-promo-bar {
+header:has(.feds-menu-active) .feds-promo-wrapper,
+header:has(.feds-popup.is-open) .feds-promo-wrapper {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper) #main-content .section > div:first-child {
-  border-top-left-radius: 30;
-  border-top-right-radius: 30;
-}
-
-.feds-promo-aside-wrapper::after {
+.feds-promo-wrapper::after {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
   background-color: inherit;
   z-index: -1;
+}
+
+body:has(.feds-promo-wrapper) #main-content .section > div:first-child {
+  border-top-left-radius: 30;
+  border-top-right-radius: 30;
 }
 
 .feds-promo-bar {
@@ -39,7 +39,7 @@ body:has(.feds-promo-aside-wrapper) #main-content .section > div:first-child {
   color: var(--s2a-color-gray-25);
 }
 
-.feds-promo-aside-wrapper .feds-primary-cta {
+.feds-promo-wrapper .feds-primary-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;

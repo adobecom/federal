@@ -80,9 +80,6 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
-  /* Height of the promo bar; measured after render and set via JS so
-     the fixed <nav> can offset itself below the promo bar. */
-  --feds-promo-bar-height: 0px;
 }
 
 
@@ -91,10 +88,9 @@ header.global-navigation {
   background: transparent;
   visibility: visible;
   display: flex;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
   z-index: 10;
   /* Drives the height of `nav::after` (the rounded backdrop frame).
      Default value covers the nav row; the JS in
@@ -109,9 +105,11 @@ header.feds-header-scrolled .feds-link {
   color: var(--s2a-color-gray-1000);
 }
 
-header.feds-header-scrolled nav {
+header.global-navigation.feds-header-scrolled nav {
   color: var(--s2a-color-gray-1000);
   box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
+  position: fixed;
+  top: 0;
 }
 
 .global-navigation .universal-nav-container .profile-signed-out button {
@@ -296,12 +294,17 @@ header.feds-header-scrolled nav {
   justify-content: flex-start;
 }
 
+.feds-promo-wrapper {
+  width: 100%;
+}
+
 header.global-navigation nav {
-  position: fixed;
-  top: var(--feds-promo-bar-height);
+  position: sticky;
+  top: 0;
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
   margin: var(--s2a-spacing-xs) auto;
+  margin-bottom: calc(-1 * (var(--s2a-spacing-64) + var(--s2a-spacing-xs)));
   border: none;
   padding: 0;
   overflow: visible;

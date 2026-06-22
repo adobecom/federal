@@ -130,17 +130,10 @@ mountpoint: HTMLElement
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
   if (data.promoBar !== null) {
-    const promoWrapper = document.querySelector<HTMLElement>(
-      '.feds-promo-aside-wrapper',
-    );
-    if (promoWrapper !== null) {
-      promoWrapper.innerHTML = renderPromoBar(data.promoBar);
-      const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
-      const barBgColor = promoBarEl?.style.backgroundColor ?? '';
-      if (barBgColor !== '') {
-        promoWrapper.style.backgroundColor = barBgColor;
-      }
-    }
+    const promoEl = document.createElement('div');
+    promoEl.className = 'feds-promo-wrapper';
+    promoEl.innerHTML = renderPromoBar(data.promoBar);
+    mountpoint.prepend(promoEl);
   }
   if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');
   if (data.darkFont) mountpoint.classList.add('dark-font');
@@ -292,7 +285,6 @@ export const postRenderingTasks = async (
   activeDropDown?.classList.add('active-element');
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
-  initPromoBarHeight(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -472,9 +464,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     }
   };
 
-  const promoBarEl = document.querySelector<HTMLElement>(
-    '.feds-promo-aside-wrapper .feds-promo-bar',
-  );
+  const promoBarEl = header.querySelector<HTMLElement>('.feds-promo-bar');
   const getScrollThreshold = (): number =>
     promoBarEl !== null ? promoBarEl.offsetHeight : 20;
 
@@ -625,39 +615,3 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
-const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
-  const promoBar = document.querySelector<HTMLElement>(
-    '.feds-promo-aside-wrapper .feds-promo-bar',
-  );
-  if (promoBar === null) return;
-
-  let naturalHeight = promoBar.offsetHeight;
-  let rafId: number | null = null;
-
-  const update = (): void => {
-    // How much of the promo bar is still above the viewport top.
-    // Clamp to [0, naturalHeight] so nav never goes negative or overshoots.
-    const visible = Math.max(0, naturalHeight - window.scrollY);
-    document.documentElement.style.setProperty(
-      '--feds-promo-bar-height',
-      `${visible}px`,
-    );
-  };
-
-  // Re-measure on resize in case the promo bar reflows (e.g. mobile wrap).
-  new ResizeObserver(() => {
-    naturalHeight = promoBar.offsetHeight;
-    update();
-  }).observe(promoBar);
-
-  const onScroll = (): void => {
-    if (rafId !== null) return;
-    rafId = requestAnimationFrame(() => {
-      rafId = null;
-      update();
-    });
-  };
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  update();
-};
