@@ -72,12 +72,12 @@ export const preloadAupSdk = (): void => {
   const isArpEnabled = config?.unav?.isArpEnabled ?? true;
   if (!isArpEnabled) return;
 
-  const environment = config.env.name === 'prod' ? 'prod' : 'stage';
+  const environment = config.env.name === 'prod' ? '' : '.stage';
   const clientId = (window as WindowWithAdobeId)?.adobeid?.client_id;
   const beEnabled = isBEEnabled();
 
   aupSdkPromise = loadScript(
-    `https://shared-components.${environment}.adobe.com/aup-sdk/${AUP_SDK_VERSION}/main.js`,
+    `https://shared-components${environment}.adobe.com/aup-sdk/${AUP_SDK_VERSION}/main.js`,
     undefined,
     { mode: 'async' },
   ).then(async (): Promise<unknown> => {
