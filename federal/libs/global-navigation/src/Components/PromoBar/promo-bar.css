@@ -7,9 +7,8 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper) #main-content .section > div:first-child {
-  border-top-left-radius: 30;
-  border-top-right-radius: 30;
+body:has(.feds-promo-aside-wrapper) main  {
+  clip-path: inset(0 round 30px);
 }
 
 .feds-promo-aside-wrapper::after {

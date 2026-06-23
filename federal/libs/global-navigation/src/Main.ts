@@ -631,6 +631,8 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
   );
   if (promoBar === null) return;
 
+  promoBar.closest('.feds-promo-aside-wrapper')?.setAttribute('data-lenis-prevent', '');
+
   let naturalHeight = promoBar.offsetHeight;
   let rafId: number | null = null;
 
