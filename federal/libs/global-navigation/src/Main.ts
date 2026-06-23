@@ -136,6 +136,7 @@ mountpoint: HTMLElement
     if (promoWrapper !== null) {
       promoWrapper.innerHTML = renderPromoBar(data.promoBar);
       const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
+      if (promoBarEl !== null) promoBarEl.classList.add('feds-promo-bar--hidden');
       const barBgColor = promoBarEl?.style.backgroundColor ?? '';
       if (barBgColor !== '') {
         promoWrapper.style.backgroundColor = barBgColor;
@@ -630,6 +631,11 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
   if (promoBar === null) return;
+
+  setTimeout(() => {
+    promoBar.classList.remove('feds-promo-bar--hidden');
+    promoBar.classList.add('feds-promo-bar--reveal');
+  }, 6000);
 
   promoBar.closest('.feds-promo-aside-wrapper')?.setAttribute('data-lenis-prevent', '');
 
