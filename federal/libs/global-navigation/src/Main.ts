@@ -7,9 +7,9 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
-import { loadUnav } from "./PostRendering/Unav/Unav";
+import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { sanitize, setMiloConfig, setPersonalizationConfig, setLocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, setPersonalizationConfig, setLocalizeLink, setLingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -58,9 +58,17 @@ export const main = async (
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
+  // Normalize null → undefined so the stored state matches the
+  // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
+  setLingoLocaleConfig(input.lingoRegion ?? undefined);
 
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
+
+  // Kick off AUP SDK init in parallel with gnav fetch/parse/render and the
+  // UniversalNav.js download. Bails internally if prerequisites aren't met;
+  // loadUnav() retries defensively for the late-IMS case.
+  if (unavEnabled) preloadAupSdk();
 
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError) {
@@ -85,6 +93,12 @@ export const main = async (
 
   // TODO: Implement Aside
   await renderGnav(gnavData)(mountpoint);
+
+  input.convertStageLinks?.({
+    anchors: [...mountpoint.querySelectorAll('a')],
+    hostname: window.location.hostname,
+    href: window.location.href,
+  });
 
   return postRenderingTasks(input);
 };

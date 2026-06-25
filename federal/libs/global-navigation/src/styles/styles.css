@@ -32,6 +32,7 @@
 @import "../Components/Panels/panels.css";
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
+@import "../PostRendering/Unav/unav.css";
 
 /* =========================================
    Skip to Main Content Link
@@ -886,6 +887,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
       height: 100%;
       display: flex;
       align-items: center;
+      overflow: visible;
     }
   }
 
@@ -958,6 +960,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   header.global-navigation.dark-font:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
     border-bottom: 2px var(--s2a-color-gray-1000) solid;
   }
+
+   header.global-navigation.is-compact .unav-comp-app-switcher-popover {
+    z-index: 4;
+   }
 }
 
 /* =========================================

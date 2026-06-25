@@ -65,6 +65,8 @@ export type UnavProfileConfig = {
   complexConfig?: Record<string, unknown> | null;
   config?: Record<string, unknown>;
   signInCtaStyle?: 'primary' | 'secondary';
+  enableManagePeople?: boolean;
+  managePeopleConfig?: Record<string, unknown>;
 };
 
 // NOTE: name collides with the unrelated `UnavConfig` in
@@ -75,6 +77,10 @@ export type UnavConfig = {
   uncAppId?: string;
   uncConfig?: Record<string, unknown>;
   showSectionDivider?: boolean;
+  isArpEnabled?: boolean;
+  arpConfig?: {
+    metadata?: Record<string, string>;
+  };
 };
 
 export type JarvisConfig = {
@@ -90,4 +96,15 @@ export type MiloConfig = {
   jarvis?: JarvisConfig;
   // IMS sign-in context for UNAV
   signInContext?: object;
+};
+
+/**
+ * Lingo locale config — federal-specific locale data (currently just
+ * `ietf`, e.g. `'fr-LU'`) that may override the milo config locale for
+ * downstream consumers (AUP SDK, UNav). Optional; consumers must fall
+ * back to `getMiloConfig().locale.ietf` when `getLingoLocaleConfig()`
+ * returns `undefined`.
+ */
+export type LingoLocaleConfig = {
+  ietf: string;
 };
