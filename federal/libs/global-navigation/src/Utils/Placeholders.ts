@@ -1,9 +1,7 @@
-import { Input } from "../Main";
+import type { Input } from "../types/Input";
 import { RecoverableError } from "../Error/Error";
 import { lanaLog } from "./Log";
 import { getFederatedContentRoot, getMiloConfig } from "./Utils";
-// TODO: avoid circular dependencies between Main and
-// This file (or any other file.
 
 type PlaceholderResponse = {
   columns: string[];
@@ -91,27 +89,14 @@ export function replacePlaceholders(
   });
 };
 
-type PlaceholdersStateFunctions = [
-  (p: Promise<Map<string, string>>) => void,
-  () => Promise<Map<string, string>>,
-];
-
-export const [
+// Re-exported for backward compatibility. The singleton implementation
+// now lives in src/state/Placeholders.ts as part of the
+// extract-input-type-and-singletons migration. Remove these
+// re-exports in a final cleanup commit once all importers migrate to
+// the new location.
+export {
   setPlaceholders,
   getPlaceholders,
-] = ((): PlaceholdersStateFunctions => {
-  let placeholdersPromise: Promise<Map<string, string>> | undefined;
-
-  return [
-    (p: Promise<Map<string, string>>): void => {
-      if (placeholdersPromise) return;
-      placeholdersPromise = p;
-    },
-    (): Promise<Map<string, string>> => {
-      if (!placeholdersPromise) {
-        throw new Error('Placeholders not initialized. Call setPlaceholders() first.');
-      }
-      return placeholdersPromise;
-    },
-  ];
-})();
+  peekPlaceholders,
+  __resetPlaceholdersForTests,
+} from '../state/Placeholders';

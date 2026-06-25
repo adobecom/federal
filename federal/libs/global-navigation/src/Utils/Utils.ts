@@ -3,6 +3,54 @@ import { lanaLog } from "./Log";
 import { getPlaceholders, replacePlaceholders } from "./Placeholders";
 import { IS_OPEN_CLASS, closePopup } from "../PostRendering/PopupWiring";
 
+// Re-exports for backward compatibility. Implementations now live in
+// src/state/ and src/types/ as part of the
+// extract-input-type-and-singletons migration. Remove these
+// re-exports in a final cleanup commit once all importers migrate to
+// the new locations.
+import {
+  setMiloConfig,
+  getMiloConfig,
+} from "../state/MiloConfig";
+import {
+  setPersonalizationConfig,
+  getPersonalizationConfig,
+} from "../state/Personalization";
+import {
+  setLocalizeLink,
+  getLocalizeLink,
+  localizeHref,
+} from "../state/LocalizeLink";
+import {
+  setLingoLocaleConfig,
+  getLingoLocaleConfig,
+} from "../state/LingoLocale";
+import type {
+  MiloConfig,
+  MiloConfigLocale,
+  PersonalizationConfig,
+  LocalizeLink,
+  LingoLocaleConfig,
+} from "../types/MiloConfig";
+
+export {
+  setMiloConfig,
+  getMiloConfig,
+  setPersonalizationConfig,
+  getPersonalizationConfig,
+  setLocalizeLink,
+  getLocalizeLink,
+  localizeHref,
+  setLingoLocaleConfig,
+  getLingoLocaleConfig,
+};
+export type {
+  MiloConfig,
+  PersonalizationConfig,
+  LocalizeLink,
+  LingoLocaleConfig,
+};
+
 export const isDesktop = window.matchMedia('(min-width: 1024px)');
 
 export const isNavDesktop = (): boolean =>
@@ -162,100 +210,6 @@ export const parseListAndAccumulateErrors = <
   },
   [[],[]] as Parsed<Array<ParsedObj>, ErrorType>
   );
-
-export type PersonalizationConfig = {
-  commands: unknown[];
-  handleCommands: (
-    commands: unknown[],
-    rootEl: Document | HTMLElement
-  ) => unknown;
-};
-
-export type LocalizeLink = (link: string) => string;
-
-type PersonalizationStateFunctions = [
-  (config: PersonalizationConfig) => void,
-  () => PersonalizationConfig
-];
-
-// TODO: Consolidate all global state handlers into
-// a single file (but still probably keep them separate)
-export const [setPersonalizationConfig, getPersonalizationConfig] =
-  ((): PersonalizationStateFunctions => {
-    let personalizationConfig: PersonalizationConfig | undefined;
-    let isInitialized = false;
-
-    return [
-      (config: PersonalizationConfig): void => {
-        if (isInitialized) {
-          return;
-        }
-
-        personalizationConfig = config;
-        isInitialized = true;
-      },
-      (): PersonalizationConfig => {
-        if (!personalizationConfig) {
-          throw new Error('PersonalizationConfig not initialized. Call setPersonalizationConfig() first.');
-        }
-        return personalizationConfig;
-      },
-    ];
-  })();
-
-type LocalizeLinkStateFunctions = [
-  (localizeLink: LocalizeLink) => void,
-  () => LocalizeLink
-];
-
-export const [setLocalizeLink, getLocalizeLink] =
-  ((): LocalizeLinkStateFunctions => {
-    let localizeLink: LocalizeLink = (link: string): string => link;
-
-    return [
-      (nextLocalizeLink: LocalizeLink): void => {
-        localizeLink = nextLocalizeLink;
-      },
-      (): LocalizeLink => localizeLink,
-    ];
-  })();
-
-export const localizeHref = (href: string): string => {
-  try {
-    const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
-    return getLocalizeLink()(absoluteHref);
-  } catch {
-    return href;
-  }
-};
-
-/**
- * Lingo locale config — federal-specific locale data (currently just `ietf`,
- * e.g. `'fr-LU'`) that may override the milo config locale for downstream
- * consumers (AUP SDK, UNav). Optional; consumers must fall back to
- * `getMiloConfig().locale.ietf` when `getLingoLocaleConfig()` returns
- * `undefined`.
- */
-export type LingoLocaleConfig = {
-  ietf: string;
-};
-
-type LingoLocaleConfigStateFunctions = [
-  (config: LingoLocaleConfig | undefined) => void,
-  () => LingoLocaleConfig | undefined,
-];
-
-export const [setLingoLocaleConfig, getLingoLocaleConfig] =
-  ((): LingoLocaleConfigStateFunctions => {
-    let lingoLocaleConfig: LingoLocaleConfig | undefined;
-
-    return [
-      (config: LingoLocaleConfig | undefined): void => {
-        lingoLocaleConfig = config;
-      },
-      (): LingoLocaleConfig | undefined => lingoLocaleConfig,
-    ];
-  })();
 
 export const fetchAndProcessPlainHTML = async (
   source: URL | null
@@ -711,166 +665,6 @@ export function getMetadata(
   const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
   return meta instanceof HTMLMetaElement ? meta.content : null;
 }
-
-type MiloConfigEnv = {
-  name: string;                    // Env name: 'local', 'stage', or 'prod'
-  ims?: string;                    // IMS environment: 'stg1' or 'prod'
-  adobeIO?: string;                // Adobe I/O hostname
-  adminconsole?: string;           // Admin Console hostname
-  account?: string;                // Account hostname
-  edgeConfigId?: string;           // Edge configuration ID
-  pdfViewerClientId?: string;      // PDF Viewer client ID
-  consumer?: {                     // Consumer-specific configuration (optional)
-    pdfViewerClientId: string;
-    pdfViewerReportSuite: string;
-    psUrl: string;
-    odinEndpoint: string;
-  };
-};
-
-type MiloConfigLocale = {
-  prefix: string;                  // e.g., '', '/fr', '/de', '/jp/ja'
-  ietf?: string;                   // e.g., 'en-US', 'fr-FR', 'de-DE'
-  tk?: string;                     // Typekit font ID, e.g., 'hah7vzn.css'
-  region?: string;                 // Region/country code, e.g. 'us', 'gb', 'fr'
-  regions?: Record<string, unknown>; // Regional configuration mapping
-  contentRoot?: string;            // Full content path with origin
-  language?: string;               // Langcode (new routing)e.g., 'en','fr','de'
-  dir?: string;                    // Text direction: 'ltr' or 'rtl'
-
-  // Allow additional locale-specific properties
-  [key: string]: unknown;          // Additional locale configuration
-};
-
-type UnavProfileConfig = {
-  messageEventListener?: (event: CustomEvent) => void;
-  complexConfig?: Record<string, unknown> | null;
-  config?: Record<string, unknown>;
-  signInCtaStyle?: 'primary' | 'secondary';
-  enableManagePeople?: boolean;
-  managePeopleConfig?: Record<string, unknown>;
-}
-
-type UnavConfig = {
-  unavHelpChildren?: Array<{ type: string }>;
-  profile?: UnavProfileConfig;
-  uncAppId?: string;
-  uncConfig?: Record<string, unknown>;
-  showSectionDivider?: boolean;
-  isArpEnabled?: boolean;
-  arpConfig?: {
-    metadata?: Record<string, string>;
-  };
-}
-
-type JarvisConfig = {
-  id: string;
-  callbacks?: Record<string, () => unknown>;
-}
-
-export type MiloConfig = {
-  env: MiloConfigEnv;
-  base: string;
-  locale: MiloConfigLocale;
-  unav?: UnavConfig;
-  jarvis?: JarvisConfig;
-  signInContext?: object;          // IMS sign-in context for UNAV
-};
-
-/**
- * Validates MiloConfig structure at runtime
- * @param config - Configuration object to validate
- * @returns true if valid, false otherwise
- */
-const isValidMiloConfig = (config: unknown): config is MiloConfig => {
-  const cfg = config as MiloConfig;
-
-  const invalid = (x: unknown): boolean => x === null || x === undefined || typeof x !== 'object';
-
-  if (invalid(cfg)) return false;
-
-  // Validate locale structure
-  if (invalid(cfg.locale)) return false;
-  const locale = cfg.locale as Record<string, unknown>;
-  if (typeof locale.prefix !== 'string') return false;
-
-  // Validate env structure
-  if (invalid(cfg.env)) return false;
-  const env = cfg.env as Record<string, unknown>;
-  if (typeof env.name !== 'string') return false;
-
-  // Validate optional unav structure
-  if (cfg.unav !== undefined) {
-    if (typeof cfg.unav !== 'object' || cfg.unav === null) return false;
-    const unav = cfg.unav as Record<string, unknown>;
-
-    // Validate unav.profile if present
-    if (unav.profile !== undefined) {
-      if (typeof unav.profile !== 'object' || unav.profile === null) return false;
-      const profile = unav.profile as Record<string, unknown>;
-
-      // Validate signInCtaStyle if present
-      if (profile.signInCtaStyle !== undefined) {
-        if (profile.signInCtaStyle !== 'primary' && profile.signInCtaStyle !== 'secondary') {
-          return false;
-        }
-      }
-
-      // Validate messageEventListener if present
-      if (profile.messageEventListener !== undefined && typeof profile.messageEventListener !== 'function') {
-        return false;
-      }
-    }
-  }
-
-  // Validate optional jarvis structure
-  if (cfg.jarvis !== undefined) {
-    if (typeof cfg.jarvis !== 'object' || cfg.jarvis === null) return false;
-    const jarvis = cfg.jarvis as Record<string, unknown>;
-
-    // id is required if jarvis object exists
-    if (typeof jarvis.id !== 'string') return false;
-  }
-
-  return true;
-};
-
-/**
- * MiloConfig Configuration State Management
- * Implements closure-based singleton pattern
- * for global configuration with validation
- *
- * @throws Error if config validation fails or if accessed before initialization
- */
-
- type ConfigStateFunctions = [ (config: unknown) => void, () => MiloConfig]
-
-export const [setMiloConfig, getMiloConfig] = ((): ConfigStateFunctions => {
-  let miloConfig: MiloConfig | undefined;
-  let isInitialized = false;
-
-  return [
-    (config: unknown): void => {
-      if (isInitialized) {
-        return;
-      }
-
-      // Validate config structure
-      if (!isValidMiloConfig(config)) {
-        throw new Error('MiloConfig validation failed: Invalid structure');
-      }
-
-      miloConfig = config;
-      isInitialized = true;
-    },
-    (): MiloConfig => {
-      if (!miloConfig) {
-        throw new Error('MiloConfig not initialized. Call setMiloConfig() first.');
-      }
-      return miloConfig;
-    },
-  ];
-})();
 
 const LanguageMap = {
   en: 'US',

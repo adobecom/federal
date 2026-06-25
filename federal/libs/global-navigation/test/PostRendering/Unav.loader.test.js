@@ -1,6 +1,7 @@
 import { expect } from '@esm-bundle/chai';
 import { loadUnav } from '../../src/PostRendering/Unav/Unav.loader';
 import { setMiloConfig } from '../../src/Utils/Utils';
+import { __resetMiloConfigForTests } from '../../src/state/MiloConfig';
 
 /**
  * UNAV Loader Unit Tests
@@ -16,16 +17,13 @@ import { setMiloConfig } from '../../src/Utils/Utils';
 describe('UNAV Loader', () => {
   let createdElements = [];
 
-  before(() => {
-    // Initialize MiloConfig once (singleton pattern)
-    try {
-      setMiloConfig({
-        env: { name: 'stage' },
-        locale: { prefix: '' },
-      });
-    } catch (e) {
-      // Already initialized
-    }
+  beforeEach(() => {
+    // Reset and re-initialize MiloConfig for test isolation
+    __resetMiloConfigForTests();
+    setMiloConfig({
+      env: { name: 'stage' },
+      locale: { prefix: '' },
+    });
   });
 
   afterEach(() => {

@@ -3,13 +3,30 @@
  * Contains pure functions and state management for UNAV functionality
  */
 
-import { getMiloConfig } from '../../Utils/Utils';
+import { peekMiloConfig } from '../../state/MiloConfig';
+import {
+  setUserProfile,
+  getUserProfile,
+  peekUserProfile,
+  __resetUserProfileForTests,
+} from '../../state/UserProfile';
 import type {
-  UserProfile,
   UnavConfig,
   AlloyIdentityData,
   WindowWithAlloy,
 } from './Unav.types';
+
+// Re-exported for backward compatibility. The singleton implementation
+// now lives in src/state/UserProfile.ts as part of the
+// extract-input-type-and-singletons migration. Remove these
+// re-exports in a final cleanup commit once all importers migrate to
+// the new location.
+export {
+  setUserProfile,
+  getUserProfile,
+  peekUserProfile,
+  __resetUserProfileForTests,
+};
 
 // ============================================================================
 // Constants
@@ -19,9 +36,6 @@ import type {
  * Components visible to signed-out users
  */
 export const SIGNED_OUT_ICONS = ['appswitcher', 'help'];
-
-/** Timeout in ms before profile resolution falls back to an empty profile */
-const PROFILE_RESOLUTION_TIMEOUT_MS = 5000;
 
 /** Width in px of the sign-in button used for UNAV
  *  container min-width calculation */
@@ -46,44 +60,6 @@ export const LANGMAP = {
   uk: ['ua'],
   zh: ['cn', 'tw'],
 };
-
-// ============================================================================
-// Profile State Management
-// ============================================================================
-
-/**
- * Profile state management using closure pattern
- * Provides async access to user profile with 5-second timeout fallback
- * @returns Tuple of [setter, getter] functions
- */
-export const [setUserProfile, getUserProfile] = ((): [
-  (data: UserProfile) => void,
-  () => Promise<UserProfile>
-] => {
-  let profileData: UserProfile | undefined;
-  let profileResolve: ((value: UserProfile) => void) | undefined;
-  let profileTimeout: ReturnType<typeof setTimeout> | undefined;
-
-  const profilePromise = new Promise<UserProfile>((resolve) => {
-    profileResolve = resolve;
-
-    profileTimeout = setTimeout(() => {
-      profileData = {};
-      resolve(profileData);
-    }, PROFILE_RESOLUTION_TIMEOUT_MS);
-  });
-
-  return [
-    (data: UserProfile): void => {
-      if (profileData === undefined) {
-        profileData = data;
-        clearTimeout(profileTimeout);
-        profileResolve?.(profileData);
-      }
-    },
-    (): Promise<UserProfile> => profilePromise,
-  ];
-})();
 
 // ============================================================================
 // Component Visibility
@@ -152,12 +128,7 @@ export function getUnavWidthCSS(
 
   // Read section divider preference from MiloConfig, gracefully tolerating
   // the case where the config has not been initialised yet (e.g. in tests).
-  let sectionDivider = false;
-  try {
-    sectionDivider = getMiloConfig()?.unav?.showSectionDivider === true;
-  } catch {
-    sectionDivider = false;
-  }
+  const sectionDivider = peekMiloConfig()?.unav?.showSectionDivider === true;
 
   const dividerCss = sectionDivider
     ? ` + 2px + ${2 * sectionDividerMargin}px + ${flexGap}rem`
