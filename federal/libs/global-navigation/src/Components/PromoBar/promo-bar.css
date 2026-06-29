@@ -7,7 +7,7 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper) main  {
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
   clip-path: inset(0 round 30px);
 }
 
@@ -33,12 +33,7 @@ body:has(.feds-promo-aside-wrapper) main  {
   margin: auto;
 }
 
-.feds-promo-bar--hidden {
-  max-height: 0 !important;
-  overflow: hidden;
-}
-
-.feds-promo-bar--reveal {
+.feds-promo-aside-wrapper.feds-promo-bar--reveal {
   overflow: hidden;
   animation: feds-promo-bar-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }

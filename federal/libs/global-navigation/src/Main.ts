@@ -136,7 +136,7 @@ mountpoint: HTMLElement
     if (promoWrapper !== null) {
       promoWrapper.innerHTML = renderPromoBar(data.promoBar);
       const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
-      if (promoBarEl !== null) promoBarEl.classList.add('feds-promo-bar--hidden');
+      promoWrapper.style.display = 'none';
       const barBgColor = promoBarEl?.style.backgroundColor ?? '';
       if (barBgColor !== '') {
         promoWrapper.style.backgroundColor = barBgColor;
@@ -632,12 +632,15 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
   );
   if (promoBar === null) return;
 
-  setTimeout(() => {
-    promoBar.classList.remove('feds-promo-bar--hidden');
-    promoBar.classList.add('feds-promo-bar--reveal');
-  }, 6000);
+  const promoWrapper = promoBar.closest<HTMLElement>('.feds-promo-aside-wrapper');
+  promoWrapper?.setAttribute('data-lenis-prevent', '');
 
-  promoBar.closest('.feds-promo-aside-wrapper')?.setAttribute('data-lenis-prevent', '');
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      if (promoWrapper) promoWrapper.style.display = '';
+      promoWrapper?.classList.add('feds-promo-bar--reveal');
+    }, 5000);
+  });
 
   let naturalHeight = promoBar.offsetHeight;
   let rafId: number | null = null;
