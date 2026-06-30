@@ -27,7 +27,7 @@ export const getInitialHTML = async ({
     return mainNav;
   const promoBarEl = promoResult instanceof IrrecoverableError ?
     null : promoResult;
-  const promoBar = promoBarEl?.querySelector<HTMLElement>('.gnav-promo-bar') ?? null;
+  const promoBar = promoBarEl?.querySelector<HTMLElement>('.gnav-promo') ?? null;
   if (promoBar !== null && promoUrl !== null) {
     const fetchedFrom = federateUrl(
       `${promoUrl.origin}${promoUrl.pathname.replace(/(\.html$|$)/, '.plain.html')}`,

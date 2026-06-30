@@ -38,15 +38,13 @@ const ERRORS = {
   elementNull: "Error when parsing PromoBar. Element is null",
 };
 
-const parseVariant = (classList: DOMTokenList): PromoBarVariant => {
-  if (classList.contains('maximized-release')) return 'maximized-release';
-  if (classList.contains('maximized')) return 'maximized';
-  return 'minimized';
-};
+const VARIANTS: readonly PromoBarVariant[] = ['maximized-release', 'maximized'];
+
+const parseVariant = (classList: DOMTokenList): PromoBarVariant =>
+  VARIANTS.find((v) => classList.contains(v)) ?? 'minimized';
 
 const parseIconLink = (cell: Element): { icon: string | null; iconAlt: string | null } => {
   // Icon is authored as <p><a href="...svg">https://...svg | Alt Text</a></p>
-  // The pipe separates the full URL from the alt text in the link text.
   const iconAnchor = [...cell.querySelectorAll(':scope > p > a')].find((a) => {
     const href = a.getAttribute('href') ?? '';
     return /\.(svg|png|jpg|jpeg|webp)(\?.*)?$/i.test(href);
@@ -62,7 +60,6 @@ const parseIconLink = (cell: Element): { icon: string | null; iconAlt: string | 
 
 const parseContent = (cell: Element): PromoBarContent => {
   const { icon, iconAlt } = parseIconLink(cell);
-
   const pictures = [...cell.querySelectorAll('picture')];
   // Last <picture> is a bg image only when there are 2+ pictures;
   // with just one it is the icon.
@@ -137,21 +134,15 @@ export const parsePromoBar = (
   // 1 cell  → all viewports
   // 2 cells → [0] mobile+tablet, [1] desktop
   // 3 cells → [0] mobile, [1] tablet, [2] desktop
-  const slots: PromoBarSlot[] = parsed.length === 3
-    ? [
-        { viewports: ['mobile'], content: parsed[0] },
-        { viewports: ['tablet'], content: parsed[1] },
-        { viewports: ['desktop'], content: parsed[2] },
-      ]
-    : parsed.length === 2
-    ? [
-        { viewports: ['mobile', 'tablet'], content: parsed[0] },
-        { viewports: ['desktop'], content: parsed[1] },
-      ]
-    : parsed.map((content) => ({
-        viewports: ['mobile', 'tablet', 'desktop'] as PromoBarViewport[],
-        content,
-      }));
+  const ALL: PromoBarViewport[] = ['mobile', 'tablet', 'desktop'];
+  const viewportGroups: PromoBarViewport[][] =
+    parsed.length === 3 ? [['mobile'], ['tablet'], ['desktop']]
+    : parsed.length === 2 ? [['mobile', 'tablet'], ['desktop']]
+    : parsed.map(() => ALL);
+  const slots: PromoBarSlot[] = parsed.map((content, i) => ({
+    viewports: viewportGroups[i],
+    content,
+  }));
 
   return [
     { type: 'PromoBar', variant, theme, bgColor, slots },
