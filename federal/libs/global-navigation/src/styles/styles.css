@@ -33,6 +33,7 @@
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
 @import "../Components/PromoBar/promo-bar.css";
+@import "../PostRendering/Unav/unav.css";
 
 /* =========================================
    Skip to Main Content Link
@@ -303,7 +304,7 @@ header.global-navigation nav {
   position: fixed;
   top: 0;
   width: calc(100% - var(--s2a-spacing-xs) * 2);
-  max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
+  max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;
   border: none;
   padding: 0;
@@ -891,6 +892,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
       height: 100%;
       display: flex;
       align-items: center;
+      overflow: visible;
     }
   }
 
