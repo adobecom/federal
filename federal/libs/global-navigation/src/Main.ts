@@ -633,7 +633,6 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
   if (promoBar === null) return;
 
   const promoWrapper = promoBar.closest<HTMLElement>('.feds-promo-aside-wrapper');
-  promoWrapper?.setAttribute('data-lenis-prevent', '');
 
   requestAnimationFrame(() => {
     setTimeout(() => {
