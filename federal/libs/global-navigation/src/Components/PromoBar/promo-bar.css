@@ -61,7 +61,8 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
   letter-spacing: var(--s2a-typography-letter-spacing-label);
   color: var(--s2a-color-gray-25);
   text-decoration: none;
-  background-color: rgba(59, 99, 251, 1);
+  background-color: var(--s2a-color-blue-900);
+  white-space: nowrap;
 }
 
 .feds-promo-bar-icon {
@@ -174,6 +175,10 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
   &.feds-promo-bar--light {
     .feds-promo-bar-right {
       background-color: var(--s2a-color-background-subtle);
+    }
+
+    .feds-promo-bar-product {
+      color: var(--s2a-color-transparent-black-64);
     }
   }
 
