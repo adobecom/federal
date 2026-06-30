@@ -1784,3 +1784,34 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   color: var(--s2a-color-gray-1000);
 }
 
+/* =========================================
+   Language banner offset
+   Pushes the gnav below the banner while it is visible;
+   smoothly removes the offset as the banner scrolls out of the viewport.
+   ========================================= */
+
+/* Banner is fixed at 44px — JS ResizeObserver will confirm the real
+   offsetHeight, but the banner design no longer wraps to two lines. */
+:root {
+  --feds-language-banner-height: 44px;
+  /* Expands the named view-timeline scope so sibling elements (the fixed
+     header) can reference --language-banner-view, not just descendants. */
+  timeline-scope: --language-banner-view;
+}
+
+.language-banner {
+  view-timeline: --language-banner-view block;
+}
+
+@keyframes feds-gnav-banner-offset {
+  from  { top: var(--feds-language-banner-height, 42px); }
+  to  { top: 0; }
+}
+
+:root:has(.language-banner) header.global-navigation,
+:root:has(.language-banner) header.global-navigation nav {
+  animation: feds-gnav-banner-offset linear both;
+  animation-timeline: --language-banner-view;
+  animation-range: exit;
+}
+

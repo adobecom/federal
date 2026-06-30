@@ -298,6 +298,7 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
+  initLanguageBannerOffset();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -499,6 +500,32 @@ const initHeaderAnalytics = (
   const header = mountpoint.closest("header");
   if (header === null) return;
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
+};
+
+const initLanguageBannerOffset = (): void => {
+  const observe = (banner: HTMLElement): void => {
+    // ResizeObserver fires after layout so offsetHeight is always accurate.
+    // It also fires on the initial observation overriding the CSS calc()
+    // fallback with the real measured value (needed for two-line mobile wraps).
+    new ResizeObserver(() => {
+      document.documentElement.style.setProperty(
+        '--feds-language-banner-height',
+        `${banner.offsetHeight}px`,
+      );
+    }).observe(banner);
+  };
+
+  const banner = document.querySelector<HTMLElement>('.language-banner');
+  if (banner) { observe(banner); return; }
+
+  // Banner is added asynchronously after geo/language detection
+  const mo = new MutationObserver((_, observer) => {
+    const el = document.querySelector<HTMLElement>('.language-banner');
+    if (!el) return;
+    observer.disconnect();
+    observe(el);
+  });
+  mo.observe(document.body, { childList: true });
 };
 
 const initCompactOverflow = (mountpoint: HTMLElement): void => {
