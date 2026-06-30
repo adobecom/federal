@@ -476,14 +476,9 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const promoBarEl = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
-  const promoBarElMinHeight = (): number =>
-    promoBarEl === null ? 70
-    : promoBarEl.classList.contains('feds-promo-bar--maximized-release') ? 280
-    : promoBarEl.classList.contains('feds-promo-bar--maximized') ? 182
-    : 70;
 
   const getScrollThreshold = (): number =>
-    promoBarEl !== null ? promoBarElMinHeight() : 20;
+    promoBarEl !== null ? (promoBarEl.offsetHeight || 56) : 20;
 
   let scrolledPast = window.scrollY > getScrollThreshold();
   let scrollRafId: number | null = null;
@@ -632,7 +627,7 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
-const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
+const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
@@ -649,15 +644,27 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
     }, 5000);
   });
 
-  // Set the height once and on resize — the CSS scroll-driven animation
-  // (view-timeline on .feds-promo-aside-wrapper) handles the header offset
-  // as the promo exits the viewport. No scroll listener needed.
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+
+  let promoHeight = promoBar.offsetHeight;
+  
+  const updateHeaderTop = (): void => {
+    const offset = Math.max(0, promoHeight - window.scrollY);
+    header.style.top = `${offset}px`;
+  };
+
   const setHeight = (): void => {
+    promoHeight = promoBar.offsetHeight;
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
-      `${promoBar.offsetHeight}px`,
+      `${promoHeight}px`,
     );
+    updateHeaderTop();
   };
+
   new ResizeObserver(setHeight).observe(promoBar);
   setHeight();
+
+  window.addEventListener('scroll', updateHeaderTop, { passive: true });
 };
