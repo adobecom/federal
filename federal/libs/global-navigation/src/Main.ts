@@ -476,8 +476,14 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const promoBarEl = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
+  const promoBarElMinHeight = (): number =>
+    promoBarEl === null ? 70
+    : promoBarEl.classList.contains('feds-promo-bar--maximized-release') ? 280
+    : promoBarEl.classList.contains('feds-promo-bar--maximized') ? 182
+    : 70;
+
   const getScrollThreshold = (): number =>
-    promoBarEl !== null ? promoBarEl.offsetHeight : 20;
+    promoBarEl !== null ? promoBarElMinHeight() : 20;
 
   let scrolledPast = window.scrollY > getScrollThreshold();
   let scrollRafId: number | null = null;
@@ -632,7 +638,9 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
   );
   if (promoBar === null) return;
 
-  const promoWrapper = promoBar.closest<HTMLElement>('.feds-promo-aside-wrapper');
+  const promoWrapper = promoBar.closest<HTMLElement>(
+    '.feds-promo-aside-wrapper',
+  );
 
   requestAnimationFrame(() => {
     setTimeout(() => {
@@ -641,33 +649,15 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
     }, 5000);
   });
 
-  let naturalHeight = promoBar.offsetHeight;
-  let rafId: number | null = null;
-
-  const update = (): void => {
-    // How much of the promo bar is still above the viewport top.
-    // Clamp to [0, naturalHeight] so nav never goes negative or overshoots.
-    const visible = Math.max(0, naturalHeight - window.scrollY);
+  // Set the height once and on resize — the CSS scroll-driven animation
+  // (view-timeline on .feds-promo-aside-wrapper) handles the header offset
+  // as the promo exits the viewport. No scroll listener needed.
+  const setHeight = (): void => {
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
-      `${visible}px`,
+      `${promoBar.offsetHeight}px`,
     );
   };
-
-  // Re-measure on resize in case the promo bar reflows (e.g. mobile wrap).
-  new ResizeObserver(() => {
-    naturalHeight = promoBar.offsetHeight;
-    update();
-  }).observe(promoBar);
-
-  const onScroll = (): void => {
-    if (rafId !== null) return;
-    rafId = requestAnimationFrame(() => {
-      rafId = null;
-      update();
-    });
-  };
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  update();
+  new ResizeObserver(setHeight).observe(promoBar);
+  setHeight();
 };

@@ -80,9 +80,12 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
-  /* Height of the promo bar; measured after render and set via JS so
-     the fixed <nav> can offset itself below the promo bar. */
+  /* Height of the promo bar; set once by ResizeObserver, consumed by
+     the scroll-driven animation that offsets the fixed header. */
   --feds-promo-bar-height: 0px;
+  /* Hoists the promo view-timeline so the fixed <header> sibling
+     can reference it (same pattern as --language-banner-view). */
+  timeline-scope: --promo-bar-view;
 }
 
 
@@ -298,7 +301,7 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
-  top: var(--feds-promo-bar-height);
+  top: 0;
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
   margin: var(--s2a-spacing-xs) auto;
@@ -1784,3 +1787,26 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   color: var(--s2a-color-gray-1000);
 }
 
+
+/* =========================================
+   Promo bar offset (scroll-driven)
+   Pushes the fixed header below the promo bar while it is visible;
+   smoothly removes the offset as the promo scrolls out of the viewport.
+   Same pattern as the language-banner offset.
+   ========================================= */
+
+.feds-promo-aside-wrapper {
+  view-timeline: --promo-bar-view block;
+}
+
+@keyframes feds-gnav-promo-offset {
+  from { top: var(--feds-promo-bar-height, 0px); }
+  to   { top: 0; }
+}
+
+:root:has(.feds-promo-aside-wrapper) header.global-navigation,
+:root:has(.feds-promo-aside-wrapper) header.global-navigation nav {
+  animation: feds-gnav-promo-offset linear both;
+  animation-timeline: --promo-bar-view;
+  animation-range: exit;
+}
