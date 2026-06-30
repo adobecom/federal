@@ -5,7 +5,6 @@ import {
   parsePrimaryCTA,
   parseSecondaryCTA,
 } from "../CTA/Parse";
-import { alternative } from "../../Utils/Utils";
 
 export type PromoBarVariant = 'minimized' | 'maximized' | 'maximized-release';
 
@@ -15,7 +14,8 @@ export type PromoBarContent = {
   productName: string | null;
   headline: string | null;
   body: string | null;
-  cta: PrimaryCTA | SecondaryCTA | null;
+  primaryCta: PrimaryCTA | null;
+  secondaryCta: SecondaryCTA | null;
   bgImage: string | null;
 };
 
@@ -93,21 +93,29 @@ const parseContent = (cell: Element): PromoBarContent => {
   }) ?? null;
   const body = bodyEl?.innerHTML?.trim() ?? null;
 
-  // CTA row: a <p> whose only content is <strong><a> or <em><a>.
-  const ctaP = [...cell.querySelectorAll(':scope > p')].find((p) =>
-    p.querySelector('strong > a') !== null || p.querySelector('em > a') !== null
+  // CTA rows: <strong><a> = primary, <em><a> = secondary.
+  const primaryCtaP = allPs.find(
+    (p) => p.querySelector('strong > a') !== null,
   ) ?? null;
-  let cta: PrimaryCTA | SecondaryCTA | null = null;
-  try {
-    const [parsed] = alternative(parsePrimaryCTA)
-      .or(parseSecondaryCTA)
-      .eval(ctaP);
-    cta = parsed;
-  } catch (_) {
-    cta = null;
-  }
+  const secondaryCtaP = allPs.find(
+    (p) => p.querySelector('em > a') !== null,
+  ) ?? null;
 
-  return { icon, iconAlt, productName, headline, body, cta, bgImage };
+  let primaryCta: PrimaryCTA | null = null;
+  try {
+    [primaryCta] = parsePrimaryCTA(primaryCtaP) as Parsed<PrimaryCTA, unknown>;
+  } catch (_) { primaryCta = null; }
+
+  let secondaryCta: SecondaryCTA | null = null;
+  try {
+    [secondaryCta] = parseSecondaryCTA(secondaryCtaP) as
+      Parsed<SecondaryCTA, unknown>;
+  } catch (_) { secondaryCta = null; }
+
+  return {
+    icon, iconAlt, productName, headline, body,
+    primaryCta, secondaryCta, bgImage,
+  };
 };
 
 export const parsePromoBar = (

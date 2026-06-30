@@ -10,10 +10,13 @@ const iconHTML = (
   ? `<img class="feds-promo-bar-icon" src="${federateUrl(src)}" alt="${alt ?? ''}" width="40" height="40" loading="lazy">`
   : '';
 
-const ctaHTML = (cta: PrimaryCTA | SecondaryCTA | null): HTML => {
-  if (cta === null) return '';
-  return cta.type === 'PrimaryCTA' ? primaryCTA(cta) : secondaryCTA(cta);
-};
+const ctasHTML = (
+  p: PrimaryCTA | null,
+  s: SecondaryCTA | null,
+): HTML => [
+  p !== null ? primaryCTA(p) : '',
+  s !== null ? secondaryCTA(s) : '',
+].join('');
 
 const bgStyle = (bgColor: string | null): string =>
   bgColor !== null ? ` style="background-color:${bgColor}"` : '';
@@ -30,7 +33,9 @@ const minimizedSlot = (
   <div class="feds-promo-bar-inner">
     ${iconHTML(col.icon, col.iconAlt)}
     <p class="feds-promo-bar-text">${col.headline ?? ''}</p>
-    ${ctaHTML(col.cta)}
+   <div class="feds-promo-bar-ctas">
+    ${ctasHTML(col.primaryCta, col.secondaryCta)}
+   </div>
   </div>
 </div>`.trim();
 
@@ -61,7 +66,7 @@ const maximizedSlot = (
     </div>
    <div class="feds-promo-bar-right">
       ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
-      ${ctaHTML(col.cta)}
+      ${ctasHTML(col.primaryCta, col.secondaryCta)}
     </div>
   </div>
 </div>`.trim();
@@ -92,7 +97,7 @@ const maximizedReleaseSlot = (
     </div>
     ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
     ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
-    ${ctaHTML(col.cta)}
+    ${ctasHTML(col.primaryCta, col.secondaryCta)}
     </div>
     ${col.bgImage !== null ? `<picture class="feds-promo-bar-bg"><img loading="lazy" src="${federateUrl(col.bgImage)}" alt=""></picture>` : ''}
   </div>
