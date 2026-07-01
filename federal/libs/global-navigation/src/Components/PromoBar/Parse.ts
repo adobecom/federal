@@ -34,6 +34,11 @@ export type PromoBar = {
   slots: PromoBarSlot[];
 };
 
+type PromoBarIcon = {
+  icon: string | null;
+  iconAlt: string | null;
+};
+
 const ERRORS = {
   elementNull: "Error when parsing PromoBar. Element is null",
 };
@@ -43,7 +48,7 @@ const VARIANTS: readonly PromoBarVariant[] = ['maximized-release', 'maximized'];
 const parseVariant = (classList: DOMTokenList): PromoBarVariant =>
   VARIANTS.find((v) => classList.contains(v)) ?? 'minimized';
 
-const parseIconLink = (cell: Element): { icon: string | null; iconAlt: string | null } => {
+const parseIconLink = (cell: Element): PromoBarIcon => {
   // Icon is authored as <p><a href="...svg">https://...svg | Alt Text</a></p>
   const iconAnchor = [...cell.querySelectorAll(':scope > p > a')].find((a) => {
     const href = a.getAttribute('href') ?? '';
