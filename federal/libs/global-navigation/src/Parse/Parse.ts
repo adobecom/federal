@@ -9,7 +9,7 @@ export type GlobalNavigationData = {
   breadcrumbs: Breadcrumbs | null;
   components: Array<Component>;
   productCTA: ProductEntryCTA | null;
-  promoBar: PromoBar | null;
+  promoBar: Promise<PromoBar | null>;
   localnav: boolean;
   darkFont: boolean;
   errors: Array<RecoverableError>;
@@ -22,7 +22,7 @@ export const parseNavigation = (
   mainNav: HTMLElement,
   unavEnabled: boolean,
   placeholders: Map<string, string> = new Map(),
-  promoBarEl: HTMLElement | null = null,
+  promoBarEl: Promise<HTMLElement | null> = Promise.resolve(null),
 ): GlobalNavigationData | IrrecoverableError => {
   // Breadcrumbs are authored in the page body, not in the gnav source,
   // and they're optional. If the block is missing we silently skip
@@ -35,14 +35,11 @@ export const parseNavigation = (
     ? [null, []]
     : parseBreadcrumbs(breadcrumbsEl);
 
-  // Promo bar is fetched from the URL in the gnav-promo-source metadata
-  // and passed in as a pre-fetched HTMLElement. Optional — null skips it.
-  const [promoBar, promoBarErrors]: [
-    PromoBar | null,
-    Array<RecoverableError>
-  ] = promoBarEl === null
-    ? [null, []]
-    : parsePromoBar(promoBarEl);
+  const promoBar: Promise<PromoBar | null> = promoBarEl.then(el => {
+    if (el === null) return null;
+    const [parsed] = parsePromoBar(el);
+    return parsed;
+  });
 
   const [parsedComponents, componentErrors]
     = parseListAndAccumulateErrors(
@@ -64,7 +61,6 @@ export const parseNavigation = (
   const brandConciergeEnabled = getMetadata('gnav-brand-concierge') === 'on';
   const errors = [
     breadcrumbErrors,
-    promoBarErrors,
     componentErrors,
   ].flat();
 

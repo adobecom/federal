@@ -9,7 +9,7 @@ import {
 
 type Initial = {
   mainNav: HTMLElement;
-  promoBarEl: HTMLElement | null;
+  promoBarEl: Promise<HTMLElement | null>;
 };
 
 export const getInitialHTML = async ({
@@ -19,21 +19,26 @@ export const getInitialHTML = async ({
   const promoUrl = promoSource !== null
     ? new URL(promoSource, window.location.href)
     : null;
-  const [mainNav, promoResult] = await Promise.all([
-    fetchAndProcessPlainHTML(gnavSource),
-    fetchAndProcessPlainHTML(promoUrl),
-  ]);
+
+  const promoBarEl: Promise<HTMLElement | null> = promoUrl === null
+    ? Promise.resolve(null)
+    : fetchAndProcessPlainHTML(promoUrl).then(promoResult => {
+        const el = promoResult instanceof IrrecoverableError
+          ? null : promoResult;
+        const promoBar = el?.querySelector<HTMLElement>('.gnav-promo') ?? null;
+        if (promoBar !== null) {
+          const fetchedFrom = federateUrl(
+            `${promoUrl.origin}${promoUrl.pathname.replace(/(\.html$|$)/, '.plain.html')}`,
+          );
+          replaceDotMedia(fetchedFrom, promoBar);
+        }
+        return promoBar;
+      });
+
+  const mainNav = await fetchAndProcessPlainHTML(gnavSource);
   if (mainNav instanceof IrrecoverableError)
     return mainNav;
-  const promoBarEl = promoResult instanceof IrrecoverableError ?
-    null : promoResult;
-  const promoBar = promoBarEl?.querySelector<HTMLElement>('.gnav-promo') ?? null;
-  if (promoBar !== null && promoUrl !== null) {
-    const fetchedFrom = federateUrl(
-      `${promoUrl.origin}${promoUrl.pathname.replace(/(\.html$|$)/, '.plain.html')}`,
-    );
-    replaceDotMedia(fetchedFrom, promoBar);
-  }
-  return { mainNav, promoBarEl: promoBar };
+
+  return { mainNav, promoBarEl };
 }
 

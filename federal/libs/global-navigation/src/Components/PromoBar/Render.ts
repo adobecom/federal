@@ -117,11 +117,11 @@ const renderMaximizedRelease = (
   ${slots.map(({ content, viewports }) => maximizedReleaseSlot(content, viewports)).join('')}
 </div>`.trim();
 
-// ─── Entry point ────────────────────────────────────────────────────────
 export const promoBar = (data: PromoBar): HTML => {
   switch (data.variant) {
     case 'maximized':         return renderMaximized(data);
     case 'maximized-release': return renderMaximizedRelease(data);
-    default:                  return renderMinimized(data);
+    case 'minimized': return renderMinimized(data);
+    default: return (data.variant satisfies never);
   }
 };

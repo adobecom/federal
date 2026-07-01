@@ -114,6 +114,7 @@ export const main = async (
     await getPlaceholders(),
     promoBarEl,
   );
+
   if (gnavData instanceof IrrecoverableError) {
     lanaLog(gnavData.message);
     throw gnavData;
@@ -138,12 +139,13 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
-  if (data.promoBar !== null) {
+  const promoBar = await data.promoBar;
+  if (promoBar !== null) {
     const promoWrapper = document.querySelector<HTMLElement>(
       '.feds-promo-aside-wrapper',
     );
     if (promoWrapper !== null) {
-      promoWrapper.innerHTML = renderPromoBar(data.promoBar);
+      promoWrapper.innerHTML = renderPromoBar(promoBar);
       const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
       promoWrapper.style.display = 'none';
       const barBgColor = promoBarEl?.style.backgroundColor ?? '';
