@@ -112,7 +112,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
     align-items: center;
     justify-content: center;
     width: fit-content;
-    padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg);
+    padding: 9px var(--s2a-spacing-lg);
     border-radius: var(--s2a-border-radius-round);
     font-size: var(--s2a-typography-font-size-label);
     line-height: var(--s2a-typography-line-height-label);
@@ -170,7 +170,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
 
 .feds-promo-bar--minimized .feds-promo-bar-text {
   margin: 0;
-  font-family: var(--s2a-font-family-label);
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
   font-size: var(--s2a-typography-font-size-label);
   line-height: var(--s2a-typography-line-height-label);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
@@ -203,7 +203,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
 .feds-promo-bar--maximized {
   .feds-promo-bar-right {
     display: flex;
-    gap: var(--s2a-spacing-xs);
+    gap: var(--s2a-spacing-2xl);
     align-items: center;
     padding: var(--s2a-spacing-lg);
     border-radius: var(--s2a-border-radius-round);
@@ -241,20 +241,20 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
 
   .feds-promo-bar-product {
     color: var(--s2a-color-transparent-white-64);
-    font-family: var(--body-font-family);
-    font-size: var(--s2a-typography-font-size-label);
+    font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+    font-size: var(--s2a-typography-font-size-eyebrow);
+    line-height: var(--s2a-typography-line-height-eyebrow);
     font-weight: var(--s2a-font-weight-adobe-clean-bold);
-    letter-spacing: var(--s2a-typography-letter-spacing-label);
-    line-height: var(--s2a-typography-line-height-label);
+    letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
   }
 
   .feds-promo-bar-headline {
     margin: 0;
-    font-weight: var(--s2a-font-weight-adobe-clean-black);
+    letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
+    font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
     font-size: var(--s2a-typography-font-size-heading-4);
     line-height: var(--s2a-typography-line-height-heading-4);
-    letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
-    font-family: var( --heading-font-family);
+    font-weight: var(--s2a-font-weight-adobe-clean-black);
   }
 
   .feds-promo-bar-body {
@@ -262,6 +262,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
     font-family: var(--body-font-family, "Adobe Clean", sans-serif);
     font-size: var(--s2a-typography-font-size-body-sm);
     line-height: var(--s2a-typography-line-height-body-sm);
+    letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
     color: inherit;
     opacity: 0.8;
   }
@@ -313,6 +314,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
   background-repeat: no-repeat;
   padding: var(--s2a-spacing-4xl);
   padding-right: var(--s2a-spacing-2xl);
+  max-width: calc(480px + var(--s2a-spacing-4xl) + var(--s2a-spacing-2xl));
 
   .feds-primary-cta,
   .feds-secondary-cta {
@@ -331,8 +333,8 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
 .feds-promo-bar--maximized-release .feds-promo-bar-product {
   margin: 0;
   font-family: var(--body-font-family, "Adobe Clean", sans-serif);
-  font-size: var(--s2a-typography-font-size-label);
-  line-height: var(--s2a-typography-line-height-label);
+  font-size: var(--s2a-typography-font-size-eyebrow);
+  line-height: var(--s2a-typography-line-height-eyebrow);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   color: inherit;
   opacity: 0.8;
@@ -341,17 +343,17 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
 .feds-promo-bar--maximized-release .feds-promo-bar-headline {
   margin: 0;
   font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
-  font-size: 1.5rem;
-  line-height: 1.2;
-  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-heading-4);
+  line-height: var(--s2a-typography-line-height-heading-4);
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: inherit;
 }
 
 .feds-promo-bar--maximized-release .feds-promo-bar-body {
   margin: 0;
   font-family: var(--body-font-family, "Adobe Clean", sans-serif);
-  font-size: var(--s2a-typography-font-size-body-sm);
-  line-height: var(--s2a-typography-line-height-body-sm);
+  font-size: var(--s2a-typography-font-size-body-lg);
+  line-height: var(--s2a-typography-line-height-body-lg);
   color: inherit;
   opacity: 0.8;
 }
