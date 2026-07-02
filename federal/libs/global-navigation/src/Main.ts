@@ -195,7 +195,7 @@ export const renderGnavString = ({
       ? lastBreadcrumb
       : lastBreadcrumb.text;
   return `
-<nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
+<nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul role="presentation">
@@ -378,8 +378,12 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
     }
   });
 
+  menuWrapper?.setAttribute('data-lenis-prevent', '');
+  mountpoint.querySelector<HTMLElement>('.feds-gnav-items')?.setAttribute('data-lenis-prevent', '');
+
   const megaMenuPopovers = mountpoint.querySelectorAll<HTMLElement>('.feds-popup');
   megaMenuPopovers.forEach(popup => {
+    popup.setAttribute('data-lenis-prevent', '');
     popup.addEventListener('toggle', () => {
       const trigger = mountpoint.querySelector<HTMLElement>(
         `[aria-controls="${popup.id}"]`

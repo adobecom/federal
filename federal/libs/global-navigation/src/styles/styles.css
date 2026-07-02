@@ -1804,7 +1804,7 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
 }
 
 @keyframes feds-gnav-banner-offset {
-  from  { top: var(--feds-language-banner-height, 42px); }
+  from  { top: var(--feds-language-banner-height, 44px); }
   to  { top: 0; }
 }
 
@@ -1815,8 +1815,47 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   animation-range: exit;
 }
 
-/* Mobile menu drawer: track banner exit so the drawer top and height
-   stay flush with the gnav bar regardless of scroll position. */
+/* feds-popup: offset top when banner is visible */
+@keyframes feds-popup-top-offset {
+  from { top: calc(var(--feds-language-banner-height, 44px) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px); }
+  to   { top: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px); }
+}
+
+@keyframes feds-popup-max-height-offset {
+  from { max-height: calc(100dvh - var(--feds-language-banner-height, 44px) - var(--s2a-spacing-64)); }
+  to   { max-height: calc(100dvh - var(--s2a-spacing-64)); }
+}
+
+:root:has(.language-banner) header.global-navigation .feds-popup {
+  animation-name: feds-popup-top-offset;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: --language-banner-view;
+  animation-range: exit;
+}
+
+/* On desktop-only (subscreen-opening never fires on desktop, so no fade-in
+   animation-name conflict). Animates max-height in sync with popup top offset
+   so the inner scrollable container tracks the popup height during scroll. */
+@media (min-width: 1024px) {
+  :root:has(.language-banner) header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
+    animation-name: feds-popup-max-height-offset;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --language-banner-view;
+    animation-range: exit;
+  }
+}
+
+/* Disable the height transition on the backdrop while the banner is present.
+   The scroll-driven max-height animation triggers ResizeObserver every frame;
+   without this override the 0.35s height ease would cause the backdrop to
+   lag visibly behind the popup during scroll. */
+:root:has(.language-banner) header.global-navigation nav::after {
+  transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1), height 0s linear;
+}
+
+/* feds-menu-wrapper top: safe globally, no effect on position:static desktop nav item */
 @keyframes feds-menu-wrapper-top-offset {
   from { top: calc(var(--feds-language-banner-height, 44px) + var(--s2a-spacing-64)); }
   to   { top: var(--s2a-spacing-64); }
@@ -1827,7 +1866,6 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   to   { height: calc(100dvh - var(--s2a-spacing-64)); }
 }
 
-/* top only: safe globally, no effect on position:static desktop nav item */
 :root:has(.language-banner) header.global-navigation nav > ul > li.feds-menu-wrapper {
   animation-name: feds-menu-wrapper-top-offset;
   animation-timing-function: linear;
@@ -1836,7 +1874,6 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   animation-range: exit;
 }
 
-/* top + height: only where the drawer is position:fixed */
 @media (max-width: 1023px) {
   :root:has(.language-banner) .global-navigation nav > ul > li.feds-menu-wrapper {
     animation-name: feds-menu-wrapper-top-offset, feds-menu-wrapper-height-offset;
@@ -1852,18 +1889,6 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   animation-timing-function: linear, linear;
   animation-fill-mode: both, both;
   animation-timeline: --language-banner-view, --language-banner-view;
-  animation-range: exit;
-}
-
-/* Compact popup: inset uses a fixed top that also needs the banner offset. */
-@keyframes feds-popup-top-offset {
-  from { top: calc(var(--feds-language-banner-height, 44px) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px); }
-  to   { top: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px); }
-}
-
-:root:has(.language-banner) header.global-navigation .feds-popup {
-  animation: feds-popup-top-offset linear both;
-  animation-timeline: --language-banner-view;
   animation-range: exit;
 }
 
