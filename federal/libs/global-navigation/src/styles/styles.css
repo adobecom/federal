@@ -1815,3 +1815,55 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   animation-range: exit;
 }
 
+/* Mobile menu drawer: track banner exit so the drawer top and height
+   stay flush with the gnav bar regardless of scroll position. */
+@keyframes feds-menu-wrapper-top-offset {
+  from { top: calc(var(--feds-language-banner-height, 44px) + var(--s2a-spacing-64)); }
+  to   { top: var(--s2a-spacing-64); }
+}
+
+@keyframes feds-menu-wrapper-height-offset {
+  from { height: calc(100dvh - var(--feds-language-banner-height, 44px) - var(--s2a-spacing-64)); }
+  to   { height: calc(100dvh - var(--s2a-spacing-64)); }
+}
+
+/* top only: safe globally, no effect on position:static desktop nav item */
+:root:has(.language-banner) header.global-navigation nav > ul > li.feds-menu-wrapper {
+  animation-name: feds-menu-wrapper-top-offset;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: --language-banner-view;
+  animation-range: exit;
+}
+
+/* top + height: only where the drawer is position:fixed */
+@media (max-width: 1023px) {
+  :root:has(.language-banner) .global-navigation nav > ul > li.feds-menu-wrapper {
+    animation-name: feds-menu-wrapper-top-offset, feds-menu-wrapper-height-offset;
+    animation-timing-function: linear, linear;
+    animation-fill-mode: both, both;
+    animation-timeline: --language-banner-view, --language-banner-view;
+    animation-range: exit;
+  }
+}
+
+:root:has(.language-banner) header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper {
+  animation-name: feds-menu-wrapper-top-offset, feds-menu-wrapper-height-offset;
+  animation-timing-function: linear, linear;
+  animation-fill-mode: both, both;
+  animation-timeline: --language-banner-view, --language-banner-view;
+  animation-range: exit;
+}
+
+/* Compact popup: inset uses a fixed top that also needs the banner offset. */
+@keyframes feds-popup-top-offset {
+  from { top: calc(var(--feds-language-banner-height, 44px) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px); }
+  to   { top: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px); }
+}
+
+:root:has(.language-banner) header.global-navigation .feds-popup {
+  animation: feds-popup-top-offset linear both;
+  animation-timeline: --language-banner-view;
+  animation-range: exit;
+}
+
