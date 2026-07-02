@@ -152,6 +152,7 @@ mountpoint: HTMLElement
       if (barBgColor !== '') {
         promoWrapper.style.backgroundColor = barBgColor;
       }
+      await initMerchLinks(promoWrapper);
     }
   }
   if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');

@@ -5,6 +5,7 @@ import {
   parsePrimaryCTA,
   parseSecondaryCTA,
 } from "../CTA/Parse";
+import { isMerchLink } from "../../Utils/Utils";
 
 export type PromoBarVariant = 'minimized' | 'maximized' | 'maximized-release';
 
@@ -86,7 +87,6 @@ const parseContent = (cell: Element): PromoBarContent => {
         === (strong.querySelector('a')?.textContent ?? '').trim();
     return !isCtaRow;
   }) ?? null;
-  const headline = headlineEl?.innerHTML?.trim() ?? null;
 
   // Body: the first <p> after the headline that has no <strong>.
   const allPs = [...cell.querySelectorAll(':scope > p')];
@@ -96,6 +96,17 @@ const parseContent = (cell: Element): PromoBarContent => {
     if (p.querySelector('em > a') !== null) return false;
     return (p.textContent?.trim() ?? '').length > 0;
   }) ?? null;
+
+  // Decorate merch links within headline and body before serializing innerHTML.
+  [headlineEl, bodyEl].forEach((el) => {
+    if (el === null) return;
+    el.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+      const href = a.getAttribute('href') ?? '';
+      if (isMerchLink(href)) a.classList.add('merch');
+    });
+  });
+
+  const headline = headlineEl?.innerHTML?.trim() ?? null;
   const body = bodyEl?.innerHTML?.trim() ?? null;
 
   // CTA rows: <strong><a> = primary, <em><a> = secondary.
