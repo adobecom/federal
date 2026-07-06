@@ -7,7 +7,7 @@ body:has(.feds-popup.is-open) .feds-promo-bar {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main  {
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) main  {
   clip-path: inset(0 round var(--s2a-border-radius-lg));
 }
 
