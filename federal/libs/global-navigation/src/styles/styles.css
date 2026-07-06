@@ -1790,10 +1790,9 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
    smoothly removes the offset as the banner scrolls out of the viewport.
    ========================================= */
 
-/* Banner is fixed at 44px — JS ResizeObserver will confirm the real
-   offsetHeight, but the banner design no longer wraps to two lines. */
+/* --feds-language-banner-height is defined in milo/libs/c2/styles/styles.css,
+   next to the .language-banner reservation rule it sizes. */
 :root {
-  --feds-language-banner-height: 44px;
   /* Expands the named view-timeline scope so sibling elements (the fixed
      header) can reference --language-banner-view, not just descendants. */
   timeline-scope: --language-banner-view;
@@ -1803,13 +1802,24 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   view-timeline: --language-banner-view block;
 }
 
+/* Opening the localnav bar suppresses the banner (see Main.ts,
+   initAriaToggleListeners) rather than trying to hand off the header's `top`
+   from the banner's scroll-linked animation to localnav.css's static
+   open-state value — animations don't transition smoothly into a static
+   value, so that hand-off always snapped. With the banner suppressed,
+   :has(.language-banner...) below stops matching entirely and the header
+   falls back to localnav.css's own already-smooth open/close transition. */
+.language-banner.feds-banner-suppressed {
+  display: none;
+}
+
 @keyframes feds-gnav-banner-offset {
   from  { top: var(--feds-language-banner-height, 44px); }
   to  { top: 0; }
 }
 
-:root:has(.language-banner) header.global-navigation,
-:root:has(.language-banner) header.global-navigation nav {
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation,
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav {
   animation: feds-gnav-banner-offset linear both;
   animation-timeline: --language-banner-view;
   animation-range: exit;
@@ -1826,7 +1836,7 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   to   { max-height: calc(100dvh - var(--s2a-spacing-64)); }
 }
 
-:root:has(.language-banner) header.global-navigation .feds-popup {
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) .feds-popup {
   animation-name: feds-popup-top-offset;
   animation-timing-function: linear;
   animation-fill-mode: both;
@@ -1834,11 +1844,35 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   animation-range: exit;
 }
 
+/* localnav's hamburger-flow popup (bar closed) uses a plain --s2a-spacing-64
+   top with no +8-1px baseline (see localnav.css) — different from the
+   standard popup the rule above targets. When the bar is open instead, the
+   banner is already suppressed via the bar's own open/close handling in
+   Main.ts, so :has(.language-banner...) below simply won't match and
+   localnav.css's breadcrumbs-height-based top applies untouched. */
+@keyframes feds-popup-localnav-top-offset {
+  from { top: calc(var(--feds-language-banner-height, 44px) + var(--s2a-spacing-64)); }
+  to   { top: var(--s2a-spacing-64); }
+}
+
+@keyframes feds-popup-localnav-max-height-offset {
+  from { max-height: calc(100dvh - var(--feds-language-banner-height, 44px) - var(--s2a-spacing-64)); }
+  to   { max-height: calc(100dvh - var(--s2a-spacing-64)); }
+}
+
+:root:has(.language-banner:not(.feds-banner-suppressed)) nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup {
+  animation-name: feds-popup-localnav-top-offset, feds-popup-localnav-max-height-offset;
+  animation-timing-function: linear, linear;
+  animation-fill-mode: both, both;
+  animation-timeline: --language-banner-view, --language-banner-view;
+  animation-range: exit;
+}
+
 /* On desktop-only (subscreen-opening never fires on desktop, so no fade-in
    animation-name conflict). Animates max-height in sync with popup top offset
    so the inner scrollable container tracks the popup height during scroll. */
 @media (min-width: 1024px) {
-  :root:has(.language-banner) header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
+  :root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     animation-name: feds-popup-max-height-offset;
     animation-timing-function: linear;
     animation-fill-mode: both;
@@ -1851,7 +1885,7 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
    The scroll-driven max-height animation triggers ResizeObserver every frame;
    without this override the 0.35s height ease would cause the backdrop to
    lag visibly behind the popup during scroll. */
-:root:has(.language-banner) header.global-navigation nav::after {
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav::after {
   transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1), height 0s linear;
 }
 
@@ -1866,7 +1900,7 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   to   { height: calc(100dvh - var(--s2a-spacing-64)); }
 }
 
-:root:has(.language-banner) header.global-navigation nav > ul > li.feds-menu-wrapper {
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
   animation-name: feds-menu-wrapper-top-offset;
   animation-timing-function: linear;
   animation-fill-mode: both;
@@ -1875,7 +1909,7 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
 }
 
 @media (max-width: 1023px) {
-  :root:has(.language-banner) .global-navigation nav > ul > li.feds-menu-wrapper {
+  :root:has(.language-banner:not(.feds-banner-suppressed)) .global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
     animation-name: feds-menu-wrapper-top-offset, feds-menu-wrapper-height-offset;
     animation-timing-function: linear, linear;
     animation-fill-mode: both, both;
@@ -1884,7 +1918,7 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   }
 }
 
-:root:has(.language-banner) header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper {
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
   animation-name: feds-menu-wrapper-top-offset, feds-menu-wrapper-height-offset;
   animation-timing-function: linear, linear;
   animation-fill-mode: both, both;

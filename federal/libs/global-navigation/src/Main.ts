@@ -300,7 +300,6 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
-  initLanguageBannerOffset();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -356,6 +355,14 @@ export const postRenderingTasks = async (
 const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
   const menuWrapper = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
   const navToggle = mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
+  const nav = mountpoint.querySelector<HTMLElement>('nav');
+
+  // Lenis should only be blocked from hijacking scroll while something
+  // scrollable (the mobile drawer or a mega-menu popup) is actually open —
+  // not permanently. Recomputed on every open/close instead of set once.
+  const updateNavLenisPrevent = (): void => {
+    nav?.toggleAttribute('data-lenis-prevent', mountpoint.querySelector(`.${IS_OPEN_CLASS}`) !== null);
+  };
 
   menuWrapper?.addEventListener('toggle', () => {
     const isOpen = menuWrapper.classList.contains(IS_OPEN_CLASS);
@@ -372,6 +379,18 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       );
     }
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
+
+    // Opening the localnav bar slides the header up via a plain static `top`
+    // (see localnav.css). Suppressing the banner for the duration removes it
+    // from :has(.language-banner) matching entirely, so the header falls
+    // back to localnav.css's own open/close rule instead of fighting the
+    // banner's scroll-linked offset animation.
+    if (mountpoint.querySelector('nav.localnav')) {
+      document.querySelector('.language-banner')
+        ?.classList.toggle('feds-banner-suppressed', isOpen);
+    }
+
+    updateNavLenisPrevent();
   });
 
   menuWrapper?.addEventListener('transitionend', () => {
@@ -380,12 +399,8 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
     }
   });
 
-  menuWrapper?.setAttribute('data-lenis-prevent', '');
-  mountpoint.querySelector<HTMLElement>('.feds-gnav-items')?.setAttribute('data-lenis-prevent', '');
-
   const megaMenuPopovers = mountpoint.querySelectorAll<HTMLElement>('.feds-popup');
   megaMenuPopovers.forEach(popup => {
-    popup.setAttribute('data-lenis-prevent', '');
     popup.addEventListener('toggle', () => {
       const trigger = mountpoint.querySelector<HTMLElement>(
         `[aria-controls="${popup.id}"]`
@@ -393,6 +408,7 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       const isOpen = popup.classList.contains(IS_OPEN_CLASS);
       trigger?.setAttribute('aria-expanded', String(isOpen));
       trigger?.setAttribute('daa-ll', isOpen ? 'header|Close' : 'header|Open');
+      updateNavLenisPrevent();
     });
   });
 };
@@ -506,32 +522,6 @@ const initHeaderAnalytics = (
   const header = mountpoint.closest("header");
   if (header === null) return;
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
-};
-
-const initLanguageBannerOffset = (): void => {
-  const observe = (banner: HTMLElement): void => {
-    // ResizeObserver fires after layout so offsetHeight is always accurate.
-    // It also fires on the initial observation overriding the CSS calc()
-    // fallback with the real measured value (needed for two-line mobile wraps).
-    new ResizeObserver(() => {
-      document.documentElement.style.setProperty(
-        '--feds-language-banner-height',
-        `${banner.offsetHeight}px`,
-      );
-    }).observe(banner);
-  };
-
-  const banner = document.querySelector<HTMLElement>('.language-banner');
-  if (banner) { observe(banner); return; }
-
-  // Banner is added asynchronously after geo/language detection
-  const mo = new MutationObserver((_, observer) => {
-    const el = document.querySelector<HTMLElement>('.language-banner');
-    if (!el) return;
-    observer.disconnect();
-    observe(el);
-  });
-  mo.observe(document.body, { childList: true });
 };
 
 const initCompactOverflow = (mountpoint: HTMLElement): void => {
