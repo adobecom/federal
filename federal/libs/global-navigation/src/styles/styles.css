@@ -302,7 +302,7 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
-  top: 0;
+  top: var(--feds-promo-bar-height);
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;
@@ -1787,28 +1787,4 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
 header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-nav-toggle svg {
   animation: none;
   color: var(--s2a-color-gray-1000);
-}
-
-
-/* =========================================
-   Promo bar offset (scroll-driven)
-   Pushes the fixed header below the promo bar while it is visible;
-   smoothly removes the offset as the promo scrolls out of the viewport.
-   Same pattern as the language-banner offset.
-   ========================================= */
-
-.feds-promo-aside-wrapper {
-  view-timeline: --promo-bar-view block;
-}
-
-@keyframes feds-gnav-promo-offset {
-  from { top: var(--feds-promo-bar-height, 0px); }
-  to   { top: 0; }
-}
-
-:root:has(.feds-promo-aside-wrapper) header.global-navigation,
-:root:has(.feds-promo-aside-wrapper) header.global-navigation nav {
-  animation: feds-gnav-promo-offset linear both;
-  animation-timeline: --promo-bar-view;
-  animation-range: exit;
 }

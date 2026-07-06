@@ -213,7 +213,7 @@ export const renderGnavString = ({
       ? lastBreadcrumb
       : lastBreadcrumb.text;
   return `
-<nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
+<nav  class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul role="presentation">
@@ -663,15 +663,31 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
     }, 5000);
   });
 
-  // Set the height once and on resize — the CSS scroll-driven animation
-  // (view-timeline on .feds-promo-aside-wrapper) handles the header offset
-  // as the promo exits the viewport. No scroll listener needed.
-  const setHeight = (): void => {
+  let naturalHeight = promoBar.offsetHeight;
+  let rafId: number | null = null;
+
+  const update = (): void => {
+    const visible = Math.max(0, naturalHeight - window.scrollY);
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
-      `${promoBar.offsetHeight}px`,
+      `${visible}px`,
     );
   };
-  new ResizeObserver(setHeight).observe(promoBar);
-  setHeight();
+
+  // Re-measure on resize in case the promo bar reflows
+  new ResizeObserver(() => {
+    naturalHeight = promoBar.offsetHeight;
+    update();
+  }).observe(promoBar);
+
+  const onScroll = (): void => {
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      update();
+    });
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  update();
 };
