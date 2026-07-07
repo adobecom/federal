@@ -209,6 +209,28 @@ header.feds-header-scrolled nav {
   border-color: var(--s2a-color-gray-25);
 }
 
+.global-navigation:has(.feds-menu-active) ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation:has(.feds-menu-active) .feds-product-entry-cta .feds-primary-cta  {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation:has(.feds-menu-active) ul.feds-gnav-items > li > .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation.dark-font ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.dark-font .feds-product-entry-cta .feds-primary-cta,
+.global-navigation.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-1000);
+}
+
 .global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
 .global-navigation .feds-product-entry-cta .feds-secondary-cta {
   background-color: transparent;
@@ -225,14 +247,19 @@ header.feds-header-scrolled nav {
 /* Scrolled (blurred whitish backdrop):
    - primary: filled dark pill with white text (inverse of default)
    - secondary: outlined in dark, transparent fill (matches popup secondary) */
-.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
+.global-navigation.feds-header-scrolled.dark-font .feds-primary-cta {
   background-color: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
   border-color: var(--s2a-color-gray-1000);
 }
 
-.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.feds-header-scrolled .feds-primary-cta {
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.feds-header-scrolled ul.feds-gnav-items>li>.feds-secondary-cta,
 .global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-1000);
@@ -252,17 +279,30 @@ header.feds-header-scrolled nav {
    is white (over a transparent gnav), so on hover we darken the text as
    well so it remains legible against the hover fill. The primary
    CTA already resolves to white text on hover in both states. */
+.global-navigation.dark-font ul.feds-gnav-items > li > .feds-secondary-cta:hover,
+.global-navigation.dark-font .feds-product-entry-cta .feds-secondary-cta:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: var(--s2a-color-gray-1000);
+}
+
 .global-navigation ul.feds-gnav-items > li > .feds-secondary-cta:hover,
 .global-navigation .feds-product-entry-cta .feds-secondary-cta:hover {
-  background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
+  background-color: rgba(255, 255, 255, 0.64);
   color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation.dark-font ul.feds-gnav-items > li > .feds-primary-cta:hover,
+.global-navigation.dark-font .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
 }
 
 .global-navigation ul.feds-gnav-items > li > .feds-primary-cta:hover,
 .global-navigation .feds-product-entry-cta .feds-primary-cta:hover {
-  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
-  color: var(--s2a-color-gray-25);
-  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  background-color: rgba(255, 255, 255, 0.64);
+  color: var(--s2a-color-gray-1000);
+  border-color: rgba(255, 255, 255, 0.64);
 }
 
 .global-navigation.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
