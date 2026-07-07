@@ -265,6 +265,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
     letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
     color: inherit;
     opacity: 0.8;
+    max-width: 355px;
   }
 
   .feds-promo-bar-body a {
@@ -356,13 +357,14 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   line-height: var(--s2a-typography-line-height-body-lg);
   color: inherit;
   opacity: 0.8;
+  max-width: 355px;
 }
 
 .feds-promo-bar--maximized-release .feds-promo-bar-body a {
   color: inherit;
 }
 
-.feds-promo-bar--maximized-release .feds-promo-bar-cta {
+.feds-promo-bar--maximized-release .fedsg-promo-bar-cta {
   margin-top: var(--s2a-spacing-sm);
 }
 
