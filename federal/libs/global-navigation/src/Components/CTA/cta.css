@@ -103,9 +103,9 @@
     }
   }
 
-  /* Menu active: invert primary to dark — desktop only */
+  /* Menu active: invert primary to dark — desktop only, not compact */
   @media (min-width: 1024px) {
-    &:has(.feds-menu-active):not(:has(.small-menu.is-open)) :is(
+    &:not(.is-compact):has(.feds-menu-active):not(:has(.small-menu.is-open)) :is(
       ul.feds-gnav-items > li > .feds-primary-cta,
       .feds-product-entry-cta .feds-primary-cta
     ) {
