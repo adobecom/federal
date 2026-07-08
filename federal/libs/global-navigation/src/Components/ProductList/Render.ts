@@ -5,11 +5,17 @@ import { ProductCategory, ProductList } from "./Parse";
 export const productlist = (
   { categories, links, placeholders }: ProductList
 ): HTML => {
+  const scrollPrevLabel = placeholders.get('product-list-scroll-prev') ?? 'Scroll tabs left';
+  const scrollNextLabel = placeholders.get('product-list-scroll-next') ?? 'Scroll tabs right';
   const tabs = `
-    <ul class="tabs" role="tablist">
-      ${categories.map(renderTab).join('')}
-      ${links.length ? `<li class="product-links"><a class="feds-link" href="${localizeHref(links[links.length - 1].href)}"${getAnalyticsAttrs(null, links[links.length - 1].daaLl ?? links[links.length - 1].text)}>${links[links.length - 1].text}${icons.chevronRight}</a></li>` : ''}
-    </ul>
+    <div class="tabs-scroller">
+      <div class="tabs-scroll-btn tabs-scroll-btn--prev" hidden><button class="tabs-scroll-icon-btn" aria-label="${scrollPrevLabel}">${icons.chevronLeft}</button></div>
+      <ul class="tabs" role="tablist">
+        ${categories.map(renderTab).join('')}
+        ${links.length ? `<li class="product-links"><a class="feds-link" href="${localizeHref(links[links.length - 1].href)}"${getAnalyticsAttrs(null, links[links.length - 1].daaLl ?? links[links.length - 1].text)}>${links[links.length - 1].text}${icons.chevronRight}</a></li>` : ''}
+      </ul>
+      <div class="tabs-scroll-btn tabs-scroll-btn--next" hidden><button class="tabs-scroll-icon-btn" aria-label="${scrollNextLabel}">${icons.chevronLeft}</button></div>
+    </div>
   `.trim();
   const tabcontent = `
     <ul class="tab-content">
@@ -56,6 +62,7 @@ const renderTab = (
           aria-selected="${(i === 0).toString()}"
           aria-controls="${i}"
           aria-describedby="product-hint-${i}"
+          tabindex="${i === 0 ? '0' : '-1'}"
           ${getAnalyticsAttrs('', daaLl)}
           >
             ${name}

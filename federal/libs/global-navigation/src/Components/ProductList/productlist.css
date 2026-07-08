@@ -35,10 +35,13 @@
   background-color: transparent;
 }
 
-.feds-popup .product-list .tabs {
+.feds-popup .product-list .tabs-scroller {
   margin-left: calc(0px - var(--s2a-spacing-lg));
   margin-right: calc(0px - var(--s2a-spacing-lg));
-  padding: 0 var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-lg);
+}
+
+.feds-popup .product-list .tabs {
+  padding: 0 33px var(--s2a-spacing-lg);
 }
 
 .product-list .tabs::-webkit-scrollbar {
@@ -84,6 +87,63 @@
 header.global-navigation:not(.is-compact) .product-list .tabs button.tab:focus-visible {
   box-shadow: inset 0 0 0 2px var(--s2a-color-blue-800);
   outline: none;
+}
+
+/* =========================================
+   Tabs Scroller & Scroll Buttons
+   ========================================= */
+
+.product-list .tabs-scroller {
+  position: relative;
+}
+
+.product-list .tabs-scroll-btn {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: var(--s2a-spacing-lg);
+  z-index: 1;
+  width: 68px;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.product-list .tabs-scroll-btn:not([hidden]) {
+  display: flex;
+}
+
+.product-list .tabs-scroll-btn--prev {
+  left: 0;
+  background: linear-gradient(to right, var(--s2a-color-gray-75) 43.75%, transparent 100%);
+}
+
+.product-list .tabs-scroll-btn--next {
+  right: 0;
+  background: linear-gradient(to left, var(--s2a-color-gray-75) 43.75%, transparent 100%);
+}
+
+.product-list .tabs-scroll-btn--next svg {
+  transform: rotate(180deg);
+}
+
+.product-list .tabs-scroll-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.product-list .tabs-scroll-icon-btn:focus-visible {
+  outline: 2px solid var(--s2a-color-blue-800);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* =========================================
@@ -155,7 +215,8 @@ header.global-navigation:not(.is-compact) .product-list .tabs button.tab:focus-v
 
 [dir="rtl"] {
   .product-links .feds-link svg,
-  .featured-card .feds-link svg {
+  .featured-card .feds-link svg,
+  .tabs-scroll-btn svg {
     transform: scaleX(-1);
   }
 }
@@ -176,9 +237,17 @@ header.global-navigation:not(.is-compact) .product-list .tabs button.tab:focus-v
     overflow: visible;
   }
 
+  header.global-navigation:not(.is-compact) .feds-popup .product-list .tabs-scroller {
+    margin: 0;
+  }
+
   header.global-navigation:not(.is-compact) .feds-popup .product-list .tabs {
     margin: 0;
     padding: 0;
+  }
+
+  header.global-navigation:not(.is-compact) .product-list .tabs-scroll-btn {
+    display: none;
   }
 
   header.global-navigation:not(.is-compact) .product-list .tabs li {

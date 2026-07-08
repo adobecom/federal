@@ -53,12 +53,14 @@ export const initClickListeners = (
 
       tabButtons.forEach(tabButton => {
         tabButton.setAttribute('aria-selected', 'false');
+        tabButton.setAttribute('tabindex', '-1');
       });
       tabPanels.forEach(tabPanel => {
         tabPanel.setAttribute('hidden', 'true');
       });
       tabPanels[i]?.removeAttribute('hidden');
       button.setAttribute('aria-selected', 'true');
+      button.setAttribute('tabindex', '0');
 
       if (!popup) return;
       if (!isNavDesktop()) return;
@@ -86,6 +88,58 @@ export const initClickListeners = (
   });
 
   const tabList = gnav.querySelector<HTMLElement>('.tabs[role="tablist"]');
+  const prevBtn = gnav.querySelector<HTMLElement>('.tabs-scroll-btn--prev');
+  const nextBtn = gnav.querySelector<HTMLElement>('.tabs-scroll-btn--next');
+  const prevIconBtn = gnav.querySelector<HTMLButtonElement>('.tabs-scroll-btn--prev .tabs-scroll-icon-btn');
+  const nextIconBtn = gnav.querySelector<HTMLButtonElement>('.tabs-scroll-btn--next .tabs-scroll-icon-btn');
+
+  const updateScrollButtons = (): void => {
+    if (!tabList || !prevBtn || !nextBtn) return;
+    if (isNavDesktop()) {
+      prevBtn.setAttribute('hidden', '');
+      nextBtn.setAttribute('hidden', '');
+      return;
+    }
+    const hasOverflow = tabList.scrollWidth > tabList.clientWidth;
+    if (!hasOverflow) {
+      prevBtn.setAttribute('hidden', '');
+      nextBtn.setAttribute('hidden', '');
+      return;
+    }
+    const atStart = tabList.scrollLeft <= 1;
+    const atEnd = tabList.scrollLeft + tabList.clientWidth >= tabList.scrollWidth - 1;
+    const focusedTab = gnav.querySelector<HTMLElement>('.tabs [role="tab"][aria-selected="true"]');
+    if (atStart) {
+      if (prevBtn.querySelector('.tabs-scroll-icon-btn') === document.activeElement) focusedTab?.focus();
+      prevBtn.setAttribute('hidden', '');
+    } else {
+      prevBtn.removeAttribute('hidden');
+    }
+    if (atEnd) {
+      if (nextBtn.querySelector('.tabs-scroll-icon-btn') === document.activeElement) focusedTab?.focus();
+      nextBtn.setAttribute('hidden', '');
+    } else {
+      nextBtn.removeAttribute('hidden');
+    }
+  };
+
+  const onTabsScroll = (): void => { updateScrollButtons(); };
+  tabList?.addEventListener('scroll', onTabsScroll, { passive: true });
+
+  const onScrollPrev = (): void => {
+    if (!tabList) return;
+    tabList.scrollBy({ left: -(tabList.clientWidth * 0.8), behavior: 'smooth' });
+  };
+  const onScrollNext = (): void => {
+    if (!tabList) return;
+    tabList.scrollBy({ left: tabList.clientWidth * 0.8, behavior: 'smooth' });
+  };
+  prevIconBtn?.addEventListener('click', onScrollPrev);
+  nextIconBtn?.addEventListener('click', onScrollNext);
+
+  const tabsResizeObserver = new ResizeObserver(() => { updateScrollButtons(); });
+  if (tabList) tabsResizeObserver.observe(tabList);
+
   const updateTablistOrientation = (): void => {
     if (!tabList) return;
     if (isNavDesktop()) {
@@ -109,6 +163,10 @@ export const initClickListeners = (
       button.removeEventListener('click', tabButtonClickCallbacks[i]);
       button.removeEventListener('focus', tabButtonFocusCallbacks[i]);
     });
+    tabList?.removeEventListener('scroll', onTabsScroll);
+    prevIconBtn?.removeEventListener('click', onScrollPrev);
+    nextIconBtn?.removeEventListener('click', onScrollNext);
+    tabsResizeObserver.disconnect();
     isDesktop.removeEventListener('change', updateTablistOrientation);
   };
 };

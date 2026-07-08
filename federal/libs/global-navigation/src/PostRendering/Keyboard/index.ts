@@ -78,9 +78,9 @@ const applyBarTabIndex = (gnav: HTMLElement, open: boolean): void => {
 /** Focusable elements inside an open popup, in DOM order. */
 const popupFocusables = (popup: HTMLElement): HTMLElement[] => {
   const selector
-    = 'a[href], button:not([disabled]),'
+    = 'a[href], button:not([disabled]):not([tabindex="-1"]),'
     + ' [tabindex]:not([tabindex="-1"]),'
-    + ' input:not([disabled]), [role="tab"]';
+    + ' input:not([disabled]), [role="tab"]:not([tabindex="-1"])';
   return [...popup.querySelectorAll<HTMLElement>(selector)]
     .filter((el) => el.offsetParent !== null);
 };
@@ -372,6 +372,24 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     const items = $$(popup, '.tabs :is([role="tab"], .product-links a)');
     const firstTabOffsetLeft = items[0]?.offsetLeft ?? 0;
     const index = items.indexOf(el);
+
+    // Handle Tab/Shift+Tab when focus is on the right scroll icon button
+    if (el.matches('.tabs-scroll-icon-btn') && el.closest('.tabs-scroll-btn--next')) {
+      if (key === 'Tab' && !event.shiftKey) {
+        const panel = visiblePanel(popup);
+        if (!panel) return false;
+        setTabindex(panel, 'a', true);
+        const firstLink = panel.querySelector<HTMLElement>('a');
+        if (firstLink) focusAndPrevent(firstLink, event);
+        return true;
+      }
+      if (key === 'Tab' && event.shiftKey) {
+        const selected = selectedTab(popup);
+        if (selected) { focusAndPrevent(selected, event); return true; }
+      }
+      return false;
+    }
+
     if (index < 0) return false;
 
     /** 1->Next, -1->Previous, 0->No movement */
@@ -401,7 +419,26 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
       return true;
     }
 
+    if ((key === 'Home' || key === 'End') && el.matches('[role="tab"]')) {
+      const tabItems = items.filter(item => item.matches('[role="tab"]'));
+      if (!tabItems.length) return false;
+      const target = key === 'Home' ? tabItems[0] : tabItems[tabItems.length - 1];
+      target.click();
+      if (!isNavDesktop()) {
+        requestAnimationFrame(() => {
+          const container = target.closest<HTMLElement>('.tabs');
+          if (container !== null) {
+            container.scrollLeft = key === 'Home' ? 0 : container.scrollWidth;
+          }
+        });
+      }
+      focusAndPrevent(target, event);
+      return true;
+    }
+
     if (key === 'Tab' && !event.shiftKey && el.matches('[aria-selected="true"]')) {
+      const nextIconBtn = popup.querySelector<HTMLElement>('.tabs-scroll-btn--next:not([hidden]) .tabs-scroll-icon-btn');
+      if (nextIconBtn) { focusAndPrevent(nextIconBtn, event); return true; }
       const panel = visiblePanel(popup);
       if (!panel) return false;
       setTabindex(panel, 'a', true);
@@ -448,6 +485,8 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
         focusAndPrevent(items[index - 1], event);
       } else {
         setTabindex(panel, 'a', false);
+        const nextIconBtn = popup.querySelector<HTMLElement>('.tabs-scroll-btn--next:not([hidden]) .tabs-scroll-icon-btn');
+        if (nextIconBtn) { focusAndPrevent(nextIconBtn, event); return true; }
         const target = selectedTab(popup)
           ?? $$(popup, '.tabs :is([role="tab"], .product-links a)')[0];
         // eslint is disabled because it complains that nextTarget
