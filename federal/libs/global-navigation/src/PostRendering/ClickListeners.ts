@@ -92,22 +92,26 @@ export const initClickListeners = (
   const nextBtn = gnav.querySelector<HTMLElement>('.tabs-scroll-btn--next');
   const prevIconBtn = gnav.querySelector<HTMLButtonElement>('.tabs-scroll-btn--prev .tabs-scroll-icon-btn');
   const nextIconBtn = gnav.querySelector<HTMLButtonElement>('.tabs-scroll-btn--next .tabs-scroll-icon-btn');
+  const liveRegion = gnav.querySelector<HTMLElement>('.tabs-live-region');
 
   const updateScrollButtons = (): void => {
     if (!tabList || !prevBtn || !nextBtn) return;
     if (isNavDesktop()) {
       prevBtn.setAttribute('hidden', '');
       nextBtn.setAttribute('hidden', '');
+      if (liveRegion) liveRegion.textContent = '';
       return;
     }
     const hasOverflow = tabList.scrollWidth > tabList.clientWidth;
     if (!hasOverflow) {
       prevBtn.setAttribute('hidden', '');
       nextBtn.setAttribute('hidden', '');
+      if (liveRegion) liveRegion.textContent = '';
       return;
     }
     const atStart = tabList.scrollLeft <= 1;
-    const atEnd = tabList.scrollLeft + tabList.clientWidth >= tabList.scrollWidth - 1;
+    const atEnd = tabList.scrollLeft + tabList.clientWidth
+      >= tabList.scrollWidth - 1;
     const focusedTab = gnav.querySelector<HTMLElement>('.tabs [role="tab"][aria-selected="true"]');
     if (atStart) {
       if (prevBtn.querySelector('.tabs-scroll-icon-btn') === document.activeElement) focusedTab?.focus();
@@ -120,6 +124,33 @@ export const initClickListeners = (
       nextBtn.setAttribute('hidden', '');
     } else {
       nextBtn.removeAttribute('hidden');
+    }
+    if (liveRegion && tabButtons.length > 0) {
+      const firstTabOffset = tabButtons[0].offsetLeft;
+      const scrollLeft = tabList.scrollLeft;
+      const viewEnd = scrollLeft + tabList.clientWidth;
+      let firstVisible = 1;
+      let lastVisible = tabButtons.length;
+      for (let i = 0; i < tabButtons.length; i++) {
+        if (tabButtons[i].offsetLeft - firstTabOffset >= scrollLeft - 1) {
+          firstVisible = i + 1;
+          break;
+        }
+      }
+      for (let i = tabButtons.length - 1; i >= 0; i--) {
+        const rightEdge = tabButtons[i].offsetLeft
+          + tabButtons[i].offsetWidth - firstTabOffset;
+        if (rightEdge <= viewEnd + 1) {
+          lastVisible = i + 1;
+          break;
+        }
+      }
+      const template = liveRegion.dataset.label ?? 'Showing tabs {start} through {end} of {total}';
+      const message = template
+        .replace('{start}', String(firstVisible))
+        .replace('{end}', String(lastVisible))
+        .replace('{total}', String(tabButtons.length));
+      if (liveRegion.textContent !== message) liveRegion.textContent = message;
     }
   };
 
@@ -137,7 +168,9 @@ export const initClickListeners = (
   prevIconBtn?.addEventListener('click', onScrollPrev);
   nextIconBtn?.addEventListener('click', onScrollNext);
 
-  const tabsResizeObserver = new ResizeObserver(() => { updateScrollButtons(); });
+  const tabsResizeObserver = new ResizeObserver(() => {
+    updateScrollButtons();
+  });
   if (tabList) tabsResizeObserver.observe(tabList);
 
   const updateTablistOrientation = (): void => {

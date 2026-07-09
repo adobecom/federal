@@ -7,6 +7,7 @@ export const productlist = (
 ): HTML => {
   const scrollPrevLabel = placeholders.get('product-list-scroll-prev') ?? 'Scroll tabs left';
   const scrollNextLabel = placeholders.get('product-list-scroll-next') ?? 'Scroll tabs right';
+  const tabsRangeLabel = placeholders.get('product-list-tabs-range') ?? 'Showing tabs {start} through {end} of {total}';
   const tabs = `
     <div class="tabs-scroller">
       <div class="tabs-scroll-btn tabs-scroll-btn--prev" hidden><button class="tabs-scroll-icon-btn" aria-label="${scrollPrevLabel}">${icons.chevronLeft}</button></div>
@@ -15,6 +16,7 @@ export const productlist = (
         ${links.length ? `<li class="product-links"><a class="feds-link" href="${localizeHref(links[links.length - 1].href)}"${getAnalyticsAttrs(null, links[links.length - 1].daaLl ?? links[links.length - 1].text)}>${links[links.length - 1].text}${icons.chevronRight}</a></li>` : ''}
       </ul>
       <div class="tabs-scroll-btn tabs-scroll-btn--next" hidden><button class="tabs-scroll-icon-btn" aria-label="${scrollNextLabel}">${icons.chevronLeft}</button></div>
+      <span class="tabs-live-region" aria-live="polite" aria-atomic="true" data-label="${tabsRangeLabel}"></span>
     </div>
   `.trim();
   const tabcontent = `
