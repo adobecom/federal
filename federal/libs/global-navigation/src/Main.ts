@@ -213,7 +213,7 @@ export const renderGnavString = ({
       ? lastBreadcrumb
       : lastBreadcrumb.text;
   return `
-<nav  class="${localnav ? "localnav" : ""}">
+<nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul role="presentation">
@@ -373,6 +373,14 @@ export const postRenderingTasks = async (
 const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
   const menuWrapper = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
   const navToggle = mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
+  const nav = mountpoint.querySelector<HTMLElement>('nav');
+
+  // Lenis should only be blocked from hijacking scroll while something
+  // scrollable (the mobile drawer or a mega-menu popup) is actually open —
+  // not permanently. Recomputed on every open/close instead of set once.
+  const updateNavLenisPrevent = (): void => {
+    nav?.toggleAttribute('data-lenis-prevent', mountpoint.querySelector(`.${IS_OPEN_CLASS}`) !== null);
+  };
 
   menuWrapper?.addEventListener('toggle', () => {
     const isOpen = menuWrapper.classList.contains(IS_OPEN_CLASS);
@@ -389,6 +397,18 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       );
     }
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
+
+    // Opening the localnav bar slides the header up via a plain static `top`
+    // (see localnav.css). Suppressing the banner for the duration removes it
+    // from :has(.language-banner) matching entirely, so the header falls
+    // back to localnav.css's own open/close rule instead of fighting the
+    // banner's scroll-linked offset animation.
+    if (mountpoint.querySelector('nav.localnav')) {
+      document.querySelector('.language-banner')
+        ?.classList.toggle('feds-banner-suppressed', isOpen);
+    }
+
+    updateNavLenisPrevent();
   });
 
   menuWrapper?.addEventListener('transitionend', () => {
@@ -406,6 +426,7 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       const isOpen = popup.classList.contains(IS_OPEN_CLASS);
       trigger?.setAttribute('aria-expanded', String(isOpen));
       trigger?.setAttribute('daa-ll', isOpen ? 'header|Close' : 'header|Open');
+      updateNavLenisPrevent();
     });
   });
 };
