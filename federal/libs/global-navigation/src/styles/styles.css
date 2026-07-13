@@ -175,6 +175,18 @@ header.global-navigation {
   --feds-popup-bg-height: 100%;
 }
 
+/* header.global-navigation being in-flow (sticky, not fixed) means it now
+   pushes `main` down by its own height on promo pages. Pull `main` back up
+   by that height so it starts right under the promo, with the transparent
+   header/nav overlapping its top edge — matching the overlay look the
+   fixed header gave on the first screen. .feds-promo-bar--reveal is only
+   ever added when a real promo bar exists (see Main.ts,
+   initPromoBarHeight) — a plain :has(.feds-promo-aside-wrapper) would also
+   match the always-present, empty wrapper on promo-less pages. */
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main {
+  margin-top: -80px;
+}
+
 header.feds-header-scrolled .feds-link {
   color: var(--s2a-color-gray-1000);
 }
