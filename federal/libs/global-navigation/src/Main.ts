@@ -684,31 +684,20 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
     }, 5000);
   });
 
-  let naturalHeight = promoBar.offsetHeight;
-  let rafId: number | null = null;
-
+  // Feeds the `from` value of the --feds-promo-bar-scroll keyframe
+  // (styles.css), which drives the fixed nav's top offset natively via a
+  // scroll-linked animation. No scroll listener needed here — the browser
+  // handles the per-frame tracking, avoiding the flicker a JS rAF/scroll
+  // handler introduces.
   const update = (): void => {
-    const visible = Math.max(0, naturalHeight - window.scrollY);
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
-      `${visible}px`,
+      `${promoBar.offsetHeight}px`,
     );
   };
 
   // Re-measure on resize in case the promo bar reflows
-  new ResizeObserver(() => {
-    naturalHeight = promoBar.offsetHeight;
-    update();
-  }).observe(promoBar);
+  new ResizeObserver(update).observe(promoBar);
 
-  const onScroll = (): void => {
-    if (rafId !== null) return;
-    rafId = requestAnimationFrame(() => {
-      rafId = null;
-      update();
-    });
-  };
-
-  window.addEventListener('scroll', onScroll, { passive: true });
   update();
 };

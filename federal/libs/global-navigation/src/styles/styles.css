@@ -82,12 +82,55 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
-  /* Height of the promo bar; set once by ResizeObserver, consumed by
-     the scroll-driven animation that offsets the fixed header. */
-  --feds-promo-bar-height: 0px;
+  /* Height of the promo bar; set once by ResizeObserver, consumed as the
+     `from` value of the scroll-linked --feds-promo-scroll-offset keyframe
+     below. */
+  --feds-promo-bar-height: 70px;
   /* Hoists the promo view-timeline so the fixed <header> sibling
      can reference it (same pattern as --language-banner-view). */
   timeline-scope: --promo-bar-view;
+}
+
+/* =========================================
+   Promo bar offset
+   Same pattern as the language-banner offset further down this file: a
+   single scroll-linked animation on one custom property drives the fixed
+   nav's `top`, so it tracks the promo bar natively (no JS scroll handler,
+   no per-frame flicker) and pins to the viewport top once the promo bar has
+   scrolled out of view.
+
+   `top` (not `transform`) is used deliberately: `nav` is the containing
+   element for several `position: fixed` descendants (.feds-backdrop,
+   .feds-popup, the mobile .feds-menu-wrapper drawer) that assume
+   viewport-relative coordinates (e.g. .feds-popup's `inset`, .feds-backdrop's
+   `inset: 0`). A `transform` on `nav` would make `nav` their containing
+   block instead of the viewport, breaking their positioning — the same
+   hazard already documented where .feds-popup was reparented into <nav> to
+   escape a *different* transformed ancestor (see PostRendering comment
+   above .feds-menu-wrapper). Animating `top` via a scroll-linked
+   compositor-driven timeline avoids the JS/rAF race that caused the
+   flicker without introducing that hazard.
+   ========================================= */
+
+.feds-promo-aside-wrapper {
+  view-timeline: --promo-bar-view block;
+}
+
+@property --feds-promo-scroll-offset {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@keyframes feds-promo-bar-scroll {
+  from { --feds-promo-scroll-offset: var(--feds-promo-bar-height); }
+  to   { --feds-promo-scroll-offset: 0px; }
+}
+
+:root:has(.feds-promo-aside-wrapper) {
+  animation: feds-promo-bar-scroll linear both;
+  animation-timeline: --promo-bar-view;
+  animation-range: exit;
 }
 
 
@@ -176,7 +219,7 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
-  top: var(--feds-promo-bar-height);
+  top: var(--feds-promo-scroll-offset);
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;
