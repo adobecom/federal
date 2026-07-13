@@ -667,7 +667,7 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
-const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
+const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
@@ -684,20 +684,29 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
     }, 5000);
   });
 
-  // Feeds the `from` value of the --feds-promo-bar-scroll keyframe
-  // (styles.css), which drives the fixed nav's top offset natively via a
-  // scroll-linked animation. No scroll listener needed here — the browser
-  // handles the per-frame tracking, avoiding the flicker a JS rAF/scroll
-  // handler introduces.
-  const update = (): void => {
+  // header.global-navigation is `position: sticky`, so it renders below the
+  // promo bar and scrolls with the page natively — no JS or CSS animation
+  // needed for that part. --feds-promo-bar-height only feeds the extra
+  // offset that popups/the mobile drawer need while the promo is still
+  // showing (see styles.css); re-measured on resize in case the promo
+  // reflows.
+  const updateHeight = (): void => {
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
       `${promoBar.offsetHeight}px`,
     );
   };
+  new ResizeObserver(updateHeight).observe(promoBar);
+  updateHeight();
 
-  // Re-measure on resize in case the promo bar reflows
-  new ResizeObserver(update).observe(promoBar);
-
-  update();
+  // Toggles `.feds-promo-showing` on <header> so the popup/drawer offset
+  // overrides only apply while the promo is actually on screen. Fires only
+  // when the promo bar enters/exits the viewport — not per scroll frame —
+  // avoiding the layout-thrashing a continuous scroll listener caused here
+  // previously.
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+  new IntersectionObserver(([entry]) => {
+    header.classList.toggle('feds-promo-showing', entry.isIntersecting);
+  }).observe(promoBar);
 };
