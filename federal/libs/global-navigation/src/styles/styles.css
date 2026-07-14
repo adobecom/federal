@@ -82,14 +82,79 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
-  /* Height of the promo bar; set once by ResizeObserver, consumed by
-     the scroll-driven animation that offsets the fixed header. */
+  /* Height of the promo bar; set once by ResizeObserver (Main.ts,
+     initPromoBarHeight). Consumed below as the extra offset popups/drawers
+     need while the promo hasn't scrolled past yet. */
   --feds-promo-bar-height: 0px;
-  /* Hoists the promo view-timeline so the fixed <header> sibling
-     can reference it (same pattern as --language-banner-view). */
-  timeline-scope: --promo-bar-view;
 }
 
+/* =========================================
+   Promo bar offset
+   header.global-navigation is `position: sticky` (not `fixed`) so it
+   renders in normal flow directly after .feds-promo-aside-wrapper (its DOM
+   sibling): below the promo initially, scrolling with the page, then
+   sticking to the viewport top once it reaches it — all native browser
+   behavior, no animated `top`/`transform` involved.
+
+   An earlier version of this drove nav's `top` with a scroll-linked
+   `animation-timeline` (view()) to fake this same effect while header
+   stayed `fixed`. That still animated `top` every frame, which forces
+   layout on each frame and was the actual source of the flicker — a
+   scroll-timeline-driven animation is not exempt from that cost just
+   because it's not JS. `position: sticky` needs no animation at all.
+
+   The one thing that still needs promo-awareness is every `position:
+   fixed` descendant of nav that assumes nav sits at a fixed viewport
+   offset (.feds-popup inset/max-height, the mobile .feds-menu-wrapper
+   drawer's top/height) — while the promo hasn't been scrolled past yet,
+   nav sits lower than that. .feds-backdrop is unaffected: its `inset: 0`
+   already covers the full viewport regardless of nav's position.
+
+   --feds-promo-extra-offset carries the extra amount those descendants
+   need to add (0 once the promo has cleared); PostRendering/
+   ClickListeners.ts toggles `.feds-promo-showing` on <header> via a single
+   IntersectionObserver on the promo bar (fires only on enter/exit, not
+   per scroll frame). */
+:root {
+  --feds-promo-extra-offset: 0px;
+}
+
+header.global-navigation.feds-promo-showing {
+  --feds-promo-extra-offset: var(--feds-promo-bar-height, 0px);
+}
+
+/* .feds-popup: offset top/max-height while the promo is still showing.
+   :not(.small-menu) excludes the small-menu variant (Components/SmallMenu/
+   small-menu.css), which is position: absolute anchored to its own trigger
+   <li> rather than position: fixed relative to the viewport. */
+header.global-navigation.feds-promo-showing nav:not(.localnav) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
+}
+
+/* localnav's hamburger-flow popup (bar closed) uses a plain --s2a-spacing-64
+   top with no +8-1px baseline (see localnav.css) — same distinction the
+   language-banner override block makes below. */
+header.global-navigation.feds-promo-showing nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+  max-height: calc(100dvh - var(--feds-promo-extra-offset) - var(--s2a-spacing-64));
+}
+
+/* Mobile drawer top/height */
+header.global-navigation.feds-promo-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+}
+
+@media (max-width: 1023px) {
+  header.global-navigation.feds-promo-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+    top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+    height: calc(100dvh - var(--feds-promo-extra-offset) - var(--s2a-spacing-64));
+  }
+}
+
+header.global-navigation.feds-promo-showing.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+  height: calc(100dvh - var(--feds-promo-extra-offset) - var(--s2a-spacing-64));
+}
 
 header.global-navigation {
   width: 100%;
@@ -97,7 +162,7 @@ header.global-navigation {
   visibility: visible;
   display: flex;
   justify-content: center;
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   z-index: 10;
@@ -108,6 +173,18 @@ header.global-navigation {
      the popover content. Using a custom property keeps the JS free
      of CSSOM walks and immune to CSS selector refactors. */
   --feds-popup-bg-height: 100%;
+}
+
+/* header.global-navigation being in-flow (sticky, not fixed) means it now
+   pushes `main` down by its own height on promo pages. Pull `main` back up
+   by that height so it starts right under the promo, with the transparent
+   header/nav overlapping its top edge — matching the overlay look the
+   fixed header gave on the first screen. .feds-promo-bar--reveal is only
+   ever added when a real promo bar exists (see Main.ts,
+   initPromoBarHeight) — a plain :has(.feds-promo-aside-wrapper) would also
+   match the always-present, empty wrapper on promo-less pages. */
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main {
+  margin-top: -80px;
 }
 
 header.feds-header-scrolled .feds-link {
@@ -175,8 +252,7 @@ header.feds-header-scrolled nav {
 }
 
 header.global-navigation nav {
-  position: fixed;
-  top: var(--feds-promo-bar-height);
+  position: relative;
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;
@@ -1472,6 +1548,10 @@ header.global-navigation.is-compact .feds-popup {
   inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 0 0;
 }
 
+header.global-navigation.is-compact.feds-promo-showing .feds-popup {
+  inset: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 0 0;
+}
+
 header.global-navigation.is-compact .feds-popup.is-open {
   position: fixed;
   z-index: 3;
@@ -1773,4 +1853,3 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
   top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
   height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
 }
-
