@@ -179,11 +179,19 @@ header.global-navigation {
    pushes `main` down by its own height on promo pages. Pull `main` back up
    by that height so it starts right under the promo, with the transparent
    header/nav overlapping its top edge — matching the overlay look the
-   fixed header gave on the first screen. .feds-promo-bar--reveal is only
-   ever added when a real promo bar exists (see Main.ts,
-   initPromoBarHeight) — a plain :has(.feds-promo-aside-wrapper) would also
-   match the always-present, empty wrapper on promo-less pages. */
-body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal) main {
+   fixed header gave on the first screen.
+
+   Keyed off :has(.feds-promo-bar) rather than .feds-promo-bar--reveal:
+   this compensates for header's own height, which is constant regardless
+   of the promo's reveal-animation state — it must already apply during the
+   hidden/pre-reveal window (renderGnav sets .feds-promo-bar's innerHTML
+   synchronously, well before the reveal delay in Main.ts,
+   initPromoBarHeight, adds --reveal). Gating on --reveal instead left a
+   window where main sat 80px lower than its final position, so revealing
+   the promo caused main to jump up at the same time the promo was
+   animating in. A plain :has(.feds-promo-aside-wrapper) would incorrectly
+   match on promo-less pages too, since the wrapper is always in the DOM. */
+body:has(.feds-promo-aside-wrapper .feds-promo-bar) main {
   margin-top: -80px;
 }
 
