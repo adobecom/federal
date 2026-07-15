@@ -86,6 +86,11 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
      initPromoBarHeight). Consumed below as the extra offset popups/drawers
      need while the promo hasn't scrolled past yet. */
   --feds-promo-bar-height: 0px;
+  --feds-nav-total-height: 80px;
+}
+
+body:has(.global-navigation) main {
+   margin-top: calc(-1 * var(--feds-nav-total-height));
 }
 
 /* =========================================
@@ -175,24 +180,22 @@ header.global-navigation {
   --feds-popup-bg-height: 100%;
 }
 
-/* header.global-navigation being in-flow (sticky, not fixed) means it now
-   pushes `main` down by its own height on promo pages. Pull `main` back up
-   by that height so it starts right under the promo, with the transparent
-   header/nav overlapping its top edge — matching the overlay look the
-   fixed header gave on the first screen.
+/* Once revealed, .feds-promo-aside-wrapper is `position: fixed` (see
+   Components/PromoBar/promo-bar.css) and pinned to the top of the
+   viewport — it no longer occupies space in normal flow. Reserve that
+   space on body instead, so header/main start below the fixed promo
+   rather than being covered by it.
 
    Keyed off :has(.feds-promo-bar) rather than .feds-promo-bar--reveal:
-   this compensates for header's own height, which is constant regardless
-   of the promo's reveal-animation state — it must already apply during the
-   hidden/pre-reveal window (renderGnav sets .feds-promo-bar's innerHTML
-   synchronously, well before the reveal delay in Main.ts,
-   initPromoBarHeight, adds --reveal). Gating on --reveal instead left a
-   window where main sat 80px lower than its final position, so revealing
-   the promo caused main to jump up at the same time the promo was
-   animating in. A plain :has(.feds-promo-aside-wrapper) would incorrectly
-   match on promo-less pages too, since the wrapper is always in the DOM. */
-body:has(.feds-promo-aside-wrapper .feds-promo-bar) main {
-  margin-top: -80px;
+   this must already apply during the hidden/pre-reveal window
+   (renderGnav sets .feds-promo-bar's innerHTML synchronously, well
+   before the reveal delay in Main.ts, initPromoBarHeight, adds
+   --reveal), otherwise header/main would jump down by the promo's
+   height at the same moment the promo animates in. A plain
+   :has(.feds-promo-aside-wrapper) would incorrectly match on
+   promo-less pages too, since the wrapper is always in the DOM. */
+body:has(.feds-promo-aside-wrapper .feds-promo-bar) {
+  padding-top: var(--feds-promo-bar-height, 0px);
 }
 
 header.feds-header-scrolled .feds-link {

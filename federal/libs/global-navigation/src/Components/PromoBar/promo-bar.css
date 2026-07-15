@@ -46,6 +46,10 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
 }
 
 .feds-promo-aside-wrapper.feds-promo-bar--reveal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   animation: feds-promo-bar-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
@@ -207,7 +211,6 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
     align-items: center;
     padding: var(--s2a-spacing-lg);
     border-radius: var(--s2a-border-radius-round);
-    text-align: center;
   }
 
   &.feds-promo-bar--dark {
