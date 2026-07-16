@@ -271,7 +271,7 @@ version="1.0" encoding="UTF-8"?>
         ${Be(e.icon,e.iconAlt)}
         ${e.productName!==null?`<p class="feds-promo-bar-product">${e.productName}</p>`:""}
       </div>
-      ${e.headline!==null?`<p class="feds-promo-bar-headline">${e.headline}</p>`:""}
+      ${e.headline!==null?`<h2 class="feds-promo-bar-headline">${e.headline}</h2>`:""}
     </div>
    <div class="feds-promo-bar-right">
       ${e.body!==null?`<p class="feds-promo-bar-body">${e.body}</p>`:""}
@@ -295,7 +295,7 @@ version="1.0" encoding="UTF-8"?>
       ${Be(e.icon,e.iconAlt)}
       ${e.productName!==null?`<p class="feds-promo-bar-product">${e.productName}</p>`:""}
     </div>
-    ${e.headline!==null?`<p class="feds-promo-bar-headline">${e.headline}</p>`:""}
+    ${e.headline!==null?`<h2 class="feds-promo-bar-headline">${e.headline}</h2>`:""}
     ${e.body!==null?`<p class="feds-promo-bar-body">${e.body}</p>`:""}
     ${De(e.primaryCta,e.secondaryCta)}
     </div>
