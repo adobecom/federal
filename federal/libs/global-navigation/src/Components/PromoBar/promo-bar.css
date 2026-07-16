@@ -7,9 +7,14 @@ body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) main  {
-  clip-path: inset(0 round var(--s2a-border-radius-lg));
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
+  main,
+  .rm-slide.is-active {
+    clip-path: inset(0 round var(--s2a-border-radius-lg));
+  }
 }
+
+
 
 .feds-promo-aside-wrapper {
   .feds-primary-cta {
