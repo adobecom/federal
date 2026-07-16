@@ -216,6 +216,13 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
     align-items: center;
     padding: var(--s2a-spacing-lg);
     border-radius: var(--s2a-border-radius-round);
+    text-align: center;
+  }
+
+  @media (min-width: 1024px) {
+    .feds-promo-bar-right {
+      text-align: left;
+    }
   }
 
   &.feds-promo-bar--dark {
