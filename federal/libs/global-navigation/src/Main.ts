@@ -482,27 +482,24 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
       return;
     }
     header.classList.add("feds-header-scrolled");
-    // Closing the localnav bar in scrolled state: the header's `top` animates
-    // from -64px back to 0 over 0.3s. The `feds-header-scrolled` class is
-    // needed immediately for color (the bar title would otherwise flash from
-    // dark back to its default light shade during the slide-down). But the
-    // same class pulls `inset: xs xs 0 xs` onto `nav` via
-    // `header.feds-header-scrolled nav`, which would instantly pin nav to
-    // `top: xs` and kill the slide (nav holds the visible content). The
-    // `feds-localnav-closing` marker class is added in tandem and consumed by
-    // a CSS rule that suppresses that inset for the duration of the
-    // transition; we remove the marker on `transitionend`.
-    if (fromToggle && isLocalnav()) {
+    // Closing the localnav bar in scrolled state: nav's `margin-top` animates
+    // from -64px back to 0 over 0.3s (see localnav.css). The
+    // `feds-header-scrolled` class is needed immediately for color (the bar
+    // title would otherwise flash from dark back to its default light shade
+    // during the slide-down). The `feds-localnav-closing` marker class is
+    // added in tandem for the duration of the transition and removed on
+    // `transitionend`.
+    if (fromToggle && isLocalnav() && nav !== null) {
       header.classList.add("feds-localnav-closing");
       const onTransitionEnd = (event: TransitionEvent): void => {
-        if (event.target !== header || event.propertyName !== "top") return;
-        header.removeEventListener("transitionend", onTransitionEnd);
+        if (event.target !== nav || event.propertyName !== "margin-top") return;
+        nav.removeEventListener("transitionend", onTransitionEnd);
         pendingAddCleanup = null;
         header.classList.remove("feds-localnav-closing");
       };
-      header.addEventListener("transitionend", onTransitionEnd);
+      nav.addEventListener("transitionend", onTransitionEnd);
       pendingAddCleanup = (): void => {
-        header.removeEventListener("transitionend", onTransitionEnd);
+        nav.removeEventListener("transitionend", onTransitionEnd);
         header.classList.remove("feds-localnav-closing");
       };
     }
