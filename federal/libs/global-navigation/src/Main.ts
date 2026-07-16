@@ -508,11 +508,10 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const promoBarEl = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
+  // Measured live (rather than hardcoded per state) since the promo bar's
+  // actual height differs across mobile, tablet, and desktop breakpoints.
   const promoBarElMinHeight = (): number =>
-    promoBarEl === null ? 70
-    : promoBarEl.classList.contains('feds-promo-bar--maximized-release') ? 280
-    : promoBarEl.classList.contains('feds-promo-bar--maximized') ? 182
-    : 70;
+    promoBarEl === null ? 70 : promoBarEl.getBoundingClientRect().height;
 
   const getScrollThreshold = (): number =>
     promoBarEl !== null ? promoBarElMinHeight() : 20;
