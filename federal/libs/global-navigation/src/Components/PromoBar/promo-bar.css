@@ -2,8 +2,8 @@
    Promo Bar — shared base
    ========================================= */
 
-body:has(.feds-menu-active) .feds-promo-bar,
-body:has(.feds-popup.is-open) .feds-promo-bar {
+body:has(.feds-menu-active:not(.small-menu)) .feds-promo-bar,
+body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
   display: none;
 }
 
