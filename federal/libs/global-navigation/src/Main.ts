@@ -146,12 +146,12 @@ mountpoint: HTMLElement
     );
     if (promoWrapper !== null) {
       promoWrapper.innerHTML = renderPromoBar(promoBar);
-      const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
       promoWrapper.style.display = 'none';
+      promoWrapper.classList.add(`feds-promo-bar--${promoBar.theme}`);
+
+      const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
       const barBgColor = promoBarEl?.style.backgroundColor ?? '';
-      if (barBgColor !== '') {
-        promoWrapper.style.backgroundColor = barBgColor;
-      }
+      if (barBgColor !== '') promoWrapper.style.backgroundColor = barBgColor;
       await initMerchLinks(promoWrapper);
     }
   }
@@ -677,7 +677,7 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
     setTimeout(() => {
       if (promoWrapper) promoWrapper.style.display = '';
       promoWrapper?.classList.add('feds-promo-bar--reveal');
-    }, 5000);
+    }, 4000);
   });
 
   // header.global-navigation is `position: sticky`, so it renders below the
