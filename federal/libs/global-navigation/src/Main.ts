@@ -677,7 +677,7 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
     setTimeout(() => {
       if (promoWrapper) promoWrapper.style.display = '';
       promoWrapper?.classList.add('feds-promo-bar--reveal');
-    }, 4000);
+    }, 3000);
   });
 
   // header.global-navigation is `position: sticky`, so it renders below the
