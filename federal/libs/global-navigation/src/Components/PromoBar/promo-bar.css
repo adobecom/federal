@@ -14,9 +14,13 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   }
 }
 
-
-
 .feds-promo-aside-wrapper {
+  background-color: var(--s2a-color-gray-25);
+
+  &.feds-promo-bar--dark {
+    background-color: var(--s2a-color-gray-1000);
+  }
+
   .feds-primary-cta {
     color: var(--s2a-color-gray-25);
     background-color: var(--s2a-color-blue-900);
@@ -55,7 +59,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   top: 0;
   left: 0;
   right: 0;
-  animation: feds-promo-bar-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: feds-promo-bar-reveal 500ms cubic-bezier(0.42, 0, 0, 1) 1s forwards;
 }
 
 @keyframes feds-promo-bar-reveal {
