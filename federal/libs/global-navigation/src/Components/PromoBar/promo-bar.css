@@ -14,6 +14,10 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   }
 }
 
+body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--reveal {
+  visibility: hidden;
+}
+
 .feds-promo-aside-wrapper {
   background-color: var(--s2a-color-gray-25);
 
