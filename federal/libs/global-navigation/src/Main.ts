@@ -672,11 +672,12 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoWrapper = promoBar.closest<HTMLElement>(
     '.feds-promo-aside-wrapper',
   );
+  if (promoWrapper === null) return;
 
   requestAnimationFrame(() => {
     setTimeout(() => {
-      if (promoWrapper) promoWrapper.style.display = '';
-      promoWrapper?.classList.add('feds-promo-bar--reveal');
+      promoWrapper.style.display = '';
+      promoWrapper.classList.add('feds-promo-bar--reveal');
     }, 4000);
   });
 
@@ -686,13 +687,21 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   // offset that popups/the mobile drawer need while the promo is still
   // showing (see styles.css); re-measured on resize in case the promo
   // reflows.
+  //
+  // Measure the wrapper, not the inner .feds-promo-bar: the wrapper is
+  // what the reveal animation clips via max-height, so its offsetHeight
+  // ramps up in step with the visible box. The inner bar is never
+  // height-constrained, so it reports its full natural height the instant
+  // display flips from `none` — which would snap --feds-promo-bar-height
+  // (and the body padding-top it drives) to its final value a full
+  // animation ahead of what's actually visible on screen.
   const updateHeight = (): void => {
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
-      `${promoBar.offsetHeight}px`,
+      `${promoWrapper.offsetHeight}px`,
     );
   };
-  new ResizeObserver(updateHeight).observe(promoBar);
+  new ResizeObserver(updateHeight).observe(promoWrapper);
   updateHeight();
 
   // Toggles `.feds-promo-showing` on <header> so the popup/drawer offset
