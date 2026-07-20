@@ -43,6 +43,13 @@
   color: var(--s2a-color-content-subtle);
 }
 
+.featured-card .featured-price {
+  margin-top: var(--s2a-spacing-xs);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-font-size-sm);
+  color: var(--s2a-color-gray-1000);
+}
+
 .featured-card .feds-link {
   padding: var(--s2a-spacing-md) 0;
   color: var(--s2a-color-gray-1000);
@@ -50,7 +57,7 @@
   gap: 6px;
 }
 
-.featured-card span {
+.featured-card .featured-link {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -58,7 +65,7 @@
   gap: 6px;
 }
 
-.featured-card span svg {
+.featured-card .featured-link svg {
   margin-top: 2px;
   color: var(--s2a-color-gray-1000);
   width: 3px;
