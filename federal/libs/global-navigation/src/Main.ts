@@ -663,6 +663,24 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
+// Polls (rather than listening for a `transitionend`) since the host page
+// may set body opacity via a CSS transition, an instant class toggle, or an
+// inline style — a poll catches all three without coupling to whichever
+// mechanism the host happens to use.
+const waitUntilVisible = (callback: () => void): void => {
+  const isBodyVisible = (): boolean =>
+    window.getComputedStyle(document.body).opacity === '1';
+
+  const check = (): void => {
+    if (isBodyVisible()) {
+      setTimeout(callback, 1000);
+    } else {
+      requestAnimationFrame(check);
+    }
+  };
+  check();
+};
+
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
@@ -674,11 +692,9 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   );
   if (promoWrapper === null) return;
 
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      promoWrapper.style.display = '';
-      promoWrapper.classList.add('feds-promo-bar--reveal');
-    }, 4000);
+  waitUntilVisible(() => {
+    promoWrapper.style.display = '';
+    promoWrapper.classList.add('feds-promo-bar--reveal');
   });
 
   // header.global-navigation is `position: sticky`, so it renders below the
