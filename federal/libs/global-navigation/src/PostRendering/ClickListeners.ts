@@ -159,11 +159,11 @@ export const initClickListeners = (
 
   const onScrollPrev = (): void => {
     if (!tabList) return;
-    tabList.scrollBy({ left: -(tabList.clientWidth * 0.8), behavior: 'smooth' });
+    tabList.scrollBy({ left: -(tabList.clientWidth * 0.8) });
   };
   const onScrollNext = (): void => {
     if (!tabList) return;
-    tabList.scrollBy({ left: tabList.clientWidth * 0.8, behavior: 'smooth' });
+    tabList.scrollBy({ left: tabList.clientWidth * 0.8 });
   };
   prevIconBtn?.addEventListener('click', onScrollPrev);
   nextIconBtn?.addEventListener('click', onScrollNext);
