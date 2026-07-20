@@ -308,6 +308,7 @@ export const postRenderingTasks = async (
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initPromoBarHeight(input.mountpoint);
+  initLanguageBannerOffset(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -397,16 +398,6 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       );
     }
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
-
-    // Opening the localnav bar slides the header up via a plain static `top`
-    // (see localnav.css). Suppressing the banner for the duration removes it
-    // from :has(.language-banner) matching entirely, so the header falls
-    // back to localnav.css's own open/close rule instead of fighting the
-    // banner's scroll-linked offset animation.
-    if (mountpoint.querySelector('nav.localnav')) {
-      document.querySelector('.language-banner')
-        ?.classList.toggle('feds-banner-suppressed', isOpen);
-    }
 
     updateNavLenisPrevent();
   });
@@ -730,4 +721,32 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   new IntersectionObserver(([entry]) => {
     header.classList.toggle('feds-promo-showing', entry.isIntersecting);
   }).observe(promoBar);
+};
+
+// header.global-navigation is `position: sticky`, so it renders below
+// .language-banner and scrolls with the page natively —
+// This toggles `.feds-banner-showing` on <header> so the
+// popup/drawer offset overrides in styles.css apply while the banner is
+// active. Fires only on enter/exit, not per scroll frame.
+const initLanguageBannerOffset = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+
+  const observe = (banner: HTMLElement): void => {
+    new IntersectionObserver(([entry]) => {
+      header.classList.toggle('feds-banner-showing', entry.isIntersecting);
+    }).observe(banner);
+  };
+
+  const banner = document.querySelector<HTMLElement>('.language-banner');
+  if (banner) { observe(banner); return; }
+
+  // Banner is added asynchronously after geo/language detection.
+  const mo = new MutationObserver((_, observer) => {
+    const el = document.querySelector<HTMLElement>('.language-banner');
+    if (!el) return;
+    observer.disconnect();
+    observe(el);
+  });
+  mo.observe(document.body, { childList: true });
 };
