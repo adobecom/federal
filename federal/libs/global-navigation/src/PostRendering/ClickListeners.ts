@@ -114,13 +114,13 @@ export const initClickListeners = (
       >= tabList.scrollWidth - 1;
     const focusedTab = gnav.querySelector<HTMLElement>('.tabs [role="tab"][aria-selected="true"]');
     if (atStart) {
-      if (prevBtn.querySelector('.tabs-scroll-icon-btn') === document.activeElement) focusedTab?.focus();
+      if (prevIconBtn?.matches(':focus-visible') === true) focusedTab?.focus();
       prevBtn.setAttribute('hidden', '');
     } else {
       prevBtn.removeAttribute('hidden');
     }
     if (atEnd) {
-      if (nextBtn.querySelector('.tabs-scroll-icon-btn') === document.activeElement) focusedTab?.focus();
+      if (nextIconBtn?.matches(':focus-visible') === true) focusedTab?.focus();
       nextBtn.setAttribute('hidden', '');
     } else {
       nextBtn.removeAttribute('hidden');
