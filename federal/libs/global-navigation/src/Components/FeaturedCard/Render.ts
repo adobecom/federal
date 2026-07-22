@@ -1,7 +1,7 @@
 import { link } from "../Link/Render";
 import { Card, FeaturedCard } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
-import { icons, getAnalyticsAttrs, sanitize, localizeHref } from "../../Utils/Utils";
+import { icons, getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
 
 export const featuredcards = ({
   card
@@ -14,9 +14,6 @@ const renderCard = ({
   eyeBrow,
   footerCTA,
   bodyLink,
-  priceText,
-  priceHref,
-  isPriceMerchLink,
 }: Card, megaMenuTitle: string): HTML => {
   const eyeBrowId = `featured-eyebrow-${sanitize(eyeBrow)}`;
 
@@ -28,9 +25,6 @@ const renderCard = ({
       </div>
       <h2>${title}</h2>
       <div class="featured-subtitle">${subtitle}</div>
-      ${isPriceMerchLink
-    ? `<div class="featured-price"><a href="${localizeHref(priceHref)}" class="merch">${priceText}</a></div>`
-    : ''}
       <span class="featured-link">${link({ ...bodyLink, ariaAttrs: { 'aria-describedby': eyeBrowId }, svgIcon: icons.chevronRight })}</span>
     </div>
     <div class="footer-container">

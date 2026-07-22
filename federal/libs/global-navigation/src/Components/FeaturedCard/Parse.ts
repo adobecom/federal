@@ -15,9 +15,6 @@ export type Card = {
   eyeBrow: string;
   bodyLink: Link;
   footerCTA: SecondaryCTA;
-  priceText: string;
-  priceHref: string;
-  isPriceMerchLink: boolean;
 };
 
 export const parseFeaturedCard = (
@@ -46,24 +43,13 @@ const parseCard = (
   if (!subtitleElement)
     throw new IrrecoverableError("Expected subtitle");
 
-  // Optional OST/M@S price link, authored inline within the description.
-  // When present it is rendered as an `a.merch` anchor and resolved into a
-  // live price by the merch post-render step (see PostRendering/MerchLinks).
-  const priceAnchor = subtitleElement.querySelector('a');
-  const priceHref = priceAnchor?.getAttribute('href') ?? '';
-  const isPriceMerchLink = priceHref !== '' && isMerchLink(priceHref);
-  const priceText = isPriceMerchLink ? (priceAnchor?.textContent?.trim() ?? '') : '';
-
-  // Keep the descriptive copy but strip the merch anchor's flattened text so
-  // it is not duplicated. Cards without a merch link keep the original text.
-  let subtitle = subtitleElement.textContent ?? '';
-  if (isPriceMerchLink) {
-    const subtitleClone = subtitleElement.cloneNode(true) as HTMLElement;
-    subtitleClone.querySelectorAll('a').forEach((anchor) => {
-      if (isMerchLink(anchor.getAttribute('href') ?? '')) anchor.remove();
-    });
-    subtitle = subtitleClone.textContent?.trim() ?? '';
-  }
+  // The OST/M@S price link is authored inline as part of the description.
+  // Tag it with the `merch` class so it is resolved into a live price in place;
+  // subtitle HTML is preserved so the price blends into description styling.
+  subtitleElement.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((anchor) => {
+    if (isMerchLink(anchor.getAttribute('href') ?? '')) anchor.classList.add('merch');
+  });
+  const subtitle = subtitleElement.innerHTML.trim();
 
   const linkElement
     = subtitleElement.nextElementSibling?.firstElementChild || null;
@@ -86,9 +72,6 @@ const parseCard = (
       bodyLink: cardLink,
       footerCTA,
       eyeBrow: eyeBrowElement.textContent ?? '',
-      priceText,
-      priceHref,
-      isPriceMerchLink,
     },
     [...ctaErrors, ...linkErrors]
   ];
