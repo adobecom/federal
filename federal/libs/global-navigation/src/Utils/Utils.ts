@@ -48,7 +48,6 @@ export const isMerchLink = (href: string): boolean => {
 };
 
 // mas.adobe.com studio links are resolved by Milo's `merch-card-autoblock`
-// block (e.g. `#…&field=prices` renders an inline price).
 const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
 
 /**
@@ -58,7 +57,6 @@ const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
  */
 export const isMasLink = (href: string): boolean =>
   href.includes(MAS_LINK_PATH);
-
 
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
