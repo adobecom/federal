@@ -220,6 +220,32 @@ export const [setLocalizeLink, getLocalizeLink] =
     ];
   })();
 
+// Async, whole-body link decoration provided by milo (lingo regionalization +
+// query-index existence check + mep-lingo prefix). This is the async companion
+// to the synchronous `localizeLink` above: `localizeLink` prefixes a single
+// href during render, whereas `decorateBody` runs once over the raw fetched
+// body pre-parse so `localizeLinkAsync` can resolve regional prefixes before
+// the navigation is parsed. Defaults to a no-op so callers that don't provide
+// it are unaffected.
+export type DecorateBody = (body: HTMLElement) => Promise<void>;
+
+type DecorateBodyStateFunctions = [
+  (decorateBody: DecorateBody) => void,
+  () => DecorateBody
+];
+
+export const [setDecorateBody, getDecorateBody] =
+  ((): DecorateBodyStateFunctions => {
+    let decorateBody: DecorateBody = async (): Promise<void> => {};
+
+    return [
+      (nextDecorateBody: DecorateBody): void => {
+        decorateBody = nextDecorateBody;
+      },
+      (): DecorateBody => decorateBody,
+    ];
+  })();
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
@@ -250,6 +276,10 @@ export const getTargetAttrs = (
  */
 export type LingoLocaleConfig = {
   ietf: string;
+  // Geo prefix (e.g. `'/nz'`) supplied by milo's getLingoRegion(), used to
+  // resolve region-specific `#_mep-lingo` fragment variants. Optional so
+  // callers that only need `ietf` are unaffected.
+  prefix?: string;
 };
 
 type LingoLocaleConfigStateFunctions = [
@@ -292,6 +322,11 @@ export const fetchAndProcessPlainHTML = async (
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
       await handleCommands(commands, body);
+      // Milo-provided async link decoration (lingo regionalization + QI +
+      // mep-lingo prefix). Runs pre-parse on the raw body so localizeLinkAsync
+      // resolves before the navigation is parsed. Non-fatal — shares this
+      // try/catch with personalization.
+      await getDecorateBody()(body);
     } catch (error) {
       // PersonalizationConfig not initialized or personalization failed
       // This is non-fatal, so we just log and continue
@@ -424,7 +459,25 @@ export const inlineNestedFragments = async (
             if (visitedUrls.has(anchorElement.href)) return;
             const federatedUrl = federateUrl(anchorElement.href);
             const fragmentUrl = new URL(federatedUrl);
-            const fragmentBody = await fetchAndProcessPlainHTML(fragmentUrl);
+
+            // mep-lingo content-swap: when a fragment is flagged `#_mep-lingo`
+            // and a lingo region is active, fetch the region-specific variant
+            // (region prefix prepended to the path) and fall back to the base
+            // fragment if the regional variant is absent. Fragments without the
+            // flag, or when no region is active, take the base path unchanged.
+            const isMepLingoFragment = anchorElement.href.includes('#_mep-lingo');
+            const regionPrefix = getLingoLocaleConfig()?.prefix;
+            let fragmentBody: HTMLElement | IrrecoverableError;
+            if (isMepLingoFragment && regionPrefix !== undefined && regionPrefix !== '') {
+              const regionalUrl = new URL(fragmentUrl);
+              regionalUrl.pathname = `${regionPrefix}${regionalUrl.pathname}`;
+              fragmentBody = await fetchAndProcessPlainHTML(regionalUrl);
+              if (fragmentBody instanceof IrrecoverableError)
+                fragmentBody = await fetchAndProcessPlainHTML(fragmentUrl);
+            } else {
+              fragmentBody = await fetchAndProcessPlainHTML(fragmentUrl);
+            }
+
             visitedUrls.add(anchorElement.href);
             if (fragmentBody instanceof IrrecoverableError)
               throw fragmentBody;
