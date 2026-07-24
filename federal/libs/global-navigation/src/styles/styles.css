@@ -241,6 +241,7 @@ header.feds-header-scrolled:not(:has(.feds-breadcrumbs)):not(:has(.feds-popup.is
 }
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
+  white-space: normal;
   cursor: pointer;
 }
 
