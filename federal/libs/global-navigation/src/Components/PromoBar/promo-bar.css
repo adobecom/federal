@@ -9,8 +9,7 @@ body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
 
 body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
   main,
-  header,
-  .rm-slide.is-active {
+  header {
     clip-path: inset(0 round var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0);
   }
 }
