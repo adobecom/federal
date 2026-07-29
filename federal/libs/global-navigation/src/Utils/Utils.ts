@@ -47,6 +47,17 @@ export const isMerchLink = (href: string): boolean => {
   return MERCH_LINK_PATHS.some((path) => href.includes(path));
 };
 
+// mas.adobe.com studio links are resolved by Milo's `merch-card-autoblock`
+const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
+
+/**
+ * Checks if a URL is a Mas studio link handled by merch-card-autoblock.
+ * @param href - The URL to check
+ * @returns true if the URL is a mas.adobe.com studio link
+ */
+export const isMasLink = (href: string): boolean =>
+  href.includes(MAS_LINK_PATH);
+
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
 // all arrays.
@@ -220,6 +231,32 @@ export const [setLocalizeLink, getLocalizeLink] =
     ];
   })();
 
+// Async, whole-body link decoration provided by milo (lingo regionalization +
+// query-index existence check + mep-lingo prefix). This is the async companion
+// to the synchronous `localizeLink` above: `localizeLink` prefixes a single
+// href during render, whereas `decorateBody` runs once over the raw fetched
+// body pre-parse so `localizeLinkAsync` can resolve regional prefixes before
+// the navigation is parsed. Defaults to a no-op so callers that don't provide
+// it are unaffected.
+export type DecorateBody = (body: HTMLElement) => Promise<void>;
+
+type DecorateBodyStateFunctions = [
+  (decorateBody: DecorateBody) => void,
+  () => DecorateBody
+];
+
+export const [setDecorateBody, getDecorateBody] =
+  ((): DecorateBodyStateFunctions => {
+    let decorateBody: DecorateBody = async (): Promise<void> => {};
+
+    return [
+      (nextDecorateBody: DecorateBody): void => {
+        decorateBody = nextDecorateBody;
+      },
+      (): DecorateBody => decorateBody,
+    ];
+  })();
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
@@ -292,6 +329,11 @@ export const fetchAndProcessPlainHTML = async (
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
       await handleCommands(commands, body);
+      // Milo-provided async link decoration (lingo regionalization + QI +
+      // mep-lingo prefix). Runs pre-parse on the raw body so localizeLinkAsync
+      // resolves before parseNavigation reads hrefs. Non-fatal — shares this
+      // try/catch with personalization.
+      await getDecorateBody()(body);
     } catch (error) {
       // PersonalizationConfig not initialized or personalization failed
       // This is non-fatal, so we just log and continue
