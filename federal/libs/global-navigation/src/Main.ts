@@ -8,6 +8,7 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initBrandConciergeGlobal } from "./PostRendering/BrandConciergeGlobal";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
@@ -321,6 +322,13 @@ export const postRenderingTasks = async (
   initCompactOverflow(input.mountpoint);
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
+    errors.add(error);
+    lanaLog(error.message);
+  });
+
+  const brandConciergeGlobalErrors
+    = await initBrandConciergeGlobal(input.mountpoint);
+  brandConciergeGlobalErrors.forEach((error: RecoverableError) => {
     errors.add(error);
     lanaLog(error.message);
   });
