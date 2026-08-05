@@ -89,7 +89,7 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   --feds-nav-total-height: 80px;
 }
 
-body:has(.global-navigation) main {
+body:has(.global-navigation):not(:has(.gnav-c1-host)) main {
    margin-top: calc(-1 * var(--feds-nav-total-height));
 }
 
