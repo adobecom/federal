@@ -313,6 +313,7 @@ export const postRenderingTasks = async (
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initPromoBarHeight(input.mountpoint);
   initLanguageBannerOffset(input.mountpoint);
+  initBranchBannerOffset(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -753,4 +754,79 @@ const initLanguageBannerOffset = (mountpoint: HTMLElement): void => {
     observe(el);
   });
   mo.observe(document.body, { childList: true });
+};
+
+const BRANCH_BANNER_ID = 'branch-banner-iframe';
+
+// #branch-banner-iframe is injected by the branch/PR preview overlay
+// (unrelated to gnav's own render) and can be added or removed at any point.
+// It's either `position: fixed` (must stay on screen permanently, e.g. "now
+// previewing branch X") or in normal flow (pushes header down, then scrolls
+// away once header's `position: sticky` takes over — same as the promo bar /
+// language banner above). Unlike those two, the branch banner isn't measured
+// against a hardcoded height — it's authored by an external tool, so its
+// height is read live via ResizeObserver, same as the promo bar.
+const initBranchBannerOffset = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+
+  let resizeObserver: ResizeObserver | null = null;
+  let intersectionObserver: IntersectionObserver | null = null;
+
+  const teardown = (): void => {
+    resizeObserver?.disconnect();
+    intersectionObserver?.disconnect();
+    resizeObserver = null;
+    intersectionObserver = null;
+    header.classList.remove('feds-branch-banner-fixed', 'feds-branch-banner-showing');
+    document.documentElement.style.removeProperty('--feds-branch-banner-height');
+  };
+
+  const setup = (banner: HTMLElement): void => {
+    const updateHeight = (): void => {
+      document.documentElement.style.setProperty(
+        '--feds-branch-banner-height',
+        `${banner.offsetHeight}px`,
+      );
+    };
+    resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(banner);
+    updateHeight();
+
+    // A fixed banner never leaves the viewport, so its offset is permanent —
+    // no IntersectionObserver needed. An in-flow banner behaves like the
+    // promo bar / language banner: only "showing" until it scrolls past.
+    if (window.getComputedStyle(banner).position === 'fixed') {
+      header.classList.add('feds-branch-banner-fixed');
+      return;
+    }
+    intersectionObserver = new IntersectionObserver(([entry]) => {
+      header.classList.toggle('feds-branch-banner-showing', entry.isIntersecting);
+    });
+    intersectionObserver.observe(banner);
+  };
+
+  const existing = document.getElementById(BRANCH_BANNER_ID);
+  if (existing) setup(existing);
+
+  // The preview overlay can add/remove the banner at any point in the page's
+  // lifetime (not just once, like the language banner), so this observer is
+  // kept running indefinitely rather than disconnecting after first sight.
+  new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        const isBanner = node instanceof HTMLElement
+          && node.id === BRANCH_BANNER_ID;
+        if (!isBanner) return;
+        // Let the banner's own styles/layout settle before reading its
+        // computed position/height.
+        requestAnimationFrame(() => setup(node));
+      });
+      mutation.removedNodes.forEach((node) => {
+        const isBanner = node instanceof HTMLElement
+          && node.id === BRANCH_BANNER_ID;
+        if (isBanner) teardown();
+      });
+    });
+  }).observe(document.body, { childList: true });
 };
