@@ -93,6 +93,10 @@ body:has(.global-navigation):not(:has(.gnav-c1-host)) main {
    margin-top: calc(-1 * var(--feds-nav-total-height));
 }
 
+.global-navigation.gnav-c1-host.feds-header-scrolled {
+  background: transparent;
+}
+
 /* =========================================
    Promo bar offset
    header.global-navigation is `position: sticky` (not `fixed`) so it
