@@ -1846,10 +1846,6 @@ header.global-navigation.feds-branch-banner-fixed {
   top: var(--feds-branch-banner-height, 0px);
 }
 
-body:has(header.global-navigation.feds-branch-banner-fixed) {
-  padding-top: var(--feds-branch-banner-height, 0px);
-}
-
 header.global-navigation.feds-branch-banner-fixed nav:not(.localnav) .feds-popup:not(.small-menu),
 header.global-navigation.feds-branch-banner-showing nav:not(.localnav) .feds-popup:not(.small-menu) {
   top: calc(var(--feds-branch-banner-height, 0px) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
