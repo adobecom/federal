@@ -19,13 +19,50 @@ const renderCard = (card: GnavColumn["cards"][number], megaMenuTitle: string): H
   return "";
 };
 
+// A column qualifies for the links grid only when every card in it is a
+// links-card. Columns that mix in a promo/featured card are left untouched.
+const isLinksOnlyColumn = (column: GnavColumn): boolean =>
+  column.cards.length > 0
+  && column.cards.every((card) => card.type === "LinksCard");
+
+const renderColumn = (
+  column: GnavColumn,
+  megaMenuTitle: string,
+): HTML =>
+  `<li>${column.cards.map((card) => renderCard(card, megaMenuTitle)).join("")}</li>`;
+
 export const gnavCards = ({
   sections,
   megaMenuTitle,
-}: GnavCards): HTML => `
+}: GnavCards): HTML => {
+  const items: HTML[] = [];
+  let linksRun: GnavColumn[] = [];
+
+  // Consecutive links-only columns collapse into a single grid group so their
+  // cards can lay out three-per-row. A non-links column ends the current run.
+  const flushLinksRun = (): void => {
+    if (linksRun.length === 0) return;
+    const cards = linksRun
+      .flatMap((column) => column.cards)
+      .map((card) => renderCard(card, megaMenuTitle))
+      .join("");
+    items.push(`<li class="feds-gnav-column--links-grid">${cards}</li>`);
+    linksRun = [];
+  };
+
+  sections.forEach((column) => {
+    if (isLinksOnlyColumn(column)) {
+      linksRun.push(column);
+      return;
+    }
+    flushLinksRun();
+    items.push(renderColumn(column, megaMenuTitle));
+  });
+  flushLinksRun();
+
+  return `
   <div class="feds-gnav-cards">
-    ${sections.map((column) => 
-      `<li>${column.cards.map((card) => renderCard(card, megaMenuTitle)).join("")}</li>`
-    ).join("")}
+    ${items.join("")}
   </div>
 `;
+};
