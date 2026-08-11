@@ -1,0 +1,33 @@
+name: Stage to Main Release PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - stage-copy
+
+permissions:
+  pull-requests: write
+  contents: read
+
+concurrency:
+  group: stage-to-main-release-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  populate-release-pr:
+    if: github.event.pull_request.head.ref == 'stage'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Populate release PR title and description
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            const main = require('./.github/workflows/stage-to-main-pr.cjs')
+            await main({ github, context })
