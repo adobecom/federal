@@ -1397,8 +1397,8 @@ header.global-navigation:has(.unav-comp-app-switcher-open) nav {
 }
 
 header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-overlay {
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
 }
 
 /* =========================================
