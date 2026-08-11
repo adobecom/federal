@@ -17,3 +17,7 @@
 .manage-people-disable-scroll {
     overflow: hidden;
 }
+
+.global-navigation .unc-overlay-container {
+  max-width: 100%;
+}
