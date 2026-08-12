@@ -42,11 +42,18 @@ export const gnavCards = ({
   // cards can lay out three-per-row. A non-links column ends the current run.
   const flushLinksRun = (): void => {
     if (linksRun.length === 0) return;
-    const cards = linksRun
-      .flatMap((column) => column.cards)
+    const groupCards = linksRun.flatMap((column) => column.cards);
+    // Up to five cards sit in a single row; beyond that they split across two
+    // balanced rows (columns = half the cards, rounded up).
+    const columns = groupCards.length > 5
+      ? Math.ceil(groupCards.length / 2)
+      : groupCards.length;
+    const cards = groupCards
       .map((card) => renderCard(card, megaMenuTitle))
       .join("");
-    items.push(`<li class="feds-gnav-column--links-grid">${cards}</li>`);
+    items.push(
+      `<li class="feds-gnav-column--links-grid" style="--links-grid-columns: ${columns}">${cards}</li>`
+    );
     linksRun = [];
   };
 

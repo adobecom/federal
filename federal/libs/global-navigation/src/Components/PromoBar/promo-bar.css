@@ -17,7 +17,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
 }
 
 body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
-  header:not(:has(.feds-menu-active)),
+  header:not(:has(.feds-menu-active:not(.small-menu))),
   .router-marquee {
     border-top-left-radius: var(--s2a-border-radius-lg);
     border-top-right-radius: var(--s2a-border-radius-lg);

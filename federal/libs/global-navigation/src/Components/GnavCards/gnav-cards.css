@@ -51,21 +51,12 @@
     flex: 0 0 auto;
   }
 
-  /* The links-grid group spans the row and lays its cards out in a single row
-     while there are only a few of them. */
+  /* The links-grid group spans the row. Its column count is set per-instance
+     by --links-grid-columns: the full card count (single row) for five or
+     fewer cards, or half (rounded up) so more than five wrap into two rows. */
   header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards > li.feds-gnav-column--links-grid {
     flex: 1 1 auto;
     gap: var(--s2a-spacing-xs);
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
-    grid-template-columns: none;
-  }
-
-  /* From the fourth links-card onward, wrap into three-per-row so four cards
-     render as 3 in the first row and the remainder below. */
-  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards > li.feds-gnav-column--links-grid:has(> .links-card:nth-child(4)) {
-    grid-auto-flow: row;
-    grid-auto-columns: auto;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--links-grid-columns, 1), minmax(0, 1fr));
   }
 }
