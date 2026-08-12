@@ -34,6 +34,22 @@
     margin-top: -8px;
   }
 
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open > :not(.feds-popup-header) {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-extra-offset));
+  }
+
+  header.global-navigation.feds-promo-showing:not(.is-compact) .feds-popup.small-menu.is-open > :not(.feds-popup-header) {
+    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-promo-extra-offset));
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open > div,
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open .feds-gnav-cards > li {
+    transform: none;
+    animation: none;
+  }
+
   /* Gnav cards layout */
   header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards {
     display: flex;
