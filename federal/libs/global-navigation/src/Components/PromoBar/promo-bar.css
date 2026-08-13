@@ -332,7 +332,6 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
 .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
   max-height: 344px;
 }
