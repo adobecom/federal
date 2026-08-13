@@ -179,6 +179,34 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   line-height: 120%;
 }
 
+/* More than six links split into two columns: the first six stay in column
+   one and everything after flows into column two. The forced break before the
+   seventh link pins the split at six rather than letting multicol balance the
+   columns, and caps the layout at two columns for any number of links. */
+.feds-popup .links-card .links-card-links:has(> li:nth-child(7)) {
+  columns: 2;
+  column-gap: var(--s2a-spacing-2xl);
+}
+
+.feds-popup .links-card .links-card-links:has(> li:nth-child(7)) > li:nth-child(7) {
+  break-before: column;
+}
+
+.feds-popup .links-card .links-card-links:has(> li:nth-child(7)) > li {
+  break-inside: avoid;
+  min-width: 0;
+}
+
+/* In the narrow two-column layout, let long labels wrap to the next line
+   inside their column instead of overflowing into the adjacent one. The
+   min-width: 0 releases the default flex min-content floor so the link can
+   shrink below its single-line width. */
+.feds-popup .links-card .links-card-links:has(> li:nth-child(7)) .feds-link {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .feds-popup .links-card .links-card-links li {
   display: flex;
   padding: var(--s2a-spacing-xs) 0;
