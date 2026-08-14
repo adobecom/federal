@@ -6,6 +6,7 @@ import {
   parseSecondaryCTA,
 } from "../CTA/Parse";
 import { getTargetAttrs, isMerchLink, localizeHref } from "../../Utils/Utils";
+import { parseSvgIcon } from "../SvgIcon/Parse";
 
 export type PromoBarVariant = 'minimized' | 'maximized' | 'maximized-release';
 
@@ -35,11 +36,6 @@ export type PromoBar = {
   slots: PromoBarSlot[];
 };
 
-type PromoBarIcon = {
-  icon: string | null;
-  iconAlt: string | null;
-};
-
 const ERRORS = {
   elementNull: "Error when parsing PromoBar. Element is null",
 };
@@ -49,27 +45,17 @@ const VARIANTS: readonly PromoBarVariant[] = ['maximized-release', 'maximized'];
 const parseVariant = (classList: DOMTokenList): PromoBarVariant =>
   VARIANTS.find((v) => classList.contains(v)) ?? 'minimized';
 
-const parseIconLink = (cell: Element): PromoBarIcon => {
-  // Icon is authored as <p><a href="...svg">https://...svg | Alt Text</a></p>
-  const iconAnchor = [...cell.querySelectorAll(':scope > p > a')].find((a) => {
-    const href = a.getAttribute('href') ?? '';
-    return /\.(svg|png|jpg|jpeg|webp)(\?.*)?$/i.test(href);
-  }) ?? null;
-  if (iconAnchor === null) return { icon: null, iconAlt: null };
-
-  const href = iconAnchor.getAttribute('href') ?? null;
-  const linkText = iconAnchor.textContent ?? '';
-  const pipeIdx = linkText.indexOf(' | ');
-  const iconAlt = pipeIdx !== -1 ? linkText.slice(pipeIdx + 3).trim() : null;
-  return { icon: href, iconAlt };
-};
-
 const parseContent = (cell: Element): PromoBarContent => {
-  const { icon, iconAlt } = parseIconLink(cell);
   const pictures = [...cell.querySelectorAll('picture')];
-  // Last <picture> is a bg image only when there are 2+ pictures;
-  // with just one it is the icon.
-  const bgPicture = pictures[0] ?? null;
+
+  // Any picture(s) left over after the icon (e.g. the maximized-release
+  // promo image) are bg-image candidates; the last of those is the bg image.
+  const iconMatch = parseSvgIcon(cell);
+  const icon = iconMatch?.src ?? null;
+  const iconAlt = iconMatch?.alt ?? null;
+
+  const bgPictures = pictures.filter((p) => p !== iconMatch?.element);
+  const bgPicture = bgPictures[bgPictures.length - 1] ?? null;
   const bgImg = bgPicture?.querySelector('img') ?? null;
   const bgImage = bgImg?.getAttribute('src') ?? bgImg?.getAttribute('srcset')?.split('?')[0] ?? null;
   const productName = cell.querySelector('h5')?.textContent?.trim() ?? null;
