@@ -1,6 +1,7 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { alternative } from "../../Utils/Utils";
 import { Link, parseLink } from "../Link/Parse";
+import { parseSvgIcons } from "../SvgIcon/Parse";
 
 export type ProductCardHeader = {
   type: "ProductCardHeader";
@@ -92,26 +93,6 @@ const ERRORS = {
   notAProductCard: "Expected a product-card class",
 };
 
-const ICON_EXTENSION = /\.(svg|png|jpg|jpeg|webp)(\?.*)?$/i;
-
-// Icon authored as <a href="....svg">https://...svg | Alt Text</a>.
-// The href attribute is often a relative in-page path; the resolvable
-// absolute icon URL lives in the link text, before the " | Alt Text".
-const parseIconAnchor = (a: Element): ProductCardIcons => {
-  const [iconHref = null, iconAlt = null] = (a.textContent ?? '')
-    .split('|')
-    .map((x) => x.trim());
-  return { iconHref, iconAlt };
-};
-
-// Icon authored directly as <picture><img src="..." alt="..."></picture>
-const parseIconPicture = (picture: Element): ProductCardIcons | null => {
-  const img = picture.querySelector('img');
-  if (img === null) return null;
-  const alt = img.getAttribute('alt')?.trim() ?? '';
-  return { iconHref: img.getAttribute('src'), iconAlt: alt.length > 0 ? alt : null };
-};
-
 const parseProductCardLink = (
   element: Element | null
 ): Parsed<ProductCard, RecoverableError> => {
@@ -154,18 +135,9 @@ const parseProductCardLink = (
     };
   });
 
-  const iconAnchors = [...element.querySelectorAll('a')].filter(
-    (a) => ICON_EXTENSION.test(a.getAttribute('href') ?? ''),
+  const icons: ProductCardIcons[] = parseSvgIcons(element).map(
+    ({ src, alt }) => ({ iconHref: src, iconAlt: alt }),
   );
-  const iconPictures = [...element.querySelectorAll('picture')].filter(
-    (picture) => !iconAnchors.some((a) => a.contains(picture)),
-  );
-  const icons: ProductCardIcons[] = [
-    ...iconAnchors.map(parseIconAnchor),
-    ...iconPictures
-      .map(parseIconPicture)
-      .filter((icon): icon is ProductCardIcons => icon !== null),
-  ];
 
   return [
     {
