@@ -7,7 +7,7 @@ body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled, .gnav-c1-host)) {
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled, .c2-gnav-c1-host)) {
   main {
     border-radius: var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0;
     > .section:first-child {
