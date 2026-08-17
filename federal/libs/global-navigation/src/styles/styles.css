@@ -1279,7 +1279,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
-    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-extra-offset));
+    max-height: calc(100dvh - var(--feds-nav-total-height) - var(--feds-banner-extra-offset));
   }
 
   .feds-gnav-items > li > .feds-link:first-child {

@@ -271,6 +271,7 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
 
 .feds-popup .links-card .links-card-footer--has-link {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--s2a-spacing-sm);
