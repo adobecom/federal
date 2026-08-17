@@ -19,57 +19,24 @@ const renderCard = (card: GnavColumn["cards"][number], megaMenuTitle: string): H
   return "";
 };
 
-// A column qualifies for the links grid only when every card in it is a
-// links-card. Columns that mix in a promo/featured card are left untouched.
-const isLinksOnlyColumn = (column: GnavColumn): boolean =>
-  column.cards.length > 0
-  && column.cards.every((card) => card.type === "LinksCard");
-
-const renderColumn = (
-  column: GnavColumn,
-  megaMenuTitle: string,
-): HTML =>
-  `<li>${column.cards.map((card) => renderCard(card, megaMenuTitle)).join("")}</li>`;
-
 export const gnavCards = ({
   sections,
   megaMenuTitle,
 }: GnavCards): HTML => {
-  const items: HTML[] = [];
-  let linksRun: GnavColumn[] = [];
-
-  // Consecutive links-only columns collapse into a single grid group so their
-  // cards can lay out three-per-row. A non-links column ends the current run.
-  const flushLinksRun = (): void => {
-    if (linksRun.length === 0) return;
-    const groupCards = linksRun.flatMap((column) => column.cards);
-    // Up to five cards sit in a single row; beyond that they split across two
-    // balanced rows (columns = half the cards, rounded up).
-    const columns = groupCards.length > 5
-      ? Math.ceil(groupCards.length / 2)
-      : groupCards.length;
-    const cards = groupCards
-      .map((card) => renderCard(card, megaMenuTitle))
-      .join("");
-    items.push(
-      `<li class="feds-gnav-column--links-grid" style="--links-grid-columns: ${columns}">${cards}</li>`
-    );
-    linksRun = [];
-  };
-
-  sections.forEach((column) => {
-    if (isLinksOnlyColumn(column)) {
-      linksRun.push(column);
-      return;
-    }
-    flushLinksRun();
-    items.push(renderColumn(column, megaMenuTitle));
-  });
-  flushLinksRun();
+  // Every card across all columns is laid out together in a single grid group.
+  const cards = sections.flatMap((column) => column.cards);
+  // Up to five cards sit in a single row; beyond that they split across two
+  // balanced rows (columns = half the cards, rounded up).
+  const columns = cards.length > 5
+    ? Math.ceil(cards.length / 2)
+    : cards.length;
+  const renderedCards = cards
+    .map((card) => renderCard(card, megaMenuTitle))
+    .join("");
 
   return `
   <div class="feds-gnav-cards">
-    ${items.join("")}
+    <li class="feds-gnav-column--links-grid" style="--links-grid-columns: ${columns}">${renderedCards}</li>
   </div>
 `;
 };
