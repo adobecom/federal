@@ -263,13 +263,9 @@ export const getTargetAttrs = (
 };
 
 /**
- * Authored links (e.g. an event's "Register" CTA) can end with
- * `#_hide-when-registered` to request that the link be removed once the
- * visitor is confirmed registered for the current event. Resolution happens
- * post-render in `initEventRegistrationGating`, driven by the event
- * platform's `window.events.getRegistrationStatus()` and the page's
- * `event-code` metadata — this only strips the marker and flags the link so
- * it can be found afterward.
+ * Authored links can end with `#_hide-when-registered` to be removed once the
+ * visitor is confirmed registered; the suffix is stripped here and resolved
+ * post-render in `initEventRegistrationGating`.
  */
 export const HIDE_WHEN_REGISTERED_SUFFIX = '#_hide-when-registered';
 

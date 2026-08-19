@@ -85,11 +85,7 @@ declare global {
       };
     };
 
-    /**
-     * Event registration status API, exposed by the events platform
-     * (da-events) on pages carrying `event-code` metadata. Memoized —
-     * repeated calls share a single underlying RainFocus lookup.
-     */
+    /** Event registration API exposed by da-events on `event-code` pages */
     events?: {
       getRegistrationStatus: () => Promise<{
         isRegistered: boolean;
