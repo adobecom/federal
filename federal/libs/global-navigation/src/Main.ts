@@ -7,6 +7,7 @@ import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
+import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
@@ -298,6 +299,8 @@ export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
+  // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
+  initEventRegistrationGating(input.mountpoint);
   const unav = await loadUnav(input.mountpoint);
   if (unav instanceof RecoverableError) {
     errors.add(unav);

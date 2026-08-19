@@ -263,6 +263,21 @@ export const getTargetAttrs = (
 };
 
 /**
+ * Authored links can end with `#_hide-when-registered` to be removed once the
+ * visitor is confirmed registered; the suffix is stripped here and resolved
+ * post-render in `initEventRegistrationGating`.
+ */
+export const HIDE_WHEN_REGISTERED_SUFFIX = '#_hide-when-registered';
+
+export const getRegistrationGateAttrs = (
+  href: string,
+): { href: string; hideWhenRegistered: boolean } => {
+  if (href.includes(HIDE_WHEN_REGISTERED_SUFFIX))
+    return { href: href.replace(HIDE_WHEN_REGISTERED_SUFFIX, ''), hideWhenRegistered: true };
+  return { href, hideWhenRegistered: false };
+};
+
+/**
  * Lingo locale config — federal-specific locale data (currently just `ietf`,
  * e.g. `'fr-LU'`) that may override the milo config locale for downstream
  * consumers (AUP SDK, UNav). Optional; consumers must fall back to
