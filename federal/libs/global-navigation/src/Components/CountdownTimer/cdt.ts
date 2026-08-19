@@ -64,25 +64,25 @@ function formatTime(diffMs: number): string {
 }
 
 /**
- * Returns a human-readable label for screen readers, e.g.
- * "3 days, 5 hours, 22 minutes, 15 seconds remaining".
- * Only read when the user navigates to the element — role="timer"
- * carries implicit aria-live="off" so it never auto-announces.
- * Note: strings are English — swap with your i18n solution if needed.
+ * Largest-unit coarse remaining time for announcements / on-arrival reads,
+ * e.g. "7 days", "1 hour", "30 minutes", "5 seconds".
+ * English only — localise via getMiloConfig().locale when validated.
  */
-function formatAccessibleLabel(diffMs: number): string {
-  const totalSeconds = Math.floor(diffMs / 1000);
-  const d = Math.floor(totalSeconds / (60 * 60 * 24));
-  const h = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
-  const m = Math.floor((totalSeconds % (60 * 60)) / 60);
-  const s = totalSeconds % 60;
-  const parts: string[] = [];
-  if (d > 0) parts.push(`${d} ${d === 1 ? 'day' : 'days'}`);
-  if (h > 0) parts.push(`${h} ${h === 1 ? 'hour' : 'hours'}`);
-  if (m > 0) parts.push(`${m} ${m === 1 ? 'minute' : 'minutes'}`);
-  parts.push(`${s} ${s === 1 ? 'second' : 'seconds'}`);
-  return `${parts.join(', ')} remaining`;
+function formatCoarseRemaining(diffMs: number): string {
+  const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
+  const days = Math.floor(totalSeconds / 86_400);
+  const hours = Math.floor(totalSeconds / 3_600);
+  const minutes = Math.floor(totalSeconds / 60);
+  if (days >= 1) return `${days} ${days === 1 ? 'day' : 'days'}`;
+  if (hours >= 1) return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+  if (minutes >= 1) return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+  return `${totalSeconds} ${totalSeconds === 1 ? 'second' : 'seconds'}`;
 }
+
+// Screen-reader announcement schedule (minutes remaining). As the countdown
+// crosses each threshold, a polite live region announces the promo + time.
+// Proposed pattern — pending a11y validation.
+const CDT_ANNOUNCE_MINUTES = [60, 30, 15, 10, 5, 3, 1];
 
 /**
  * Resolves the effective "now" timestamp.
@@ -118,9 +118,10 @@ function resolveNow(): number {
  * across tab-throttling; `baseNow` seeds the effective "now" and may be a
  * ?instant override in non-prod.
  *
- * @param container - The `.feds-cdt` element whose text/label is updated
+ * @param container - The `.feds-cdt` timer element (for the connected check)
  * @param endTime   - The end timestamp (ms)
  * @param baseNow   - The effective "now" (wall-clock or ?instant value)
+ * @param render    - Called each tick with the remaining ms, to update the UI
  * @param onEnd     - Called once when the end time is reached, to tear down
  *                    the countdown UI
  * @returns a function that stops the timer.
@@ -129,6 +130,7 @@ function startTimer(
   container: HTMLElement,
   endTime: number,
   baseNow: number,
+  render: (diffMs: number) => void,
   onEnd: () => void,
 ): () => void {
   const ONE_SECOND_MS = 1_000;
@@ -150,8 +152,7 @@ function startTimer(
       onEnd();
       return;
     }
-    container.textContent = formatTime(diff);
-    container.setAttribute('aria-label', formatAccessibleLabel(diff));
+    render(diff);
   }
 
   tick();
@@ -171,6 +172,11 @@ function startTimer(
  * promo-bar structure is restored: the icon is moved back to its position
  * (directly before the text) and the countdown wrapper is removed, leaving
  * the standard icon / text / CTA layout without the timer.
+ *
+ * Screen-reader support: the visible time is aria-hidden; an on-arrival
+ * "Ends in …" label is read via the timer, and a polite live region announces
+ * the promo + remaining time as the countdown crosses each threshold in
+ * CDT_ANNOUNCE_MINUTES, plus a final "… has ended".
  *
  * @param inner          - A `.feds-promo-bar-inner` element
  * @param insertBeforeEl - The element before which the wrapper is injected
@@ -196,6 +202,19 @@ export function initPromoCountdown(
   cdtEl.setAttribute('role', 'timer');
   if (isDark) cdtEl.classList.add('feds-cdt--dark');
 
+  // Visible "DD:HH:MM:SS" text — hidden from assistive tech, which otherwise
+  // reads it out as "zero seven colon zero zero…" on a role="timer" element.
+  const visualEl = document.createElement('span');
+  visualEl.className = 'feds-cdt-visual';
+  visualEl.setAttribute('aria-hidden', 'true');
+
+  // Visually-hidden human-readable label (e.g. "7 days, … remaining") — this
+  // is what screen readers announce when the timer is navigated to.
+  const srEl = document.createElement('span');
+  srEl.className = 'feds-cdt-sr';
+
+  cdtEl.append(visualEl, srEl);
+
   const wrapper = document.createElement('div');
   wrapper.className = 'feds-promo-bar-icon-cdt';
 
@@ -205,10 +224,48 @@ export function initPromoCountdown(
 
   inner.insertBefore(wrapper, insertBeforeEl);
 
-  // On end: restore the original icon / text / CTA structure without the
-  // countdown — move the icon back before the text, then drop the wrapper.
-  startTimer(cdtEl, range.end, now, () => {
-    if (iconEl !== null) inner.insertBefore(iconEl, wrapper);
-    wrapper.remove();
-  });
+  // Polite live region for the scheduled screen-reader announcements. It lives
+  // on `inner` (not the wrapper) so it survives teardown and can announce the
+  // final "has ended" message. Empty on init so nothing fires on page load.
+  const promoText = (insertBeforeEl.textContent ?? '').trim();
+  const liveEl = document.createElement('div');
+  liveEl.className = 'feds-cdt-sr feds-cdt-live';
+  liveEl.setAttribute('aria-live', 'polite');
+  liveEl.setAttribute('aria-atomic', 'true');
+  inner.append(liveEl);
+
+  const withPromo = (msg: string): string =>
+    (promoText !== '' ? `${promoText} ${msg}` : msg);
+
+  // Announcement schedule (ms), descending. Skip thresholds already passed at
+  // load — the on-arrival label covers the initial state.
+  const thresholdsMs = CDT_ANNOUNCE_MINUTES.map((m) => m * 60_000);
+  let nextThreshold = thresholdsMs.findIndex((ms) => ms < range.end - now);
+  if (nextThreshold === -1) nextThreshold = thresholdsMs.length;
+
+  // On end: announce, then restore the original icon / text / CTA structure.
+  startTimer(
+    cdtEl,
+    range.end,
+    now,
+    (diff) => {
+      visualEl.textContent = formatTime(diff);
+      // On-arrival read (via the timer's implicit aria-live="off").
+      srEl.textContent = `Ends in ${formatCoarseRemaining(diff)}`;
+      // Fire any thresholds crossed this tick (handles multi-second gaps).
+      while (
+        nextThreshold < thresholdsMs.length
+        && diff <= thresholdsMs[nextThreshold]
+      ) {
+        const label = formatCoarseRemaining(thresholdsMs[nextThreshold]);
+        liveEl.textContent = withPromo(`Ends in ${label}`);
+        nextThreshold += 1;
+      }
+    },
+    () => {
+      liveEl.textContent = withPromo('has ended');
+      if (iconEl !== null) inner.insertBefore(iconEl, wrapper);
+      wrapper.remove();
+    },
+  );
 }

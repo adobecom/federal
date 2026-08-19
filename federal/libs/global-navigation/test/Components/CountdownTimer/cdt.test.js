@@ -211,13 +211,15 @@ describe('CDT — initPromoCountdown', () => {
       expect(wrapper.querySelector('.feds-cdt')).to.not.equal(null);
     });
 
-    it('renders timer text in DD:HH:MM:SS format', () => {
+    it('renders visible timer text in DD:HH:MM:SS format (aria-hidden)', () => {
       setMeta(activeRange());
       const { inner, text } = buildInner();
       initPromoCountdown(inner, text, false);
 
-      const cdt = inner.querySelector('.feds-cdt');
-      expect(cdt.textContent).to.match(/^\d{2}:\d{2}:\d{2}:\d{2}$/);
+      const visual = inner.querySelector('.feds-cdt .feds-cdt-visual');
+      expect(visual).to.not.equal(null);
+      expect(visual.getAttribute('aria-hidden')).to.equal('true');
+      expect(visual.textContent).to.match(/^\d{2}:\d{2}:\d{2}:\d{2}$/);
     });
     it('sets role="timer" on the CDT element', () => {
       setMeta(activeRange());
@@ -228,21 +230,33 @@ describe('CDT — initPromoCountdown', () => {
       expect(cdt.getAttribute('role')).to.equal('timer');
     });
 
-    it('sets a human-readable aria-label on the CDT element', () => {
+    it('exposes an on-arrival "Ends in" label via a visually-hidden span', () => {
       setMeta(activeRange());
       const { inner, text } = buildInner();
       initPromoCountdown(inner, text, false);
 
-      const cdt = inner.querySelector('.feds-cdt');
-      expect(cdt.getAttribute('aria-label')).to.match(/remaining$/);
+      const sr = inner.querySelector('.feds-cdt .feds-cdt-sr');
+      expect(sr).to.not.equal(null);
+      expect(sr.textContent).to.match(/^Ends in /);
     });
-    it('contains no child elements inside .feds-cdt — timer is a plain text node', () => {
+    it('adds an empty polite live region for announcements', () => {
+      setMeta(activeRange());
+      const { inner, text } = buildInner();
+      initPromoCountdown(inner, text, false);
+
+      const live = inner.querySelector('.feds-cdt-live');
+      expect(live).to.not.equal(null);
+      expect(live.getAttribute('aria-live')).to.equal('polite');
+      expect(live.getAttribute('aria-atomic')).to.equal('true');
+      expect(live.textContent).to.equal('');
+    });
+    it('does not put the colon time in an aria-label (NVDA reads it literally)', () => {
       setMeta(activeRange());
       const { inner, text } = buildInner();
       initPromoCountdown(inner, text, false);
 
       const cdt = inner.querySelector('.feds-cdt');
-      expect(cdt.children.length).to.equal(0);
+      expect(cdt.getAttribute('aria-label')).to.equal(null);
     });
   });
 
@@ -281,8 +295,8 @@ describe('CDT — initPromoCountdown', () => {
       const { inner, text } = buildInner();
       initPromoCountdown(inner, text, false);
 
-      const cdt = inner.querySelector('.feds-cdt');
-      expect(cdt.textContent).to.equal('07:00:00:00');
+      const visual = inner.querySelector('.feds-cdt .feds-cdt-visual');
+      expect(visual.textContent).to.equal('07:00:00:00');
     });
 
     it('shows correct seconds component', () => {
@@ -295,8 +309,8 @@ describe('CDT — initPromoCountdown', () => {
       const { inner, text } = buildInner();
       initPromoCountdown(inner, text, false);
 
-      const cdt = inner.querySelector('.feds-cdt');
-      expect(cdt.textContent).to.equal('00:01:30:45');
+      const visual = inner.querySelector('.feds-cdt .feds-cdt-visual');
+      expect(visual.textContent).to.equal('00:01:30:45');
     });
 
     it('ignores a ?instant value that is not in canonical format', () => {
@@ -369,7 +383,17 @@ describe('CDT — initPromoCountdown', () => {
       const { inner, text, icon, ctas } = buildInnerWithCta();
       initAtEnd(inner, text);
 
-      expect([...inner.children]).to.deep.equal([icon, text, ctas]);
+      const structural = [...inner.children]
+        .filter((c) => !c.classList.contains('feds-cdt-live'));
+      expect(structural).to.deep.equal([icon, text, ctas]);
+    });
+
+    it('announces "has ended" (with promo details) at the end', () => {
+      const { inner, text } = buildInnerWithCta();
+      initAtEnd(inner, text);
+
+      const live = inner.querySelector('.feds-cdt-live');
+      expect(live.textContent).to.match(/has ended$/);
     });
   });
 
