@@ -7,6 +7,7 @@ import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
+import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
@@ -298,6 +299,10 @@ export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
+  // Fire-and-forget and unrelated to UNAV — must not be sequenced behind
+  // `await loadUnav`, which can be slow or hang in environments where the
+  // ARP/UniversalNav script fails to load.
+  initEventRegistrationGating(input.mountpoint);
   const unav = await loadUnav(input.mountpoint);
   if (unav instanceof RecoverableError) {
     errors.add(unav);

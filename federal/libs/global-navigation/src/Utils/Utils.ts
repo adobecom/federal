@@ -263,6 +263,25 @@ export const getTargetAttrs = (
 };
 
 /**
+ * Authored links (e.g. an event's "Register" CTA) can end with
+ * `#_hide-when-registered` to request that the link be removed once the
+ * visitor is confirmed registered for the current event. Resolution happens
+ * post-render in `initEventRegistrationGating`, driven by the event
+ * platform's `window.events.getRegistrationStatus()` and the page's
+ * `event-code` metadata — this only strips the marker and flags the link so
+ * it can be found afterward.
+ */
+export const HIDE_WHEN_REGISTERED_SUFFIX = '#_hide-when-registered';
+
+export const getRegistrationGateAttrs = (
+  href: string,
+): { href: string; hideWhenRegistered: boolean } => {
+  if (href.includes(HIDE_WHEN_REGISTERED_SUFFIX))
+    return { href: href.replace(HIDE_WHEN_REGISTERED_SUFFIX, ''), hideWhenRegistered: true };
+  return { href, hideWhenRegistered: false };
+};
+
+/**
  * Lingo locale config — federal-specific locale data (currently just `ietf`,
  * e.g. `'fr-LU'`) that may override the milo config locale for downstream
  * consumers (AUP SDK, UNav). Optional; consumers must fall back to
