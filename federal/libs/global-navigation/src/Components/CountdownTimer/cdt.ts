@@ -79,10 +79,10 @@ function formatCoarseRemaining(diffMs: number): string {
   return `${totalSeconds} ${totalSeconds === 1 ? 'second' : 'seconds'}`;
 }
 
-// Screen-reader announcement schedule (minutes remaining). As the countdown
-// crosses each threshold, a polite live region announces the promo + time.
-// Proposed pattern — pending a11y validation.
-const CDT_ANNOUNCE_MINUTES = [60, 30, 15, 10, 5, 3, 1];
+// Screen-reader announcement schedule (minutes remaining). Kept deliberately
+// sparse per a11y guidance: users already hear the promo + time on arrival, so
+// a single gentle 5-minute reminder is enough, plus the "has ended" message.
+const CDT_ANNOUNCE_MINUTES = [5];
 
 /**
  * Resolves the effective "now" timestamp.
