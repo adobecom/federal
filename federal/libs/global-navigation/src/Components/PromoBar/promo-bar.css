@@ -448,6 +448,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
 @media (min-width: 1024px) {
   .feds-promo-bar-slot--desktop {
     display: contents;
+    margin: 0px auto;
   }
   .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
     object-fit: cover;
