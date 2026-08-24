@@ -327,14 +327,15 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
 .feds-promo-bar--maximized-release .feds-promo-bar-bg {
   display: block;
   overflow: hidden;
+  /* aspect-ratio: 4 / 1.8; */
 }
 
 .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: left top;
   display: block;
-  max-height: 344px;
 }
 
 .feds-promo-bar--maximized-release .feds-promo-bar-column {
@@ -418,8 +419,17 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     display: contents;
   }
 
+  .feds-promo-bar--maximized-release .feds-promo-bar-bg{
+    order: -1;
+    aspect-ratio: 2 / 1;
+  }
+
   .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
-    max-height: 171px;
+    /* max-height: 171px; */
+    /* object-fit: cover; */
+    object-fit: fill;
+    height: 100%;
+    object-position: center;
   }
 }
 
@@ -428,12 +438,19 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   .feds-promo-bar-slot--tablet {
     display: contents;
   }
+
+  .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
+    object-fit: cover;
+  }
 }
 
 /* Desktop (≥ 1024px): show slots that include --desktop */
 @media (min-width: 1024px) {
   .feds-promo-bar-slot--desktop {
     display: contents;
+  }
+  .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
+    object-fit: cover;
   }
 }
 
