@@ -190,10 +190,11 @@ export function getUnavWidthCSS(
  * @param locale - Locale object with prefix property
  * @returns Normalized locale string (e.g., 'en_US', 'fr_FR')
  */
-export const getUniversalNavLocale = (locale: { prefix: string }): string => {
-  if (!locale.prefix || locale.prefix === '/') return 'en_US';
+export const getUniversalNavLocale = (locale: { prefix?: string }): string => {
+  const rawPrefix = locale.prefix ?? '';
+  if (rawPrefix === '' || rawPrefix === '/') return 'en_US';
 
-  const prefix = locale.prefix.replace('/', '');
+  const prefix = rawPrefix.replace('/', '');
 
   // Handle already formatted locales (e.g., 'en_us' or 'en_US')
   if (prefix.includes('_')) {

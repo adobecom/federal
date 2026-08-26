@@ -271,6 +271,7 @@ export const getTargetAttrs = (
  */
 export type LingoLocaleConfig = {
   ietf: string;
+  prefix?: string;
 };
 
 type LingoLocaleConfigStateFunctions = [
