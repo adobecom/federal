@@ -441,6 +441,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
 
   .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
     object-fit: cover;
+    max-height:348px;
   }
 }
 
@@ -451,6 +452,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   }
   .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
     object-fit: cover;
+    max-height:348px;
   }
 }
 
