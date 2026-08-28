@@ -421,7 +421,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
 
   .feds-promo-bar--maximized-release .feds-promo-bar-bg{
     order: -1;
-    aspect-ratio: 2 / 1;
+    /* aspect-ratio: 2 / 1; */
   }
 
   .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
@@ -504,6 +504,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     align-items: center;
     text-align: center;
     margin: 0px auto;
+    padding: var(--s2a-spacing-2xl) var(--s2a-spacing-xl);
   }
 }
 

@@ -61,7 +61,9 @@ const parseContent = (cell: Element): PromoBarContent => {
   // Keep the full <picture> markup (all <source> variants + fallback <img>)
   // so responsive/format switching survives into the rendered output. By
   // this point replaceDotMedia has already rewritten src/srcset to absolute
-  // federated URLs, so no further URL processing is needed here.
+  // federated URLs, so no further URL processing is needed here. The class
+  // is added directly to the <picture> so Render doesn't need a wrapper div.
+  bgPicture?.classList.add('feds-promo-bar-bg');
   const bgImage = bgPicture?.outerHTML ?? null;
   const productName = cell.querySelector('h5')?.textContent?.trim() ?? null;
 

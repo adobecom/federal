@@ -97,7 +97,7 @@ const maximizedReleaseSlot = (
     ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
     ${ctasHTML(col.primaryCta, col.secondaryCta)}
     </div>
-    ${col.bgImage !== null ? `<div class="feds-promo-bar-bg">${col.bgImage}</div>` : ''}
+    ${col.bgImage ?? ''}
   </div>
 </div>`.trim();
 };
