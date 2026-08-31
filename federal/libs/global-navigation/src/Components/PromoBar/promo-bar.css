@@ -456,6 +456,10 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     display: contents;
   }
 
+  .feds-promo-bar-body{
+    max-width: 330px;
+  }
+
   .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
     object-fit: cover;
   }
@@ -466,7 +470,17 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   .feds-promo-bar-slot--desktop {
     display: contents;
   }
+  
+  .feds-promo-bar--maximized-release .feds-promo-bar-body{
+    max-width: 480px;
+  }
+
+  .feds-promo-bar--maximized-release .feds-promo-bar-headline{
+    letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
+  }
+
 }
+
 
 @media (width >= 768px) {
   .feds-promo-bar--maximized-release .feds-promo-bar-inner {
