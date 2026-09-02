@@ -3,6 +3,8 @@ import { lanaLog } from "../Utils/Log";
 
 const REGISTRATION_RESOLVED_EVENT = 'registration:resolved';
 
+const REGISTRATION_PENDING_ATTR = 'data-feds-registration-pending';
+
 type RegistrationStatus = {
   isRegistered: boolean;
   inPersonAttendee?: boolean;
@@ -26,12 +28,17 @@ export const initEventRegistrationGating = (mountpoint: HTMLElement): void => {
   const gatedLinks = mountpoint.querySelectorAll<HTMLElement>('[data-feds-hide-when-registered]');
   if (gatedLinks.length === 0) return;
 
+ const mayBeRegistered = window.adobeIMS?.isSignedInUser?.() === true;
+  if (mayBeRegistered) {
+  }
+
   const applyGate = (status: RegistrationStatus | undefined): void => {
-    if (status?.isRegistered !== true) return;
-    // Remove the CTA's wrapper (nav-item `<li>` or Product Entry CTA),
-    // falling back to the link so an unexpected wrapper never no-ops.
     gatedLinks.forEach(link => {
-      (link.closest('li, .feds-product-entry-cta') ?? link).remove();
+      if (status?.isRegistered === true) {
+        (link.closest('li, .feds-product-entry-cta') ?? link).remove();
+      } else {
+        link.removeAttribute(REGISTRATION_PENDING_ATTR);
+      }
     });
   };
 

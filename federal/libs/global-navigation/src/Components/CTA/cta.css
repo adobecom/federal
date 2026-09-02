@@ -1,4 +1,8 @@
 .global-navigation {
+  & [data-feds-registration-pending] {
+    visibility: hidden;
+  }
+
   /* =========================================
      Product Entry CTA — layout
      ========================================= */
