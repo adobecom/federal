@@ -206,19 +206,18 @@ export const renderGnavString = ({
   brandConciergeEnabled,
 }: GlobalNavigationData
 ): string => {
+  const menuComponents = components.filter((c) => c.type !== "Brand");
   // In localnav mobile, the menu-wrapper is repurposed as the localnav bar
   // (a thin clickable strip below the main nav row that expands inline to
-  // reveal the remaining mega-menu entries). Its label mirrors the last
-  // breadcrumb crumb so it reads as the current section.
-  const lastBreadcrumb = localnav && breadcrumbs !== null &&
-    breadcrumbs.items.length > 0
-      ? breadcrumbs.items[breadcrumbs.items.length - 1]
-      : null;
-  const localnavBarLabel = lastBreadcrumb === null
-    ? ''
-    : typeof lastBreadcrumb === 'string'
-      ? lastBreadcrumb
-      : lastBreadcrumb.text;
+  // reveal the remaining mega-menu entries), and the hamburger opens that
+  // same mega menu's popup directly. Its label mirrors the mega menu's own
+  // title rather than the breadcrumbs, matching how milo global-navigation
+  // sources a standalone local nav's label from the nav's own first item -
+  // clients without breadcrumbs can still have a localnav.
+  const firstMegaMenu = localnav
+    ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
+    : null;
+  const localnavBarLabel = firstMegaMenu?.title ?? '';
   return `
 <nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
@@ -228,12 +227,8 @@ export const renderGnavString = ({
       const brandComponent = components.find((c) =>
         c.type === "Brand"
       ) ?? null;
-      const menuComponents = components.filter((c) => c.type !== "Brand");
       // In localnav mode the hamburger should open the first mega menu's
       // popup directly rather than the menu wrapper / gnav-items list.
-      const firstMegaMenu = localnav
-        ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
-        : null;
       const toggleControlsId = firstMegaMenu !== null
         ? sanitize(firstMegaMenu.title)
         : 'feds-menu-wrapper';
