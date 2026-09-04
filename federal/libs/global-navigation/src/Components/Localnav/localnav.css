@@ -78,6 +78,10 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     visibility: visible;
   }
 
+  .global-navigation nav.localnav:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) {
+    --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
+  }
+
   /* =========================================
      Localnav bar (li.feds-menu-wrapper repurposed)
      =========================================
@@ -356,6 +360,13 @@ header.global-navigation.is-compact nav.localnav:has(.feds-localnav-bar[aria-exp
 header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {
   opacity: 1;
   visibility: visible;
+}
+
+/* Mirrors the mobile-media-query rule above: the localnav bar stands in for
+   breadcrumbs and needs the same --feds-breadcrumbs-height bump on
+   --feds-popup-bg-height so the rounded backdrop covers it too. */
+header.global-navigation.is-compact nav.localnav:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) {
+  --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
 }
 
 header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper {

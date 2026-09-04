@@ -559,6 +559,18 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
       header.classList.remove('is-compact');
       return;
     }
+    // Skip re-measuring while a menu/popup is open. Stripping `is-compact`
+    // below (even momentarily) drops the compact-scoped body scroll-lock
+    // (see `body:has(header.global-navigation.is-compact ...)` in
+    // styles.css), which lets the scrollbar flash back in and changes
+    // `header`'s width — the very thing this function's ResizeObserver
+    // watches. That retriggers `check()`, which strips `is-compact` again,
+    // forever: an infinite loop that keeps resetting the gnav items'
+    // reveal animation mid-flight, so they never finish fading in (visible
+    // as a blank open menu). Nothing about open/closed state should change
+    // whether the nav content overflows, so it's safe to just wait for the
+    // next real resize or breakpoint change instead.
+    if (header.querySelector('.feds-menu-wrapper.is-open, .feds-popup.is-open')) return;
     // Temporarily strip is-compact so we measure the natural desktop widths,
     // then restore via toggle at the end.
     header.classList.remove('is-compact');
