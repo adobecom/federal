@@ -150,7 +150,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
        overflow to <button>. */
     display: flex;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
     align-items: center;
     justify-content: space-between;
     width: 100%;
