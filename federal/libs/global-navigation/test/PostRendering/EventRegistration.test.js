@@ -1,4 +1,5 @@
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 import { initEventRegistrationGating } from '../../src/PostRendering/EventRegistration';
 import { setMiloConfig } from '../../src/Utils/Utils';
 
@@ -45,7 +46,13 @@ describe('initEventRegistrationGating', () => {
     document.head.querySelectorAll('meta[name="event-code"]').forEach((m) => m.remove());
     document.body.querySelectorAll('div').forEach((el) => el.remove());
     delete window.events;
+    delete window.adobeIMS;
   });
+
+  const isPending = (mountpoint) =>
+    mountpoint
+      .querySelector('[data-feds-hide-when-registered]')
+      .hasAttribute('data-feds-registration-pending');
 
   it('does nothing when event-code metadata is absent', () => {
     const mountpoint = buildMountpoint();
@@ -184,5 +191,57 @@ describe('initEventRegistrationGating', () => {
     initEventRegistrationGating(mountpoint);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(mountpoint.querySelector('[data-feds-hide-when-registered]')).to.not.exist;
+  });
+
+  describe('anti-flicker pre-hide', () => {
+    it('pre-hides the CTA up front, before status resolves', () => {
+      setMetadata('event-code', 'max2026');
+      const mountpoint = buildMountpoint();
+      window.events = {
+        getRegistrationStatus: () => Promise.resolve({ isRegistered: false, inPersonAttendee: false }),
+      };
+      initEventRegistrationGating(mountpoint);
+      // Synchronous: the attribute is set before the resolve microtask runs.
+      expect(isPending(mountpoint)).to.be.true;
+    });
+
+    it('reveals the pre-hidden CTA once status resolves not-registered', async () => {
+      setMetadata('event-code', 'max2026');
+      const mountpoint = buildMountpoint();
+      window.events = {
+        getRegistrationStatus: () => Promise.resolve({ isRegistered: false, inPersonAttendee: false }),
+      };
+      initEventRegistrationGating(mountpoint);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(isPending(mountpoint)).to.be.false;
+    });
+
+    it('reveals the pre-hidden CTA when status resolution errors', async () => {
+      setMetadata('event-code', 'max2026');
+      const mountpoint = buildMountpoint();
+      window.events = {
+        getRegistrationStatus: () => Promise.reject(new Error('RF unavailable')),
+      };
+      initEventRegistrationGating(mountpoint);
+      expect(isPending(mountpoint)).to.be.true;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(isPending(mountpoint)).to.be.false;
+    });
+
+    it('reveals via the safety-net timeout if status never resolves', () => {
+      const clock = sinon.useFakeTimers();
+      try {
+        setMetadata('event-code', 'max2026');
+        const mountpoint = buildMountpoint();
+        // No window.events and no registration:resolved event ever fires.
+        initEventRegistrationGating(mountpoint);
+        expect(isPending(mountpoint)).to.be.true;
+        // Advance past the safety-net timeout — the CTA is revealed.
+        clock.tick(5000);
+        expect(isPending(mountpoint)).to.be.false;
+      } finally {
+        clock.restore();
+      }
+    });
   });
 });
