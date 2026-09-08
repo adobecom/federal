@@ -39,7 +39,7 @@ export type Input = {
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
-  // promise the host resolves in parallel; 
+  // promise the host resolves in parallel;
   countryCode?: string | Promise<string | undefined>;
   lingoRegion?: LingoLocaleConfig;
   // We deliberately stay less entangled with MEP than milo's own gnav
@@ -298,15 +298,6 @@ export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
-  const unav = await loadUnav(input.mountpoint, {
-    countryCode: input.countryCode,
-  });
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
-  }
-  else
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
@@ -321,7 +312,6 @@ export const postRenderingTasks = async (
   initKeyboardNav(input.mountpoint);
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
-  initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
@@ -331,6 +321,17 @@ export const postRenderingTasks = async (
     errors.add(error);
     lanaLog(error.message);
   });
+
+  const unav = await loadUnav(input.mountpoint, {
+    countryCode: input.countryCode,
+  });
+  if (unav instanceof RecoverableError) {
+    errors.add(unav);
+    lanaLog(unav.message);
+  }
+  else
+    unav.errors.forEach((error: RecoverableError) => errors.add(error));
+  initPopoverCloseOnUnavInteraction(input.mountpoint);
 
   const reloadUnav
     = unav instanceof RecoverableError
