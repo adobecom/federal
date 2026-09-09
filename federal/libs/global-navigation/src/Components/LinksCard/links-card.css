@@ -186,34 +186,39 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
    description: plain links split when there are more than six, but when a
    description is present anywhere the rows are taller, so the split is deferred
    to more than nine. The two triggers are mutually exclusive via the
-   :not()/:has() description guards. */
-.feds-popup .links-card .links-card-links:is(
-    :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
-    :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
-  ) {
-  columns: 2;
-  column-gap: var(--s2a-spacing-2xl);
-}
+   :not()/:has() description guards.
 
-.feds-popup .links-card .links-card-links:is(
-    :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
-    :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
-  ) > li {
-  break-inside: avoid;
-  min-width: 0;
-}
+   Desktop-only: on mobile/is-compact the card is narrow enough that a second
+   column would cramp the labels, so the list stays single-column there. */
+@media (width >= 1024px) {
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-links:is(
+      :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
+      :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
+    ) {
+    columns: 2;
+    column-gap: var(--s2a-spacing-2xl);
+  }
 
-/* In the narrow two-column layout, let long labels wrap to the next line
-   inside their column instead of overflowing into the adjacent one. The
-   min-width: 0 releases the default flex min-content floor so the link can
-   shrink below its single-line width. */
-.feds-popup .links-card .links-card-links:is(
-    :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
-    :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
-  ) .feds-link {
-  min-width: 0;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-links:is(
+      :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
+      :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
+    ) > li {
+    break-inside: avoid;
+    min-width: 0;
+  }
+
+  /* In the narrow two-column layout, let long labels wrap to the next line
+     inside their column instead of overflowing into the adjacent one. The
+     min-width: 0 releases the default flex min-content floor so the link can
+     shrink below its single-line width. */
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-links:is(
+      :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
+      :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
+    ) .feds-link {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 .feds-popup .links-card .links-card-links li {
