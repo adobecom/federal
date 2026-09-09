@@ -91,7 +91,7 @@
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   header.global-navigation:not(.is-compact) .feds-popup .featured-card {
     border-radius: 12px;
   }
@@ -107,7 +107,11 @@
    Responsive: Large Desktop (min-width: 1280px)
    ========================================= */
 
-@media (min-width: 1280px) {
+@media (width >= 1280px) {
+  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards:has(.featured-card) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
   header.global-navigation:not(.is-compact) .feds-popup .featured-card {
     min-height: 307px;
   }
@@ -117,7 +121,7 @@
    Hover: Desktop with pointer device only
    ========================================= */
 
-@media (min-width: 1024px) and (hover: hover) {
+@media (width >= 1024px) and (hover: hover) {
   header.global-navigation:not(.is-compact) .featured-card a.feds-secondary-cta {
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
