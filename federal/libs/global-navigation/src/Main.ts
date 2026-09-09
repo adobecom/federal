@@ -603,8 +603,14 @@ const isCurrentPageHref = (href: string): boolean => {
 const findActiveLink = (
   mountpoint: HTMLElement
 ): HTMLAnchorElement | null => {
+  // In localnav the first top-level <li> (before the divider) is the mega
+  // menu whose title also labels the localnav bar — it represents the
+  // section itself rather than a sibling destination, so it's excluded here
+  // and only links after the divider are eligible to be marked active.
+  const isLocalnav = mountpoint.querySelector('nav.localnav') !== null;
   return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
     .filter(a => !a.closest('.feds-breadcrumbs'))
+    .filter(a => !isLocalnav || a.closest('ul.feds-gnav-items > li:first-child') === null)
     .find(a => isCurrentPageHref(a.href)) ?? null;
 };
 
