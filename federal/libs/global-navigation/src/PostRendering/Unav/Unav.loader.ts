@@ -177,12 +177,16 @@ const setProfileSignUpRequired = (
  * 6. Sets up responsive listeners
  * 
  * @param nav - Navigation element containing .feds-utilities container
- * @param _config - Optional partial configuration override (not currently used)
+ * @param options - Optional overrides. `countryCode` (string or a promise
+ *   resolving to one) lets the host pass a geo-validated market so the unav
+ *   matches on-page pricing; when absent or it rejects,
+ *   the locale-derived default is used. A promise is awaited once in the
+ *   async body (after gnav render) so geo detection never blocks nav paint.
  * @returns Promise resolving to Unav object or RecoverableError
  */
 export const loadUnav = async (
   nav: HTMLElement,
-  _config?: Partial<UnavConfig>
+  options?: { countryCode?: string | Promise<string | undefined> }
 ): Promise<Unav | RecoverableError> => {
   try {
     // ========================================================================
@@ -246,10 +250,12 @@ export const loadUnav = async (
       throw new Error('MiloConfig not available for UNAV initialization');
     }
 
-    // Lingo ietf (e.g. 'fr-LU') overrides milo locale when provided.
-    // UNav expects underscore form ('fr_LU'), so convert hyphens.
-    const locale = getLingoLocaleConfig()?.ietf?.replace('-', '_')
-      ?? getUniversalNavLocale(config.locale);
+    // Resolve the host-provided market override once. 
+    const overrideCountryCode = await Promise.resolve(options?.countryCode)
+      .catch(() => undefined);
+
+    const lingoLocale = getLingoLocaleConfig();
+    const locale = getUniversalNavLocale(lingoLocale ?? config.locale);
     const environment = config.env.name === 'prod' ? 'prod' : 'stage';
 
     // Fetch visitor GUID for analytics
@@ -351,7 +357,9 @@ export const loadUnav = async (
         target: utilitiesContainer,
         env: environment,
         locale,
-        countryCode: getMiloLocaleSettings(config?.locale)?.country || 'US',
+        countryCode:
+          overrideCountryCode
+          ?? (getMiloLocaleSettings(config?.locale)?.country || 'US'),
         imsClientId: (window as WindowWithAdobeId)?.adobeid?.client_id,
         theme: 'light', // TODO: Add toggle based on site theme
         analyticsContext: {

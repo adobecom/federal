@@ -11,6 +11,7 @@ import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
+import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
 import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
@@ -38,17 +39,16 @@ export type Input = {
   unavEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
+  // Geo-validated market for the unav and drives the cart. String or a
+  // promise the host resolves in parallel;
+  countryCode?: string | Promise<string | undefined>;
   lingoRegion?: LingoLocaleConfig;
-  // for now we only support inBlock commands.
-  // Since MEP on gnav is relatively rare we'll
-  // keep it at this and see if any problems crop up.
-  // The Milo gnav MEP implementation is a little
-  // more entangled than what we have here.
-  // For example we're not dealing with adding manifestId to the body
-  // and so on. But the whole idea behind this refactor is
-  // that we want to reduce coupling.
-  // So we'll keep it at this for now and re-evaluate at a
-  // later date.
+  // We deliberately stay less entangled with MEP than milo's own gnav
+  // implementation (e.g. we don't add manifestId to the body). The host is
+  // expected to supply `handleCommands` (applied to each freshly-fetched,
+  // detached fragment body) and, if fragment-swap manifests targeting
+  // content nested inside the gnav are needed (e.g. a product-card
+  // fragment), `resolveFragmentHref` — see PersonalizationConfig in Utils.ts.
   personalization: PersonalizationConfig;
   localizeLink?: LocalizeLink;
   // Async companion to localizeLink — runs milo's decorateLinksAsync over the
@@ -299,15 +299,6 @@ export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
-  // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
-  initEventRegistrationGating(input.mountpoint);
-  const unav = await loadUnav(input.mountpoint);
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
-  }
-  else
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
@@ -322,15 +313,28 @@ export const postRenderingTasks = async (
   initKeyboardNav(input.mountpoint);
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
-  initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
+  initPromoCountdownInMinimizedBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
     lanaLog(error.message);
   });
+
+  // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
+  initEventRegistrationGating(input.mountpoint);
+  const unav = await loadUnav(input.mountpoint, {
+    countryCode: input.countryCode,
+  });
+  if (unav instanceof RecoverableError) {
+    errors.add(unav);
+    lanaLog(unav.message);
+  }
+  else
+    unav.errors.forEach((error: RecoverableError) => errors.add(error));
+  initPopoverCloseOnUnavInteraction(input.mountpoint);
 
   const reloadUnav
     = unav instanceof RecoverableError
@@ -677,6 +681,28 @@ const waitUntilVisible = (callback: () => void): void => {
     }
   };
   check();
+};
+
+/**
+ * Injects a countdown timer into every `.feds-promo-bar-inner` slot of a
+ * `minimized` PromoBar.  Reads the `gnav-promo-countdown` meta tag for the
+ * start/end window; no-ops silently when the tag is absent, malformed, or
+ * the current time is outside the window.
+ */
+const initPromoCountdownInMinimizedBar = (): void => {
+  const promoBar = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar--minimized',
+  );
+  if (promoBar === null) return;
+
+  const isDark = promoBar.classList.contains('feds-promo-bar--dark');
+  const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
+
+  inners.forEach((inner) => {
+    const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
+    if (textEl === null) return;
+    initPromoCountdown(inner, textEl, isDark);
+  });
 };
 
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
