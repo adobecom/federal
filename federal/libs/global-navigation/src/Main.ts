@@ -288,6 +288,7 @@ export const renderGnavString = ({
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
+  <div class="feds-notifications-wrapper"></div>
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
