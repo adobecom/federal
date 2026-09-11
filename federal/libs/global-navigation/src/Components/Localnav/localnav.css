@@ -27,11 +27,13 @@ header.feds-header-scrolled.feds-localnav-closing nav.localnav {
   inset: auto;
 }
 
-/* In localnav the popup is reached via either the hamburger (first mega-menu)
-   or a sibling button in the expanded bar — there's no back stack to step
-   through inside the popup, so hide the back-button SVG. */
-nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
+nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) .feds-popup-back-button svg {
   display: none;
+}
+
+nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
+  padding: var(--s2a-spacing-lg);
+  padding-bottom: 0;
 }
 
 /* =========================================
