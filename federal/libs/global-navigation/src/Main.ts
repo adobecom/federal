@@ -202,6 +202,7 @@ export const renderGnavString = ({
   placeholders,
   localnav,
   brandConciergeEnabled,
+  notificationsEnabled,
 }: GlobalNavigationData
 ): string => {
   // In localnav mobile, the menu-wrapper is repurposed as the localnav bar
@@ -288,7 +289,7 @@ export const renderGnavString = ({
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
-  <div class="feds-notifications-wrapper"></div>
+  ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
