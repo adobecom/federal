@@ -1,5 +1,5 @@
 import { RecoverableError } from "../../Error/Error";
-import { alternative, isMerchLink } from "../../Utils/Utils";
+import { alternative } from "../../Utils/Utils";
 
 export type PrimaryCTA = {
   type: "PrimaryCTA";
@@ -8,7 +8,6 @@ export type PrimaryCTA = {
   ariaLabel?: string;
   ariaAttrs?: Record<string, string>;
   daaLl?: string | null;
-  merch?: boolean;
 };
 
 export type SecondaryCTA = {
@@ -18,7 +17,6 @@ export type SecondaryCTA = {
   ariaLabel?: string;
   ariaAttrs?: Record<string, string>;
   daaLl?: string | null;
-  merch?: boolean;
 };
 
 export type ProductEntryCTA = {
@@ -61,7 +59,6 @@ const parseCTA = (
       href,
       ariaLabel,
       daaLl: typeof daaLl === 'string' && daaLl.trim() !== '' ? daaLl : text,
-      merch: isMerchLink(href),
     },
     es
   ]

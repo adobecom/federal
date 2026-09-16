@@ -51,6 +51,16 @@ export const initMerchLinks = async (
       placeholder.replaceWith(link);
     });
 
+  // CTA (`feds-primary-cta`/`feds-secondary-cta`) is rendered from a plain
+  // HTML string rather than a live DOM node, so it can't be tagged at parse
+  // time like the other components below. Tag it here instead, keeping this
+  // function the single place that decides which links are merch links.
+  mountpoint.querySelectorAll<HTMLAnchorElement>(
+    '.feds-primary-cta[href], .feds-secondary-cta[href]'
+  ).forEach((link) => {
+    if (isMerchLink(link.getAttribute('href') ?? '')) link.classList.add('merch');
+  });
+
   const merchLinks = mountpoint.querySelectorAll<HTMLAnchorElement>('a.merch');
   const masLinks = [...mountpoint.querySelectorAll<HTMLAnchorElement>('a[href]')]
     .filter((link) => isMasLink(link.href));
