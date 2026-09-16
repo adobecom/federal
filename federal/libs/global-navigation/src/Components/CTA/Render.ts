@@ -7,13 +7,14 @@ export const primaryCTA = ({
   daaLl,
   ariaLabel,
   ariaAttrs,
+  merch,
 }: PrimaryCTA): HTML => {
   const { href: unblankedHref, target } = getTargetAttrs(href);
   const { href: strippedHref, hideWhenRegistered } =
     getRegistrationGateAttrs(unblankedHref);
   return `
 <a href="${localizeHref(strippedHref)}"
-  class="feds-primary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  class="feds-primary-cta${merch === true ? ' merch' : ''}"${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
@@ -29,13 +30,14 @@ export const secondaryCTA = ({
   daaLl,
   ariaLabel,
   ariaAttrs,
+  merch,
 }: SecondaryCTA): HTML => {
   const { href: unblankedHref, target } = getTargetAttrs(href);
   const { href: strippedHref, hideWhenRegistered } =
     getRegistrationGateAttrs(unblankedHref);
   return `
 <a href="${localizeHref(strippedHref)}"
-  class="feds-secondary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  class="feds-secondary-cta${merch === true ? ' merch' : ''}"${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}

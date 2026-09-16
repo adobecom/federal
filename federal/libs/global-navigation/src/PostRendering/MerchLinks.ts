@@ -2,7 +2,26 @@ import { getMiloConfig, isMerchLink, isMasLink } from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
 
 type MerchModule = {
-  default?: (link: HTMLAnchorElement) => void;
+  default?: (link: HTMLAnchorElement) => unknown;
+};
+
+/**
+ * Milo's merch block replaces the authored `<a>` outright with its own
+ * checkout-link/price element (`el.replaceWith(merch)`), which drops
+ * whatever classes the original anchor had. CTA-authored merch links rely on
+ * `feds-primary-cta`/`feds-secondary-cta` for gnav button styling, so those
+ * need to survive onto the replacement element.
+ */
+const preserveCtaClasses = (
+  link: HTMLAnchorElement,
+  decorate: (link: HTMLAnchorElement) => unknown,
+): void => {
+  const ctaClasses = [...link.classList]
+    .filter((c) => c === 'feds-primary-cta' || c === 'feds-secondary-cta');
+  void Promise.resolve(decorate(link)).then((result) => {
+    if (ctaClasses.length === 0) return;
+    if (result instanceof HTMLElement) result.classList.add(...ctaClasses);
+  });
 };
 
 /**
@@ -60,7 +79,9 @@ export const initMerchLinks = async (
       if (decorateMerchLink === undefined) {
         errors.add(new RecoverableError('decorateMerchLink not found in merch module'));
       } else {
-        merchLinks.forEach((link) => { decorateMerchLink(link); });
+        merchLinks.forEach((link) => {
+          preserveCtaClasses(link, decorateMerchLink);
+        });
       }
     }
 
