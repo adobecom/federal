@@ -30,8 +30,8 @@ describe('parsePromoCardSmall — M@S / OST link preservation', () => {
     // …but the rendered HTML keeps the anchor so MerchLinks can resolve it.
     expect(card.titleHtml).to.contain('<a');
     expect(card.titleHtml).to.contain('field=cardTitle');
-    expect(card.bodyHtml).to.contain('<a');
-    expect(card.bodyHtml).to.contain('field=shortDescription');
+    expect(card.body).to.contain('<a');
+    expect(card.body).to.contain('field=shortDescription');
   });
 
   it('preserves a strong-wrapped M@S field CTA and skips the typed CTA', () => {
@@ -56,8 +56,8 @@ describe('parsePromoCardSmall — M@S / OST link preservation', () => {
 
     const [{ card }] = parsePromoCardSmall(el);
 
-    expect(card.bodyHtml).to.contain('<a');
-    expect(card.bodyHtml).to.contain('/tools/ost');
+    expect(card.body).to.contain('<a');
+    expect(card.body).to.contain('/tools/ost');
   });
 
   it('renders plain text (no anchor) when there is no commerce link', () => {
@@ -70,7 +70,7 @@ describe('parsePromoCardSmall — M@S / OST link preservation', () => {
     const [{ card }] = parsePromoCardSmall(el);
 
     expect(card.titleHtml).to.equal('Students & teachers save 71%.');
-    expect(card.bodyHtml).to.equal('Get 20+ apps for less.');
+    expect(card.body).to.equal('Get 20+ apps for less.');
     // An ordinary (non-commerce) CTA still flows through the typed path.
     expect(card.cta?.href).to.equal('/buy');
   });

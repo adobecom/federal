@@ -9,7 +9,6 @@ const renderCard = ({
   title,
   titleHtml,
   body,
-  bodyHtml,
   cta,
   ctaHtml,
   bgImageAlt,
@@ -33,7 +32,7 @@ const renderCard = ({
         <h2 id="title-${sanitize(title)}" class="promo-card-small__title" role="heading" aria-level="2">
           ${titleHtml}
         </h2>
-        ${body ? `<p class="promo-card-small__body">${bodyHtml}</p>` : ""}
+        ${body ? `<p class="promo-card-small__body">${body}</p>` : ""}
       </div>
       ${renderCta({ cta, ctaHtml, title })}
     </div>

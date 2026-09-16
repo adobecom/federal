@@ -11,7 +11,6 @@ export type PromoCardSmallData = {
   title: string;
   titleHtml: string;
   body: string;
-  bodyHtml: string;
   cta: SecondaryCTA | null;
   ctaHtml: string | null;
   bgImageAlt: string;
@@ -78,11 +77,13 @@ export const parsePromoCardSmall = (
     ? titleElement.innerHTML.trim()
     : title;
 
+  // body is only used for the presence check + render, so a single field holds
+  // HTML for a commerce anchor and plain text otherwise (unlike title, whose
+  // plain-text form is still needed for the id/aria seed).
   const bodyElement = contentSection.querySelectorAll('p:not(:has(strong > a, em > a))')[1] ?? null;
-  const body = bodyElement?.textContent?.trim() ?? "";
-  const bodyHtml = hasCommerceAnchor(bodyElement)
+  const body = hasCommerceAnchor(bodyElement)
     ? (bodyElement?.innerHTML.trim() ?? "")
-    : body;
+    : (bodyElement?.textContent?.trim() ?? "");
 
   // A M@S/OST CTA is a strong/em-wrapped commerce anchor; the wrapper implies
   // the button style once Milo resolves it. Preserve that wrapper and skip the
@@ -116,7 +117,6 @@ export const parsePromoCardSmall = (
         title,
         titleHtml,
         body,
-        bodyHtml,
         cta,
         ctaHtml,
         bgImageAlt,
