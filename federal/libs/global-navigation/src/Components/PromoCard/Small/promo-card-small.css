@@ -90,6 +90,33 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Milo's merch block resolves a M@S/OST CTA into its own `con-button` anchor;
+   restyle it to the promo's filled-on-dark button. */
+.global-navigation .feds-gnav-cards .promo-card-small__cta--merch a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px var(--s2a-spacing-lg) var(--s2a-spacing-sm);
+  border: none;
+  border-radius: var(--s2a-border-radius-round);
+  background: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  font-family: var(--body-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.global-navigation .feds-gnav-cards .promo-card-small__cta--merch a:hover,
+.global-navigation .feds-gnav-cards .promo-card-small__cta--merch a:focus {
+  background: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+}
+
 /* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */

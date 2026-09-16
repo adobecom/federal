@@ -11,6 +11,7 @@ const renderCard = ({
   body,
   bodyHtml,
   cta,
+  ctaHtml,
   bgImageAlt,
   bgImageSrc,
 }: PromoCardSmallData): HTML => `
@@ -34,11 +35,21 @@ const renderCard = ({
         </h2>
         ${body ? `<p class="promo-card-small__body">${bodyHtml}</p>` : ""}
       </div>
-      ${cta === null
-        ? ""
-        : `<div class="promo-card-small__cta">
-             ${secondaryCTA({ ...cta, ariaAttrs: { 'aria-describedby': `title-${sanitize(title)}` } })}
-           </div>`}
+      ${renderCta({ cta, ctaHtml, title })}
     </div>
   </article>
 `.trim();
+
+const renderCta = ({
+  cta,
+  ctaHtml,
+  title,
+}: Pick<PromoCardSmallData, "cta" | "ctaHtml" | "title">): HTML => {
+  if (ctaHtml !== null) {
+    return `<div class="promo-card-small__cta promo-card-small__cta--merch">${ctaHtml}</div>`;
+  }
+  if (cta === null) return "";
+  return `<div class="promo-card-small__cta">
+             ${secondaryCTA({ ...cta, ariaAttrs: { 'aria-describedby': `title-${sanitize(title)}` } })}
+           </div>`;
+};

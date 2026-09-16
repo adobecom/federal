@@ -13,18 +13,21 @@ export type PromoCardSmallData = {
   body: string;
   bodyHtml: string;
   cta: SecondaryCTA | null;
+  ctaHtml: string | null;
   bgImageAlt: string;
   bgImageSrc: string;
 };
+
+const isCommerceHref = (href: string): boolean =>
+  isMerchLink(href) || isMasLink(href);
 
 // An OST/M@S price/field link must survive parse as a live anchor so
 // PostRendering/MerchLinks can resolve it in place; textContent dropped it.
 const hasCommerceAnchor = (element: Element | null): boolean =>
   element !== null
-  && [...element.querySelectorAll('a[href]')].some((anchor) => {
-    const href = anchor.getAttribute('href') ?? '';
-    return isMerchLink(href) || isMasLink(href);
-  });
+  && [...element.querySelectorAll('a[href]')].some(
+    (anchor) => isCommerceHref(anchor.getAttribute('href') ?? ''),
+  );
 
 const ERRORS = {
   MissingContentSection: "Promo card small is missing content section",
@@ -81,15 +84,26 @@ export const parsePromoCardSmall = (
     ? (bodyElement?.innerHTML.trim() ?? "")
     : body;
 
-  const [cta, ctaErrors] =
-  (() : Parsed<SecondaryCTA | null, RecoverableError> => {
-    try {
-      return parseSecondaryCTA(contentSection) as
-        Parsed<SecondaryCTA, RecoverableError>;
-    } catch (_error) {
-      return [null, []];
-    }
-  })();
+  // A M@S/OST CTA is a strong/em-wrapped commerce anchor; the wrapper implies
+  // the button style once Milo resolves it. Preserve that wrapper and skip the
+  // typed CTA; ordinary (non-commerce) links keep the typed secondary path.
+  const ctaAnchor = contentSection.querySelector('strong > a[href], em > a[href]');
+  const ctaWrapper = ctaAnchor
+    && isCommerceHref(ctaAnchor.getAttribute('href') ?? '')
+    ? ctaAnchor.closest('strong, em')
+    : null;
+  const ctaHtml = ctaWrapper?.outerHTML.trim() ?? null;
+
+  const [cta, ctaErrors] = ctaHtml !== null
+    ? [null, []] as Parsed<SecondaryCTA | null, RecoverableError>
+    : (() : Parsed<SecondaryCTA | null, RecoverableError> => {
+      try {
+        return parseSecondaryCTA(contentSection) as
+          Parsed<SecondaryCTA, RecoverableError>;
+      } catch (_error) {
+        return [null, []];
+      }
+    })();
   ctaErrors.forEach(e => errors.add(e));
   if (cta) {
     cta.daaLl = `${title} - ${cta.daaLl}`;
@@ -104,6 +118,7 @@ export const parsePromoCardSmall = (
         body,
         bodyHtml,
         cta,
+        ctaHtml,
         bgImageAlt,
         bgImageSrc,
       },
