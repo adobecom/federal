@@ -42,6 +42,21 @@ const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
 export const isMasLink = (href: string): boolean =>
   href.includes(MAS_LINK_PATH);
 
+/**
+ * Checks if a URL is an inline M@S field link (studio.html#...&field=...) that
+ * renders a single value via the `merch` block, not a full merch-card.
+ * @param href - The URL to check
+ * @returns true if the URL is an inline mas field link
+ */
+export const isMasFieldLink = (href: string): boolean => {
+  if (!isMasLink(href)) return false;
+  try {
+    return new URL(href).hash.includes('field=');
+  } catch (_error) {
+    return href.includes('field=');
+  }
+};
+
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
 // all arrays.

@@ -1,4 +1,4 @@
-import { getMiloConfig, isMerchLink, isMasLink } from '../Utils/Utils';
+import { getMiloConfig, isMerchLink, isMasLink, isMasFieldLink } from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
 
 type MerchModule = {
@@ -32,9 +32,19 @@ export const initMerchLinks = async (
       placeholder.replaceWith(link);
     });
 
+  // Tag OST and inline M@S field links so the `a.merch` path resolves them to
+  // an inline value (mirrors Milo's `decorateAutoBlock` downgrade). Lets cards
+  // preserve a price/field anchor without re-implementing the tagging.
+  mountpoint.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
+    if (isMerchLink(link.href) || isMasFieldLink(link.href)) {
+      link.classList.add('merch');
+    }
+  });
+
   const merchLinks = mountpoint.querySelectorAll<HTMLAnchorElement>('a.merch');
+  // Full M@S cards only; field links (tagged above) never build a merch-card.
   const masLinks = [...mountpoint.querySelectorAll<HTMLAnchorElement>('a[href]')]
-    .filter((link) => isMasLink(link.href));
+    .filter((link) => isMasLink(link.href) && !isMasFieldLink(link.href));
 
   if (merchLinks.length === 0 && masLinks.length === 0) return errors;
 

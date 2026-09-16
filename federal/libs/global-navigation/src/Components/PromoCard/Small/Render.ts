@@ -7,7 +7,9 @@ export const promoCardSmall = ({ card }: PromoCardSmall): HTML =>
 
 const renderCard = ({
   title,
+  titleHtml,
   body,
+  bodyHtml,
   cta,
   bgImageAlt,
   bgImageSrc,
@@ -28,9 +30,9 @@ const renderCard = ({
   <div class="promo-card-small__content">
       <div class="promo-card-small__text">
         <h2 id="title-${sanitize(title)}" class="promo-card-small__title" role="heading" aria-level="2">
-          ${title}
+          ${titleHtml}
         </h2>
-        ${body ? `<p class="promo-card-small__body">${body}</p>` : ""}
+        ${body ? `<p class="promo-card-small__body">${bodyHtml}</p>` : ""}
       </div>
       ${cta === null
         ? ""

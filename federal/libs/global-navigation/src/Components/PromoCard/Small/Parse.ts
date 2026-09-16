@@ -1,5 +1,6 @@
 import { IrrecoverableError, RecoverableError } from "../../../Error/Error";
 import { parseSecondaryCTA, SecondaryCTA } from "../../CTA/Parse";
+import { isMerchLink, isMasLink } from "../../../Utils/Utils";
 
 export type PromoCardSmall = {
   type: "PromoCardSmall";
@@ -8,11 +9,22 @@ export type PromoCardSmall = {
 
 export type PromoCardSmallData = {
   title: string;
+  titleHtml: string;
   body: string;
+  bodyHtml: string;
   cta: SecondaryCTA | null;
   bgImageAlt: string;
   bgImageSrc: string;
 };
+
+// An OST/M@S price/field link must survive parse as a live anchor so
+// PostRendering/MerchLinks can resolve it in place; textContent dropped it.
+const hasCommerceAnchor = (element: Element | null): boolean =>
+  element !== null
+  && [...element.querySelectorAll('a[href]')].some((anchor) => {
+    const href = anchor.getAttribute('href') ?? '';
+    return isMerchLink(href) || isMasLink(href);
+  });
 
 const ERRORS = {
   MissingContentSection: "Promo card small is missing content section",
@@ -58,9 +70,16 @@ export const parsePromoCardSmall = (
   const title = titleElement.textContent?.trim() ?? "";
   if (title === "")
     errors.add(new RecoverableError(ERRORS.MissingTitleText));
+  // Keep plain text as-is; preserve HTML only for a price/field anchor.
+  const titleHtml = hasCommerceAnchor(titleElement)
+    ? titleElement.innerHTML.trim()
+    : title;
 
   const bodyElement = contentSection.querySelectorAll('p:not(:has(strong > a, em > a))')[1] ?? null;
   const body = bodyElement?.textContent?.trim() ?? "";
+  const bodyHtml = hasCommerceAnchor(bodyElement)
+    ? (bodyElement?.innerHTML.trim() ?? "")
+    : body;
 
   const [cta, ctaErrors] =
   (() : Parsed<SecondaryCTA | null, RecoverableError> => {
@@ -81,7 +100,9 @@ export const parsePromoCardSmall = (
       type: "PromoCardSmall",
       card: {
         title,
+        titleHtml,
         body,
+        bodyHtml,
         cta,
         bgImageAlt,
         bgImageSrc,
