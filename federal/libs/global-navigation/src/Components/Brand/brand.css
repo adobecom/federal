@@ -10,6 +10,7 @@
 li.feds-brand-wrapper {
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: flex-start;
   flex-shrink: 0;
 }
@@ -117,15 +118,12 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
       visibility: hidden;
     }
   }
-  /* Take the brand out of flow (not just invisible) when the drawer opens, so
-     the toggle lands at the start on its own — independent of brand width. */
   header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-brand,
   header.global-navigation:has(.feds-menu-active) .feds-brand {
     animation: brand-fade 0.3s;
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
-    position: absolute;
   }
 
   .feds-brand {
@@ -135,16 +133,14 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   [dir="rtl"] .feds-brand {
     padding: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
   }
-
-  header.global-navigation .feds-nav-toggle {
-    transition: margin 0.3s ease;
-  }
-  header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-    margin-left: var(--s2a-spacing-md);
+  
+  header.global-navigation nav .feds-nav-toggle {
+    margin-left: var(--s2a-spacing-lg);
   }
 
-  [dir="rtl"] header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-    margin-right: var(--s2a-spacing-md);
+  [dir="rtl"] header.global-navigation nav .feds-nav-toggle {
+    margin-left: 0;
+    margin-right: var(--s2a-spacing-lg);
   }
 }
 
@@ -158,19 +154,18 @@ header.global-navigation.is-compact:has(.feds-menu-active) .feds-brand {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
-  position: absolute;
 }
 
+/* The toggle renders before the brand, so it sits at the start on its own and
+   stays put when the drawer opens — it just needs a left inset so it clears the
+   rounded gnav edge (visible on scroll) and lines up with the content below. */
 header.global-navigation.is-compact .feds-nav-toggle {
-  transition: margin 0.3s ease;
+  margin-left: var(--s2a-spacing-lg);
 }
 
-header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-  margin-left: var(--s2a-spacing-md);
-}
-
-[dir="rtl"] header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-  margin-right: var(--s2a-spacing-md);
+[dir="rtl"] header.global-navigation.is-compact .feds-nav-toggle {
+  margin-left: 0;
+  margin-right: var(--s2a-spacing-lg);
 }
 
 /* =========================================
