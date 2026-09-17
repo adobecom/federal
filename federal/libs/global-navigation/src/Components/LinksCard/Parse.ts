@@ -76,18 +76,21 @@ const parseCard = (
       const anchorParentP = anchor.closest('p');
       const nextSibling = anchorParentP?.nextElementSibling;
       if (nextSibling?.tagName === 'P') {
-        const descAnchor = nextSibling.querySelector('a');
-        if (descAnchor === null) {
+        const descAnchors = [...nextSibling.querySelectorAll('a')]
+          .filter((descAnchor) => commerceDescriptionAnchors.has(descAnchor));
+        if (nextSibling.querySelector('a') === null) {
           link.description = nextSibling.textContent?.trim() ?? undefined;
-        } else if (commerceDescriptionAnchors.has(descAnchor)) {
-          // Swap the commerce anchor for a non-anchor placeholder so it isn't
-          // a nested <a> in the card link; MerchLinks rehydrates + resolves it.
-          const href = descAnchor.getAttribute('href') ?? '';
-          const placeholder = document.createElement('span');
-          placeholder.className = 'feds-commerce-placeholder';
-          placeholder.setAttribute('data-commerce-href', href);
-          placeholder.innerHTML = descAnchor.innerHTML;
-          descAnchor.replaceWith(placeholder);
+        } else if (descAnchors.length > 0) {
+          // Swap every commerce anchor for a non-anchor placeholder so none
+          // stays a nested <a> in the card link; MerchLinks resolves each.
+          descAnchors.forEach((descAnchor) => {
+            const href = descAnchor.getAttribute('href') ?? '';
+            const placeholder = document.createElement('span');
+            placeholder.className = 'feds-commerce-placeholder';
+            placeholder.setAttribute('data-commerce-href', href);
+            placeholder.innerHTML = descAnchor.innerHTML;
+            descAnchor.replaceWith(placeholder);
+          });
           link.description = nextSibling.innerHTML.trim();
         }
       }
