@@ -204,19 +204,18 @@ export const renderGnavString = ({
   brandConciergeEnabled,
 }: GlobalNavigationData
 ): string => {
+  const menuComponents = components.filter((c) => c.type !== "Brand");
   // In localnav mobile, the menu-wrapper is repurposed as the localnav bar
   // (a thin clickable strip below the main nav row that expands inline to
-  // reveal the remaining mega-menu entries). Its label mirrors the last
-  // breadcrumb crumb so it reads as the current section.
-  const lastBreadcrumb = localnav && breadcrumbs !== null &&
-    breadcrumbs.items.length > 0
-      ? breadcrumbs.items[breadcrumbs.items.length - 1]
-      : null;
-  const localnavBarLabel = lastBreadcrumb === null
-    ? ''
-    : typeof lastBreadcrumb === 'string'
-      ? lastBreadcrumb
-      : lastBreadcrumb.text;
+  // reveal the remaining mega-menu entries), and the hamburger opens that
+  // same mega menu's popup directly. Its label mirrors the mega menu's own
+  // title rather than the breadcrumbs, matching how milo global-navigation
+  // sources a standalone local nav's label from the nav's own first item -
+  // clients without breadcrumbs can still have a localnav.
+  const firstMegaMenu = localnav
+    ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
+    : null;
+  const localnavBarLabel = firstMegaMenu?.title ?? '';
   // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
   // stays visible beside the hamburger, not only inside the drawer.
   const ctaComponents = components.filter(
@@ -236,12 +235,8 @@ export const renderGnavString = ({
       const brandComponent = components.find((c) =>
         c.type === "Brand"
       ) ?? null;
-      const menuComponents = components.filter((c) => c.type !== "Brand");
       // In localnav mode the hamburger should open the first mega menu's
       // popup directly rather than the menu wrapper / gnav-items list.
-      const firstMegaMenu = localnav
-        ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
-        : null;
       const toggleControlsId = firstMegaMenu !== null
         ? sanitize(firstMegaMenu.title)
         : 'feds-menu-wrapper';
@@ -318,6 +313,7 @@ export const postRenderingTasks = async (
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initPromoBarHeight(input.mountpoint);
   initLanguageBannerOffset(input.mountpoint);
+  initBranchBannerOffset(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -578,6 +574,16 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
 
   const check = (): void => {
+    // Skip re-measuring while a menu/popup is open. Stripping the state classes
+    // below (even momentarily) drops the compact-scoped body scroll-lock (see
+    // `body:has(header.global-navigation.is-compact ...)` in styles.css), which
+    // lets the scrollbar flash back in and changes `header`'s width — the very
+    // thing this function's ResizeObserver watches — retriggering check() in an
+    // infinite loop that resets the gnav reveal animation mid-flight. Nothing
+    // about open/closed state changes whether the content overflows, so just
+    // wait for the next real resize or breakpoint change.
+    if (header.querySelector('.feds-menu-wrapper.is-open, .feds-popup.is-open')) return;
+
     const mobile = !isDesktop.matches;
 
     // Strip both classes first so measurements read natural (all-shown) widths.
@@ -622,8 +628,14 @@ const isCurrentPageHref = (href: string): boolean => {
 const findActiveLink = (
   mountpoint: HTMLElement
 ): HTMLAnchorElement | null => {
+  // In localnav the first top-level <li> (before the divider) is the mega
+  // menu whose title also labels the localnav bar — it represents the
+  // section itself rather than a sibling destination, so it's excluded here
+  // and only links after the divider are eligible to be marked active.
+  const isLocalnav = mountpoint.querySelector('nav.localnav') !== null;
   return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
     .filter(a => !a.closest('.feds-breadcrumbs'))
+    .filter(a => !isLocalnav || a.closest('ul.feds-gnav-items > li:first-child') === null)
     .find(a => isCurrentPageHref(a.href)) ?? null;
 };
 
@@ -806,4 +818,79 @@ const initLanguageBannerOffset = (mountpoint: HTMLElement): void => {
     observe(el);
   });
   mo.observe(document.body, { childList: true });
+};
+
+const BRANCH_BANNER_ID = 'branch-banner-iframe';
+
+// #branch-banner-iframe is injected by the branch/PR preview overlay
+// (unrelated to gnav's own render) and can be added or removed at any point.
+// It's either `position: fixed` (must stay on screen permanently, e.g. "now
+// previewing branch X") or in normal flow (pushes header down, then scrolls
+// away once header's `position: sticky` takes over — same as the promo bar /
+// language banner above). Unlike those two, the branch banner isn't measured
+// against a hardcoded height — it's authored by an external tool, so its
+// height is read live via ResizeObserver, same as the promo bar.
+const initBranchBannerOffset = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+
+  let resizeObserver: ResizeObserver | null = null;
+  let intersectionObserver: IntersectionObserver | null = null;
+
+  const teardown = (): void => {
+    resizeObserver?.disconnect();
+    intersectionObserver?.disconnect();
+    resizeObserver = null;
+    intersectionObserver = null;
+    header.classList.remove('feds-branch-banner-fixed', 'feds-branch-banner-showing');
+    document.documentElement.style.removeProperty('--feds-branch-banner-height');
+  };
+
+  const setup = (banner: HTMLElement): void => {
+    const updateHeight = (): void => {
+      document.documentElement.style.setProperty(
+        '--feds-branch-banner-height',
+        `${banner.offsetHeight}px`,
+      );
+    };
+    resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(banner);
+    updateHeight();
+
+    // A fixed banner never leaves the viewport, so its offset is permanent —
+    // no IntersectionObserver needed. An in-flow banner behaves like the
+    // promo bar / language banner: only "showing" until it scrolls past.
+    if (window.getComputedStyle(banner).position === 'fixed') {
+      header.classList.add('feds-branch-banner-fixed');
+      return;
+    }
+    intersectionObserver = new IntersectionObserver(([entry]) => {
+      header.classList.toggle('feds-branch-banner-showing', entry.isIntersecting);
+    });
+    intersectionObserver.observe(banner);
+  };
+
+  const existing = document.getElementById(BRANCH_BANNER_ID);
+  if (existing) setup(existing);
+
+  // The preview overlay can add/remove the banner at any point in the page's
+  // lifetime (not just once, like the language banner), so this observer is
+  // kept running indefinitely rather than disconnecting after first sight.
+  new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        const isBanner = node instanceof HTMLElement
+          && node.id === BRANCH_BANNER_ID;
+        if (!isBanner) return;
+        // Let the banner's own styles/layout settle before reading its
+        // computed position/height.
+        requestAnimationFrame(() => setup(node));
+      });
+      mutation.removedNodes.forEach((node) => {
+        const isBanner = node instanceof HTMLElement
+          && node.id === BRANCH_BANNER_ID;
+        if (isBanner) teardown();
+      });
+    });
+  }).observe(document.body, { childList: true });
 };
