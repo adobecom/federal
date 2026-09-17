@@ -117,12 +117,15 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
       visibility: hidden;
     }
   }
+  /* Take the brand out of flow (not just invisible) when the drawer opens, so
+     the toggle lands at the start on its own — independent of brand width. */
   header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-brand,
   header.global-navigation:has(.feds-menu-active) .feds-brand {
     animation: brand-fade 0.3s;
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
+    position: absolute;
   }
 
   .feds-brand {
@@ -134,15 +137,14 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   }
 
   header.global-navigation .feds-nav-toggle {
-    transform: translateX(0);
-    transition: transform 0.3s ease;
+    transition: margin 0.3s ease;
   }
   header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-    transform: translateX(-34px);
+    margin-left: var(--s2a-spacing-md);
   }
 
   [dir="rtl"] header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-    transform: translateX(34px);
+    margin-right: var(--s2a-spacing-md);
   }
 }
 
@@ -156,19 +158,19 @@ header.global-navigation.is-compact:has(.feds-menu-active) .feds-brand {
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+  position: absolute;
 }
 
 header.global-navigation.is-compact .feds-nav-toggle {
-  transform: translateX(0);
-  transition: transform 0.3s ease;
+  transition: margin 0.3s ease;
 }
 
 header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-  transform: translateX(-30px);
+  margin-left: var(--s2a-spacing-md);
 }
 
 [dir="rtl"] header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
-  transform: translateX(30px);
+  margin-right: var(--s2a-spacing-md);
 }
 
 /* =========================================
