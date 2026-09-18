@@ -135,12 +135,12 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   }
   
   header.global-navigation nav .feds-nav-toggle {
-    margin-left: var(--s2a-spacing-lg);
+    margin-left: var(--s2a-spacing-md);
   }
 
   [dir="rtl"] header.global-navigation nav .feds-nav-toggle {
     margin-left: 0;
-    margin-right: var(--s2a-spacing-lg);
+    margin-right: var(--s2a-spacing-md);
   }
 }
 
@@ -160,12 +160,12 @@ header.global-navigation.is-compact:has(.feds-menu-active) .feds-brand {
    stays put when the drawer opens — it just needs a left inset so it clears the
    rounded gnav edge (visible on scroll) and lines up with the content below. */
 header.global-navigation.is-compact .feds-nav-toggle {
-  margin-left: var(--s2a-spacing-lg);
+  margin-left: var(--s2a-spacing-md);
 }
 
 [dir="rtl"] header.global-navigation.is-compact .feds-nav-toggle {
   margin-left: 0;
-  margin-right: var(--s2a-spacing-lg);
+  margin-right: var(--s2a-spacing-md);
 }
 
 /* =========================================
