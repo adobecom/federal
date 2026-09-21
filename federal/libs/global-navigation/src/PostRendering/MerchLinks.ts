@@ -1,4 +1,4 @@
-import { getMiloConfig, isMerchLink, isMasLink, isMasFieldLink } from '../Utils/Utils';
+import { getMiloConfig, isMerchLink, isMasLink, isMasFieldLink, getMerchDecorators } from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
 
 type MerchModule = {
@@ -49,10 +49,13 @@ export const initMerchLinks = async (
   if (merchLinks.length === 0 && masLinks.length === 0) return errors;
 
   try {
-    const config = getMiloConfig();
-    const { base } = config;
+    const injected = getMerchDecorators();
+    // base is only needed for the fallback import; injected decorators skip it.
+    const needsBase = (merchLinks.length > 0 && !injected.merch)
+      || (masLinks.length > 0 && !injected.masCard);
+    const base = needsBase ? getMiloConfig().base : '';
 
-    if (base === '') {
+    if (needsBase && base === '') {
       errors.add(
         new RecoverableError(
           'base not found in config, cannot initialize merch links'
@@ -61,12 +64,10 @@ export const initMerchLinks = async (
       return errors;
     }
 
-    // OST / miniplans links: Milo `merch` block
+    // OST / miniplans + inline M@S field links: Milo `merch` block
     if (merchLinks.length > 0) {
-      const merchModule = await import(
-        `${base}/blocks/merch/merch.js`
-      ) as MerchModule;
-      const decorateMerchLink = merchModule.default;
+      const decorateMerchLink = injected.merch
+        ?? (await import(`${base}/blocks/merch/merch.js`) as MerchModule).default;
       if (decorateMerchLink === undefined) {
         errors.add(new RecoverableError('decorateMerchLink not found in merch module'));
       } else {
@@ -74,12 +75,12 @@ export const initMerchLinks = async (
       }
     }
 
-    // mas.adobe.com studio links: Milo `merch-card-autoblock` block
+    // Full M@S cards: Milo `merch-card-autoblock` block
     if (masLinks.length > 0) {
-      const masModule = await import(
-        `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
-      ) as MerchModule;
-      const decorateMasLink = masModule.default;
+      const decorateMasLink = injected.masCard
+        ?? (await import(
+          `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
+        ) as MerchModule).default;
       if (decorateMasLink === undefined) {
         errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
       } else {

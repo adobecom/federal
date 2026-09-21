@@ -269,6 +269,28 @@ export const [setDecorateBody, getDecorateBody] =
     ];
   })();
 
+// Host-injected Milo commerce block decorators (loaded from Milo's base), so
+// federal need not import them directly — a federal-base import 404s.
+export type MerchDecorators = {
+  merch?: (link: HTMLAnchorElement) => unknown;    // `merch` block default
+  masCard?: (link: HTMLAnchorElement) => unknown;  // `merch-card-autoblock`
+};
+
+type MerchDecoratorsStateFunctions = [
+  (decorators: MerchDecorators) => void,
+  () => MerchDecorators,
+];
+
+export const [setMerchDecorators, getMerchDecorators] =
+  ((): MerchDecoratorsStateFunctions => {
+    let merchDecorators: MerchDecorators = {};
+
+    return [
+      (next: MerchDecorators): void => { merchDecorators = next ?? {}; },
+      (): MerchDecorators => merchDecorators,
+    ];
+  })();
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
