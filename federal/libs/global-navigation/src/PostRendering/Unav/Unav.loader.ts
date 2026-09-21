@@ -26,6 +26,7 @@ import {
   getDevice,
   getUniversalNavLocale,
   showAupDialog,
+  syncLenisWithUnavScrollLock,
 } from './Unav.utils';
 import { getUnavComponents } from './Unav.config';
 
@@ -431,6 +432,11 @@ export const loadUnav = async (
     // ========================================================================
     
     await window?.UniversalNav?.(getConfiguration());
+
+    // UNAV locks page scroll via the `unav-no-scroll` body class (CSS
+    // overflow), which Lenis smooth-scroll ignores. Bridge the class to
+    // Lenis stop()/start() so the lock holds on Lenis-enabled pages.
+    syncLenisWithUnavScrollLock();
 
     if (!initialSignedOut) {
       // Remove min-width constraint for signed-in users (allow natural sizing)

@@ -265,6 +265,30 @@ export const getVisitorGuid = async (): Promise<string | undefined> => {
     .catch(() => undefined);
 };
 
+const UNAV_NO_SCROLL_CLASS = 'unav-no-scroll';
+let lenisUnavScrollObserver: MutationObserver | undefined;
+let scrollStoppedByUnav = false;
+
+export const syncLenisWithUnavScrollLock = (): void => {
+  if (lenisUnavScrollObserver) return;
+  const apply = (): void => {
+    const locked = document.body.classList.contains(UNAV_NO_SCROLL_CLASS);
+    if (locked && !scrollStoppedByUnav) {
+      window.lenis?.stop();
+      scrollStoppedByUnav = true;
+    } else if (!locked && scrollStoppedByUnav) {
+      window.lenis?.start();
+      scrollStoppedByUnav = false;
+    }
+  };
+  lenisUnavScrollObserver = new MutationObserver(apply);
+  lenisUnavScrollObserver.observe(document.body, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
+  apply();
+};
+
 /**
  * Creates and shows a modal dialog for AUP SDK manage-people flow.
  * Appends the provided element into a <dialog>, handles close events,
