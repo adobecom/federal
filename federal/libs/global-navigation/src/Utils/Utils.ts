@@ -855,6 +855,8 @@ type JarvisConfig = {
 export type MiloConfig = {
   env: MiloConfigEnv;
   base: string;
+  miloLibs?: string;
+  codeRoot?: string;
   locale: MiloConfigLocale;
   unav?: UnavConfig;
   jarvis?: JarvisConfig;

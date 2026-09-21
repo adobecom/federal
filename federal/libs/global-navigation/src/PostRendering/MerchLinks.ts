@@ -50,7 +50,8 @@ export const initMerchLinks = async (
 
   try {
     const config = getMiloConfig();
-    const { base } = config;
+    // Milo hosts the commerce blocks, so load them from Milo's libs base;
+    const base = config.miloLibs ?? config.codeRoot ?? config.base;
 
     if (base === '') {
       errors.add(
