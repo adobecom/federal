@@ -269,8 +269,7 @@ export const [setDecorateBody, getDecorateBody] =
     ];
   })();
 
-// Host-injected Milo commerce block decorators (loaded from Milo's base), so
-// federal need not import them directly — a federal-base import 404s.
+// Host-injected Milo commerce block decorators (loaded from Milo's base)
 export type MerchDecorators = {
   merch?: (link: HTMLAnchorElement) => unknown;    // `merch` block default
   masCard?: (link: HTMLAnchorElement) => unknown;  // `merch-card-autoblock`
