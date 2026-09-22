@@ -322,7 +322,7 @@ version="1.0" encoding="UTF-8"?>
           </svg>
         </button>
       `.trim(),v=f?je(f):"",C=(()=>{let T=s.map((p,h)=>`<li>${je(p,h)}</li>`),[S,...L]=T;return t?[S,'<li class="divider"></li>',...L]:T})().join("");return`
-        <li class="feds-brand-wrapper">
+        <li class="feds-brand-wrapper test-class">
           ${v}
           ${g}
         </li>

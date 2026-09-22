@@ -270,7 +270,7 @@ export const renderGnavString = ({
       const menuItemsHTML = menuItemsHTMLList.join('');
 
       return `
-        <li class="feds-brand-wrapper">
+        <li class="feds-brand-wrapper test-class">
           ${brandHTML}
           ${toggleButton}
         </li>
