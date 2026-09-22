@@ -17,6 +17,9 @@ export const initMerchLinks = async (
 ): Promise<Set<RecoverableError>> => {
   const errors = new Set<RecoverableError>();
 
+  // dist-conflict-test marker (visible in DOM on the <header>)
+  mountpoint.closest('header')?.classList.add('dist-test-b');
+
   // Product-card commerce links (price/discount) are authored inside the card's
   // single <a>, where a nested <a> is invalid. Parse leaves them as non-anchor
   // placeholders; convert them back to anchors so the resolution below handles
