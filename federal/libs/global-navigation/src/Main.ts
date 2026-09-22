@@ -885,3 +885,6 @@ const initBranchBannerOffset = (mountpoint: HTMLElement): void => {
     });
   }).observe(document.body, { childList: true });
 };
+
+// dist-conflict-test marker
+console.info('dist-conflict-test:A');
