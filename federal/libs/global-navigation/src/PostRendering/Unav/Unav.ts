@@ -1,7 +1,7 @@
 /**
  * Universal Navigation (UNAV) - Barrel Export
  * Public API for UNAV functionality
- * 
+ *
  * This module serves as the single entry point for all UNAV-related imports.
  * It re-exports types, utilities, configuration, and loader functions.
  */
@@ -16,8 +16,8 @@ export type {
   UnavChildren,
   UnavComponent,
   UnavComponents,
-  
-  // Component types
+
+  // Component typess
   AppSwitcher,
   Profile,
   Notifications,
@@ -25,16 +25,16 @@ export type {
   Cart,
   Jarvis,
   HelpItem,
-  
+
   // Analytics types
   AnalyticsContext,
-  
+
   // Window augmentation types
   WindowWithAdobeId,
   WindowWithUniversalNav,
   WindowWithAlloy,
   AlloyIdentityData,
-  
+
   // User types
   UserProfile,
   SignInCtaStyle,
@@ -49,19 +49,19 @@ export {
   // State management
   setUserProfile,
   getUserProfile,
-  
+
   // Width calculation
   getUnavWidthCSS,
-  
+
   // Locale handling
   getUniversalNavLocale,
-  
+
   // Device detection
   getDevice,
-  
+
   // Analytics
   getVisitorGuid,
-  
+
   // Constants
   SIGNED_OUT_ICONS,
   LANGMAP,
