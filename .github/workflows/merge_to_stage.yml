@@ -19,6 +19,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check-dist:
+    # Feature branches must not touch the built bundle — CI owns it (see the
+    # rebuild-dist workflow). This blocks PRs that stage dist/ changes, which
+    # is what causes the recurring merge conflicts on stage.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fail if dist/ was modified
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          CHANGED=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- federal/libs/global-navigation/dist/ || true)
+          if [ -n "$CHANGED" ]; then
+            echo "::error::This PR modifies committed build artifacts:"
+            echo "$CHANGED" | sed 's/^/  - /'
+            echo "dist/ is rebuilt and committed by CI on merge to stage/main."
+            echo "Remove these files from your PR (git restore --staged / revert),"
+            echo "then re-run 'npm run build' locally only for testing."
+            exit 1
+          fi
+          echo "OK — no build artifacts in this PR."
+
   lint-and-test-global-navigation:
     if: github.event.pull_request.draft == false || github.event_name == 'merge_group'
     runs-on: ubuntu-latest
