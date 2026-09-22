@@ -10,6 +10,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
+import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
 import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
@@ -24,6 +25,7 @@ import { MegaMenuExtraData } from "./Components/MegaMenu/Parse";
 type GlobalNavigation = {
   closeEverything: () => void;
   reloadUnav: () => void;
+  reloadProfile: () => void;
   getGnavTopPosition: () => number;
   setGnavTopPosition: (_: number) => void;
   getGnavHeight: () => number;
@@ -37,6 +39,11 @@ export type Input = {
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
+  // Enables the legacy, self-hosted profile (avatar button + dropdown) in
+  // place of UniversalNav — for environments (e.g. gov-cloud) where the
+  // external UNAV bundle isn't available. When true, the `.feds-profile`
+  // container is rendered and `loadProfile` runs instead of `loadUnav`.
+  profileEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
@@ -71,6 +78,7 @@ export const main = async (
     gnavSource,
     mountpoint,
     unavEnabled,
+    profileEnabled,
     miloConfig,
     personalization
   } = input;
@@ -113,9 +121,16 @@ export const main = async (
     throw mainNav;
   }
 
+  // The legacy profile sources its sign-in dropdown and "local menu" from an
+  // authored `.profile` block. Capture it (and remove it) before parse so the
+  // component parser doesn't misread it as a Link/Text component.
+  const rawProfileElem = profileEnabled ? mainNav.querySelector('.profile') : null;
+  rawProfileElem?.remove();
+
   const gnavData = parseNavigation(
     mainNav,
     unavEnabled,
+    profileEnabled,
     await getPlaceholders(),
     promoBarEl,
   );
@@ -133,7 +148,7 @@ export const main = async (
     href: window.location.href,
   });
 
-  return postRenderingTasks(input);
+  return postRenderingTasks(input, rawProfileElem);
 };
 
 export const renderGnav = (
@@ -199,6 +214,7 @@ export const renderGnavString = ({
   breadcrumbs,
   productCTA,
   unavEnabled,
+  profileEnabled,
   placeholders,
   localnav,
   brandConciergeEnabled,
@@ -298,7 +314,9 @@ export const renderGnavString = ({
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
-  ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  ${profileEnabled
+    ? '<div data-cs-mask class="feds-profile"></div>'
+    : unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
 </nav>
@@ -307,6 +325,7 @@ export const renderGnavString = ({
 
 export const postRenderingTasks = async (
   input: Input,
+  rawProfileElem: Element | null = null,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
 
@@ -336,21 +355,35 @@ export const postRenderingTasks = async (
 
   // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
   initEventRegistrationGating(input.mountpoint);
-  const unav = await loadUnav(input.mountpoint, {
-    countryCode: input.countryCode,
-  });
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
-  }
-  else
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
-  initPopoverCloseOnUnavInteraction(input.mountpoint);
 
-  const reloadUnav
-    = unav instanceof RecoverableError
-    ? (): void => {}
-    : unav.reloadUnav;
+  // The legacy profile and UNAV are mutually exclusive: `profileEnabled`
+  // renders `.feds-profile` (and skips `.feds-utilities`), so we load one or
+  // the other. Both expose a reload hook the host can call after an external
+  // IMS state change.
+  let reloadUnav = (): void => {};
+  let reloadProfile = (): void => {};
+
+  if (input.profileEnabled) {
+    const profile = await loadProfile(input.mountpoint, rawProfileElem);
+    if (profile instanceof RecoverableError) {
+      errors.add(profile);
+      lanaLog(profile.message);
+    } else {
+      reloadProfile = (): void => { void profile.reloadProfile(); };
+    }
+  } else {
+    const unav = await loadUnav(input.mountpoint, {
+      countryCode: input.countryCode,
+    });
+    if (unav instanceof RecoverableError) {
+      errors.add(unav);
+      lanaLog(unav.message);
+    } else {
+      unav.errors.forEach((error: RecoverableError) => errors.add(error));
+      reloadUnav = unav.reloadUnav;
+    }
+    initPopoverCloseOnUnavInteraction(input.mountpoint);
+  }
 
   const localnavMarginTop = 8;
   const breadcrumbs = input.mountpoint.querySelector('nav > ul.feds-breadcrumbs');
@@ -386,6 +419,7 @@ export const postRenderingTasks = async (
   return {
     closeEverything: () => closePopovers(input.mountpoint),
     reloadUnav,
+    reloadProfile,
     errors,
     setGnavTopPosition: (_): void => {},
     getGnavTopPosition: (): number => 0,

@@ -36,6 +36,7 @@
 @import "../Components/CountdownTimer/cdt.css";
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
+@import "../PostRendering/Profile/profile.css";
 
 :root {
   --body-font-family-base: var(--s2a-font-family-default), adobe-clean, "Trebuchet MS", sans-serif;
