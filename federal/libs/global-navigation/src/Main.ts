@@ -308,6 +308,9 @@ export const postRenderingTasks = async (
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
 
+  // preview-test marker (visible in DOM on the <header>)
+  input.mountpoint.closest('header')?.classList.add('dist-preview-a');
+
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
   activeDropDown?.classList.add('active-element');
