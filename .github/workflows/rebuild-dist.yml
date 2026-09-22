@@ -1,0 +1,73 @@
+name: rebuild-dist
+
+# The ONLY place the committed gnav bundle is written. Feature branches carry
+# source only (see scripts/hooks/pre-commit + the check-dist job), so after a
+# merge to stage/main the committed dist/ is stale — this rebuilds it and
+# commits it back. Because only this job writes dist/, linearly after each
+# merge, no two branches ever compete on the bundle and merges never conflict.
+#
+# Triggers only on changes to gnav *source* (not dist), so the artifact-only
+# commit this workflow makes does not re-trigger itself.
+
+on:
+  push:
+    branches:
+      - stage
+      - main
+    paths:
+      - 'federal/libs/global-navigation/src/**'
+      - 'federal/libs/global-navigation/build.js'
+      - 'federal/libs/global-navigation/build-plugins/**'
+      - 'federal/libs/global-navigation/tsconfig.json'
+      - 'federal/libs/global-navigation/package.json'
+      - 'federal/libs/global-navigation/package-lock.json'
+
+concurrency:
+  group: rebuild-dist-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-dist:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: federal/libs/global-navigation
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          # A PAT / GitHub App token is required if stage/main are protected
+          # branches (the default GITHUB_TOKEN cannot push past protection
+          # rules). Store it as the DIST_BOT_TOKEN secret; falls back to the
+          # default token for unprotected branches / forks.
+          token: ${{ secrets.DIST_BOT_TOKEN || secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.16.0
+          cache: npm
+          cache-dependency-path: federal/libs/global-navigation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build global navigation
+        run: npm run build
+
+      - name: Commit rebuilt dist
+        run: |
+          if git diff --quiet -- dist/; then
+            echo "dist/ already up to date — nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/
+          git commit -m "chore: rebuild global-navigation dist [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}
