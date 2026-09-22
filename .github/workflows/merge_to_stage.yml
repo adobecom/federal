@@ -5,6 +5,7 @@ on:
     branches:
       - stage
       - feds
+      - test-dist-ci   # TEMP: remove before merging the fix
     types:
       - opened
       - synchronize
