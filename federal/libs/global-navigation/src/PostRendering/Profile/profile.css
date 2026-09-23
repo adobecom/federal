@@ -1,20 +1,25 @@
 /**
- * Legacy (non-UniversalNav) profile styles. Ported from milo's
- * global-navigation.css (profile button / sign-in) and
- * features/profile/dropdown.css (profile menu).
+ * Legacy (non-UniversalNav) profile styles.
+ *
+ * Ported from milo's global-navigation.css / features/profile/dropdown.css and
+ * retokenized to federal's Spectrum-2 (`--s2a-*`) design tokens (milo's
+ * `--feds-*` vars don't exist in this repo). The top-level "Sign in" button is
+ * styled to match the UNAV signed-out sign-in CTA — see the
+ * `.profile-signed-out button` overrides in styles.css.
  */
 
 :root {
-  --feds-color-profile-heading: #707070;
-  --feds-color-profile: #4b4b4b;
-  --feds-color-profile--emphasis: #2c2c2c;
-  --feds-border-profile: 1px solid #e1e1e1;
+  --feds-color-profile-heading: var(--s2a-color-gray-500);
+  --feds-color-profile: var(--s2a-color-gray-800);
+  --feds-color-profile--emphasis: var(--s2a-color-gray-1000);
+  --feds-border-profile: var(--s2a-border-width-sm) solid var(--s2a-color-gray-200);
 }
 
 .feds-profile {
   position: relative;
   display: flex;
   align-items: center;
+  padding-right: var(--s2a-spacing-sm);
 }
 
 /* Profile button / avatar */
@@ -25,36 +30,78 @@
 }
 
 .feds-profile-button {
-  padding: 5px var(--feds-gutter);
-  border-radius: var(--feds-radius-utilityIcon);
+  padding: 5px var(--s2a-spacing-sm);
+  border-radius: var(--s2a-border-radius-round);
   border: none;
   background: none;
   cursor: pointer;
 }
 
-/* Sign-in button */
+/* Button reset shared by the top-level and in-dropdown sign-in buttons. */
 .feds-signIn {
-  padding: 11px var(--feds-gutter);
-  border-radius: var(--feds-radius-utilityIcon);
-  color: var(--feds-color-signIn);
-  white-space: nowrap;
   border: none;
   background: none;
   font: inherit;
-  text-align: start;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.feds-signIn:hover {
-  color: var(--link-hover-color);
+/* -----------------------------------------------------------------------
+ * Top-level "Sign in" — matches the UNAV signed-out sign-in CTA (see the
+ * `.universal-nav-container .profile-signed-out button` overrides in
+ * styles.css). Default: white solid pill / dark text, for the transparent
+ * gnav over imagery.
+ * ----------------------------------------------------------------------- */
+.feds-profile > .feds-signIn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 var(--s2a-spacing-lg);
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-25);
+  border-radius: var(--s2a-border-radius-round);
+  font-family: var(--body-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  text-align: center;
+  text-decoration: none;
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
 }
 
+/* Dark-font, or any popup / drawer open: transparent outline. */
+.global-navigation.dark-font .feds-profile > .feds-signIn,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-profile > .feds-signIn {
+  color: inherit;
+  border-color: var(--s2a-color-gray-1000);
+  background-color: transparent;
+}
+
+/* Scrolled: dark outline on a transparent fill; hover / focus fills white. */
+.global-navigation.feds-header-scrolled .feds-profile > .feds-signIn {
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+  background-color: transparent;
+}
+
+.global-navigation.feds-header-scrolled .feds-profile > .feds-signIn:hover,
+.global-navigation.feds-header-scrolled .feds-profile > .feds-signIn:focus-visible {
+  color: var(--s2a-color-gray-1000);
+  background-color: var(--s2a-color-gray-25);
+}
+
+/* -----------------------------------------------------------------------
+ * Sign-in dropdown (authored)
+ * ----------------------------------------------------------------------- */
 .feds-signIn-dropdown {
   position: absolute;
   display: none;
-  right: 0;
-  top: 100%;
-  background-color: var(--feds-background-popup);
+  right: 12px;
+  top: 120%;
+  background-color: var(--s2a-color-background-default);
   overflow: hidden;
   box-shadow: 0 3px 3px 0 rgb(0 0 0 / 20%);
   line-height: 1.4;
@@ -63,7 +110,7 @@
   transform: translate3d(0, 0, 0); /* Fix Safari issues w/ position: sticky */
 }
 
-.feds-signIn[aria-expanded="true"] + .feds-signIn-dropdown {
+.feds-profile > .feds-signIn[aria-expanded="true"] + .feds-signIn-dropdown {
   display: block;
 }
 
@@ -75,23 +122,27 @@
 .feds-signIn-dropdown ul {
   margin: 0;
   padding: 12px 0;
+  list-style: none;
 }
 
 .feds-signIn-dropdown li > a,
 .feds-signIn-dropdown .feds-signIn {
   display: block;
-  color: var(--feds-color-link);
-  padding: 6px 32px;
   width: 100%;
+  padding: 6px 32px;
+  text-align: start;
+  color: var(--s2a-color-content-default);
+  text-decoration: none;
 }
 
 .feds-signIn-dropdown li > a:hover,
 .feds-signIn-dropdown .feds-signIn:hover {
-  color: var(--feds-color-link--hover);
-  background-color: var(--feds-background-link--hover);
+  background-color: var(--s2a-color-gray-100);
 }
 
-/* Profile dropdown menu */
+/* -----------------------------------------------------------------------
+ * Profile dropdown menu (signed-in)
+ * ----------------------------------------------------------------------- */
 .feds-profile-menu {
   position: absolute;
   width: 320px;
@@ -99,7 +150,7 @@
   top: 100%;
   border: var(--feds-border-profile);
   border-radius: 0 0 4px 4px;
-  background: var(--color-white);
+  background: var(--s2a-color-background-default);
   overflow: hidden;
   box-shadow: 0 2px 6px -1px rgb(0 0 0 / 10%);
   display: none;
@@ -124,6 +175,7 @@
   flex-direction: row;
   outline-offset: -3px;
   column-gap: 15px;
+  text-decoration: none;
 }
 
 .feds-profile-header .feds-profile-img {
@@ -145,7 +197,7 @@
 .feds-profile-name {
   margin: 0;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
   color: var(--feds-color-profile--emphasis);
 }
 
@@ -184,13 +236,13 @@
 .feds-local-menu a,
 .feds-profile-actions a {
   display: block;
-  color: var(--feds-color-link);
+  color: var(--s2a-color-content-default);
+  text-decoration: none;
 }
 
 .feds-local-menu a:hover,
 .feds-profile-actions a:hover {
-  color: var(--feds-color-link--hover);
-  background-color: var(--feds-background-link--hover);
+  background-color: var(--s2a-color-gray-100);
 }
 
 .feds-local-menu a {
