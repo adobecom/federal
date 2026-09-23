@@ -39,11 +39,6 @@ export type Input = {
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
-  // Enables the legacy, self-hosted profile (avatar button + dropdown) in
-  // place of UniversalNav — for environments (e.g. gov-cloud) where the
-  // external UNAV bundle isn't available. When true, the `.feds-profile`
-  // container is rendered and `loadProfile` runs instead of `loadUnav`.
-  profileEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
@@ -78,7 +73,6 @@ export const main = async (
     gnavSource,
     mountpoint,
     unavEnabled,
-    profileEnabled,
     miloConfig,
     personalization
   } = input;
@@ -124,8 +118,13 @@ export const main = async (
   // The legacy profile sources its sign-in dropdown and "local menu" from an
   // authored `.profile` block. Capture it (and remove it) before parse so the
   // component parser doesn't misread it as a Link/Text component.
-  const rawProfileElem = profileEnabled ? mainNav.querySelector('.profile') : null;
+  const rawProfileElem = mainNav.querySelector('.profile');
   rawProfileElem?.remove();
+
+  // Mirror milo: the legacy profile is the non-UniversalNav path — it renders
+  // only when unav is off AND a `.profile` block was authored (a page opts out
+  // by not authoring one). Otherwise `loadUnav` owns the utilities slot.
+  const profileEnabled = !unavEnabled && rawProfileElem !== null;
 
   const gnavData = parseNavigation(
     mainNav,
@@ -356,14 +355,15 @@ export const postRenderingTasks = async (
   // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
   initEventRegistrationGating(input.mountpoint);
 
-  // The legacy profile and UNAV are mutually exclusive: `profileEnabled`
-  // renders `.feds-profile` (and skips `.feds-utilities`), so we load one or
-  // the other. Both expose a reload hook the host can call after an external
-  // IMS state change.
+  // The legacy profile and UNAV are mutually exclusive and derived the same
+  // way as at render time: the legacy profile is the non-unav path, taken only
+  // when unav is off AND a `.profile` block was authored. Both expose a reload
+  // hook the host can call after an external IMS state change.
+  const profileEnabled = !input.unavEnabled && rawProfileElem !== null;
   let reloadUnav = (): void => {};
   let reloadProfile = (): void => {};
 
-  if (input.profileEnabled) {
+  if (profileEnabled) {
     const profile = await loadProfile(input.mountpoint, rawProfileElem);
     if (profile instanceof RecoverableError) {
       errors.add(profile);
