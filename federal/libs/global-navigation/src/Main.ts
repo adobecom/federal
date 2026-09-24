@@ -314,7 +314,7 @@ export const renderGnavString = ({
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${profileEnabled
-    ? '<div data-cs-mask class="feds-profile"></div>'
+    ? '<div data-cs-mask class="feds-profile-new"></div>'
     : unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>

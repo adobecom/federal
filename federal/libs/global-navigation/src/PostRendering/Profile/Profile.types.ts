@@ -1,7 +1,7 @@
 /**
  * Types for the legacy (non-UniversalNav) self-hosted profile.
  *
- * This is the federal port of milo's `feds-profile`: a standalone avatar
+ * This is the federal port of milo's `feds-profile-new`: a standalone avatar
  * button + dropdown used in environments where the external UniversalNav
  * bundle isn't available. It depends only on `window.adobeIMS` and a single
  * `adobe.io/api/profile` fetch.

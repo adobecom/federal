@@ -2,7 +2,7 @@
  * Profile loader - the legacy (non-UniversalNav) self-hosted profile.
  *
  * Federal port of milo's `decorateProfile` + `ProfileDropdown`. Renders into
- * the `.feds-profile` container that renderGnavString emits when
+ * the `.feds-profile-new` container that renderGnavString emits when
  * `profileEnabled` is set.
  *
  * IMS readiness is host-driven (option A): auth state is read live from
@@ -39,7 +39,7 @@ import type {
   Profile,
 } from './Profile.types';
 
-const PROFILE_MENU_ID = 'feds-profile-menu';
+const PROFILE_MENU_ID = 'feds-profile-new-menu';
 
 /** Reads IMS signed-in state defensively (IMS may not be present yet). */
 const isSignedIn = (): boolean => {
@@ -198,9 +198,9 @@ const decorateSignedIn = async (
   }
 
   // Button first, then the menu (CSS reveals the menu via the adjacent
-  // sibling selector `.feds-profile-button[aria-expanded="true"] + .menu`).
+  // sibling selector `.feds-profile-new-button[aria-expanded="true"] + .menu`).
   container.insertAdjacentHTML('afterbegin', profileButton(avatar, labels));
-  const button = container.querySelector<HTMLElement>('.feds-profile-button');
+  const button = container.querySelector<HTMLElement>('.feds-profile-new-button');
   if (button && (profile.displayName ?? '') !== '') {
     button.setAttribute('aria-label', profile.displayName ?? '');
   }
@@ -209,7 +209,7 @@ const decorateSignedIn = async (
 
   const menu = document.createElement('div');
   menu.id = PROFILE_MENU_ID;
-  menu.className = 'feds-profile-menu';
+  menu.className = 'feds-profile-new-menu';
   menu.innerHTML = profileHeaderHTML({
     avatar,
     displayName: profile.displayName ?? '',
@@ -227,7 +227,7 @@ const decorateSignedIn = async (
   }
 
   const actions = document.createElement('ul');
-  actions.className = 'feds-profile-actions';
+  actions.className = 'feds-profile-new-actions';
   actions.innerHTML = profileActionsHTML({ labels, hasOrgs });
   menu.append(actions);
 
@@ -236,7 +236,7 @@ const decorateSignedIn = async (
   if (button) wireTriggerToggle(button);
 
   // Avatar in the header navigates to the account profile page.
-  const avatarElem = menu.querySelector<HTMLElement>('.feds-profile-header .feds-profile-img');
+  const avatarElem = menu.querySelector<HTMLElement>('.feds-profile-new-header .feds-profile-new-img');
   avatarElem?.addEventListener('click', (event) => {
     event.preventDefault();
     const url = avatarElem.dataset.url;
@@ -244,7 +244,7 @@ const decorateSignedIn = async (
   });
 
   // Sign out: clear cookies, notify listeners, then IMS sign-out.
-  const signOutLink = menu.querySelector<HTMLElement>('.feds-profile-signout');
+  const signOutLink = menu.querySelector<HTMLElement>('.feds-profile-new-signout');
   signOutLink?.addEventListener('click', (event) => {
     event.preventDefault();
     clearSignOutCookies();
@@ -254,9 +254,9 @@ const decorateSignedIn = async (
 };
 
 /**
- * Loads and decorates the legacy profile into the `.feds-profile` container.
+ * Loads and decorates the legacy profile into the `.feds-profile-new` container.
  *
- * @param nav - Navigation element containing the `.feds-profile` container
+ * @param nav - Navigation element containing the `.feds-profile-new` container
  * @param rawProfileElem - The authored `.profile` block captured pre-parse
  *   (source of the sign-in dropdown and local menu); null if none authored
  * @returns Promise resolving to a Profile handle or a RecoverableError
@@ -265,9 +265,9 @@ export const loadProfile = async (
   nav: HTMLElement,
   rawProfileElem: Element | null,
 ): Promise<Profile | RecoverableError> => {
-  const container = nav.querySelector('.feds-profile');
+  const container = nav.querySelector('.feds-profile-new');
   if (!(container instanceof HTMLElement)) {
-    return new RecoverableError('missing ".feds-profile" container');
+    return new RecoverableError('missing ".feds-profile-new" container');
   }
 
   // Legacy profile is a non-UNAV path; resolve the shared profile state to an

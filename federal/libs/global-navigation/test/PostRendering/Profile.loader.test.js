@@ -14,7 +14,7 @@ import { loadProfile } from '../../src/PostRendering/Profile/Profile.loader';
 const makeNav = () => {
   const nav = document.createElement('nav');
   const profile = document.createElement('div');
-  profile.className = 'feds-profile';
+  profile.className = 'feds-profile-new';
   nav.appendChild(profile);
   document.body.appendChild(nav);
   return nav;
@@ -62,7 +62,7 @@ describe('Profile loader', () => {
   it('returns a RecoverableError when the container is missing', async () => {
     const bareNav = document.createElement('nav');
     const result = await loadProfile(bareNav, null);
-    expect(result.message).to.equal('missing ".feds-profile" container');
+    expect(result.message).to.equal('missing ".feds-profile-new" container');
   });
 
   describe('signed out', () => {
@@ -114,18 +114,18 @@ describe('Profile loader', () => {
 
       await loadProfile(nav, null);
 
-      const button = nav.querySelector('.feds-profile-button');
+      const button = nav.querySelector('.feds-profile-new-button');
       expect(button).to.not.equal(null);
       expect(button.getAttribute('aria-label')).to.equal('Jane Doe');
 
-      const img = button.querySelector('.feds-profile-img');
+      const img = button.querySelector('.feds-profile-new-img');
       expect(img.getAttribute('src')).to.equal('https://avatar.example/x.png');
 
-      const menu = nav.querySelector('#feds-profile-menu');
+      const menu = nav.querySelector('#feds-profile-new-menu');
       expect(menu).to.not.equal(null);
-      expect(menu.querySelector('.feds-profile-name').textContent)
+      expect(menu.querySelector('.feds-profile-new-name').textContent)
         .to.equal('Jane Doe');
-      expect(menu.querySelector('.feds-profile-signout')).to.not.equal(null);
+      expect(menu.querySelector('.feds-profile-new-signout')).to.not.equal(null);
     });
 
     it('toggles aria-expanded on button click', async () => {
@@ -133,7 +133,7 @@ describe('Profile loader', () => {
       nav = makeNav();
       await loadProfile(nav, null);
 
-      const button = nav.querySelector('.feds-profile-button');
+      const button = nav.querySelector('.feds-profile-new-button');
       expect(button.getAttribute('aria-expanded')).to.equal('false');
       button.click();
       expect(button.getAttribute('aria-expanded')).to.equal('true');
@@ -145,7 +145,7 @@ describe('Profile loader', () => {
       stubSignedIn();
       nav = makeNav();
       await loadProfile(nav, null);
-      const actions = nav.querySelectorAll('.feds-profile-action');
+      const actions = nav.querySelectorAll('.feds-profile-new-action');
       // Only sign-out is present.
       expect(actions.length).to.equal(1);
     });
@@ -160,7 +160,7 @@ describe('Profile loader', () => {
       });
       nav = makeNav();
       await loadProfile(nav, null);
-      const actions = nav.querySelectorAll('.feds-profile-action');
+      const actions = nav.querySelectorAll('.feds-profile-new-action');
       expect(actions.length).to.equal(2);
     });
 
@@ -175,7 +175,7 @@ describe('Profile loader', () => {
       await loadProfile(nav, null);
       window.adobeIMS.signOut = () => { signOutCalled = true; };
 
-      nav.querySelector('.feds-profile-signout').click();
+      nav.querySelector('.feds-profile-new-signout').click();
       expect(signOutCalled).to.equal(true);
     });
 
@@ -184,9 +184,9 @@ describe('Profile loader', () => {
       nav = makeNav();
       const result = await loadProfile(nav, null);
 
-      expect(nav.querySelectorAll('.feds-profile-button').length).to.equal(1);
+      expect(nav.querySelectorAll('.feds-profile-new-button').length).to.equal(1);
       await result.reloadProfile();
-      expect(nav.querySelectorAll('.feds-profile-button').length).to.equal(1);
+      expect(nav.querySelectorAll('.feds-profile-new-button').length).to.equal(1);
     });
 
     it('bails without rendering when the profile fetch fails', async () => {
@@ -194,7 +194,7 @@ describe('Profile loader', () => {
       window.fetch = async () => ({ ok: false, statusText: 'Boom', url: 'u' });
       nav = makeNav();
       await loadProfile(nav, null);
-      expect(nav.querySelector('.feds-profile-button')).to.equal(null);
+      expect(nav.querySelector('.feds-profile-new-button')).to.equal(null);
     });
   });
 });

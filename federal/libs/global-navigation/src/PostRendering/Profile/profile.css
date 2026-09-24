@@ -15,7 +15,7 @@
   --feds-border-profile: var(--s2a-border-width-sm) solid var(--s2a-color-gray-200);
 }
 
-.feds-profile {
+.feds-profile-new {
   position: relative;
   display: flex;
   align-items: center;
@@ -23,13 +23,13 @@
 }
 
 /* Profile button / avatar */
-.feds-profile-img {
+.feds-profile-new-img {
   max-height: 30px;
   max-width: 30px;
   display: block;
 }
 
-.feds-profile-button {
+.feds-profile-new-button {
   padding: 5px var(--s2a-spacing-sm);
   border-radius: var(--s2a-border-radius-round);
   border: none;
@@ -52,7 +52,7 @@
  * styles.css). Default: white solid pill / dark text, for the transparent
  * gnav over imagery.
  * ----------------------------------------------------------------------- */
-.feds-profile > .feds-signIn {
+.feds-profile-new > .feds-signIn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -73,22 +73,22 @@
 }
 
 /* Dark-font, or any popup / drawer open: transparent outline. */
-.global-navigation.dark-font .feds-profile > .feds-signIn,
-.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-profile > .feds-signIn {
+.global-navigation.dark-font .feds-profile-new > .feds-signIn,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-profile-new > .feds-signIn {
   color: inherit;
   border-color: var(--s2a-color-gray-1000);
   background-color: transparent;
 }
 
 /* Scrolled: dark outline on a transparent fill; hover / focus fills white. */
-.global-navigation.feds-header-scrolled .feds-profile > .feds-signIn {
+.global-navigation.feds-header-scrolled .feds-profile-new > .feds-signIn {
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-1000);
   background-color: transparent;
 }
 
-.global-navigation.feds-header-scrolled .feds-profile > .feds-signIn:hover,
-.global-navigation.feds-header-scrolled .feds-profile > .feds-signIn:focus-visible {
+.global-navigation.feds-header-scrolled .feds-profile-new > .feds-signIn:hover,
+.global-navigation.feds-header-scrolled .feds-profile-new > .feds-signIn:focus-visible {
   color: var(--s2a-color-gray-1000);
   background-color: var(--s2a-color-gray-25);
 }
@@ -110,7 +110,7 @@
   transform: translate3d(0, 0, 0); /* Fix Safari issues w/ position: sticky */
 }
 
-.feds-profile > .feds-signIn[aria-expanded="true"] + .feds-signIn-dropdown {
+.feds-profile-new > .feds-signIn[aria-expanded="true"] + .feds-signIn-dropdown {
   display: block;
 }
 
@@ -143,7 +143,7 @@
 /* -----------------------------------------------------------------------
  * Profile dropdown menu (signed-in)
  * ----------------------------------------------------------------------- */
-.feds-profile-menu {
+.feds-profile-new-menu {
   position: absolute;
   width: 320px;
   right: 0;
@@ -160,16 +160,16 @@
   transform: translate3d(0, 0, 0); /* Fix Safari issues w/ position: sticky */
 }
 
-[dir="rtl"] .feds-profile-menu {
+[dir="rtl"] .feds-profile-new-menu {
   right: initial;
   left: 0;
 }
 
-.feds-profile-button[aria-expanded="true"] + .feds-profile-menu {
+.feds-profile-new-button[aria-expanded="true"] + .feds-profile-new-menu {
   display: block;
 }
 
-.feds-profile-header {
+.feds-profile-new-header {
   padding: 20px;
   display: flex;
   flex-direction: row;
@@ -178,36 +178,36 @@
   text-decoration: none;
 }
 
-.feds-profile-header .feds-profile-img {
+.feds-profile-new-header .feds-profile-new-img {
   max-height: 64px;
   max-width: 64px;
 }
 
-.feds-profile-details {
+.feds-profile-new-details {
   overflow: hidden;
   line-height: 1.25;
 }
 
-.feds-profile-name,
-.feds-profile-email {
+.feds-profile-new-name,
+.feds-profile-new-email {
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.feds-profile-name {
+.feds-profile-new-name {
   margin: 0;
   font-size: 18px;
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   color: var(--feds-color-profile--emphasis);
 }
 
-.feds-profile-email {
+.feds-profile-new-email {
   margin: 0 0 6px;
   font-size: 14px;
   color: var(--feds-color-profile-heading);
 }
 
-.feds-profile-account {
+.feds-profile-new-account {
   margin: 0;
   font-size: 14px;
   text-decoration: underline;
@@ -234,14 +234,14 @@
 }
 
 .feds-local-menu a,
-.feds-profile-actions a {
+.feds-profile-new-actions a {
   display: block;
   color: var(--s2a-color-content-default);
   text-decoration: none;
 }
 
 .feds-local-menu a:hover,
-.feds-profile-actions a:hover {
+.feds-profile-new-actions a:hover {
   background-color: var(--s2a-color-gray-100);
 }
 
@@ -251,13 +251,13 @@
   outline-offset: -1px;
 }
 
-.feds-profile-actions {
+.feds-profile-new-actions {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.feds-profile-action {
+.feds-profile-new-action {
   padding: 14px 20px;
   border-top: var(--feds-border-profile);
 }

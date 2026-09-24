@@ -11,14 +11,14 @@ import { decorateProfileLink, decorateEmail } from './Profile.utils';
 export const profileButton = (avatar: string, labels: ProfileLabels): HTML => `
   <button
     data-cs-mask
-    class="feds-profile-button"
+    class="feds-profile-new-button"
     aria-expanded="false"
-    aria-controls="feds-profile-menu"
+    aria-controls="feds-profile-new-menu"
     aria-label="${labels.profileButton}"
     daa-ll="Account"
     aria-haspopup="true"
   >
-    <img data-cs-mask class="feds-profile-img" src="${avatar}" alt="${labels.profileAvatar}" />
+    <img data-cs-mask class="feds-profile-new-img" src="${avatar}" alt="${labels.profileAvatar}" />
   </button>
 `.trim();
 
@@ -40,22 +40,22 @@ export const profileHeaderHTML = (opts: {
 }): HTML => `
   <a
     href="${decorateProfileLink('account', `?lang=${opts.lang}`)}"
-    class="feds-profile-header"
+    class="feds-profile-new-header"
     daa-ll="${opts.labels.viewAccount}"
     aria-label="${opts.labels.viewAccount}"
   >
     <img
       data-cs-mask
-      class="feds-profile-img"
+      class="feds-profile-new-img"
       src="${opts.avatar}"
       tabindex="0"
       alt="${opts.labels.profileAvatar}"
       data-url="${decorateProfileLink('account', `profile?lang=${opts.lang}`)}"
     />
-    <div class="feds-profile-details">
-      <p data-cs-mask class="feds-profile-name">${opts.displayName}</p>
-      <p data-cs-mask class="feds-profile-email">${decorateEmail(opts.email)}</p>
-      <p class="feds-profile-account">${opts.labels.viewAccount}</p>
+    <div class="feds-profile-new-details">
+      <p data-cs-mask class="feds-profile-new-name">${opts.displayName}</p>
+      <p data-cs-mask class="feds-profile-new-email">${decorateEmail(opts.email)}</p>
+      <p class="feds-profile-new-account">${opts.labels.viewAccount}</p>
     </div>
   </a>
 `.trim();
@@ -66,7 +66,7 @@ export const profileActionsHTML = (opts: {
   hasOrgs: boolean;
 }): HTML => `
   ${opts.hasOrgs
-    ? `<li><a class="feds-profile-action" href="${decorateProfileLink('adminconsole')}">${opts.labels.goToAdminConsole}</a></li>`
+    ? `<li><a class="feds-profile-new-action" href="${decorateProfileLink('adminconsole')}">${opts.labels.goToAdminConsole}</a></li>`
     : ''}
-  <li><a href="#" class="feds-profile-action feds-profile-signout" daa-ll="${opts.labels.signOut}">${opts.labels.signOut}</a></li>
+  <li><a href="#" class="feds-profile-new-action feds-profile-new-signout" daa-ll="${opts.labels.signOut}">${opts.labels.signOut}</a></li>
 `.trim();
