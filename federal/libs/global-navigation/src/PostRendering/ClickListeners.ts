@@ -240,6 +240,9 @@ const animations = (gnav: HTMLElement): void => {
 }
 
 const linksCardListeners = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  const syncFns: (() => void)[] = [];
+
   mountpoint.querySelectorAll<HTMLElement>('.feds-popup:not(.small-menu) article.links-card')
     .forEach(article => {
       const articleTitle = article.querySelector<HTMLElement>('div.links-card-title-container');
@@ -270,6 +273,7 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
         }
       };
       syncMobileAttrs();
+      syncFns.push(syncMobileAttrs);
       isDesktop.addEventListener('change', syncMobileAttrs);
 
       const toggle = (): void => {
@@ -301,4 +305,13 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
         toggle();
       });
     })
+
+  // `is-compact` is toggled on the header by a ResizeObserver (see
+  // `initCompactOverflow` in Main.ts) independently of the `isDesktop`
+  // media query, so entering/leaving compact mode at a desktop viewport
+  // width wouldn't otherwise resync these mobile-only attrs.
+  if (header !== null && syncFns.length > 0) {
+    new MutationObserver(() => syncFns.forEach(sync => sync()))
+      .observe(header, { attributes: true, attributeFilter: ['class'] });
+  }
 };
