@@ -327,6 +327,10 @@ header.global-navigation nav:has(> .feds-breadcrumbs):not(:has(.feds-popup.is-op
   --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
 }
 
+header.global-navigation nav:not(:has(> .feds-breadcrumbs)):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) {
+  --feds-popup-bg-height: 100%;
+}
+
 header.global-navigation nav:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)::after {
   width: 100vw;
   border-radius: 0 0 var(--s2a-border-radius-16) var(--s2a-border-radius-16);
@@ -1547,6 +1551,12 @@ header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link
 
 header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
   stroke-width: 0.5;
+}
+
+[dir="rtl"] header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  margin-left: 0;
+  margin-right: var(--s2a-spacing-xs);
+  transform: rotate(90deg) scale(2.5);
 }
 
 /* feds-product-card gap & border-radius (mirrors lines 983-985) */

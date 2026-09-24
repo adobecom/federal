@@ -12,7 +12,7 @@ import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -54,6 +54,8 @@ export type Input = {
   // Async companion to localizeLink — runs milo's decorateLinksAsync over the
   // raw fetched body pre-parse (lingo regionalization + mep-lingo prefix).
   decorateBody?: DecorateBody;
+  // Host-injected Milo commerce decorators; falls back to a config.base import.
+  merchDecorators?: MerchDecorators;
   convertStageLinks?: (args: {
     anchors: HTMLAnchorElement[];
     hostname: string;
@@ -90,6 +92,7 @@ export const main = async (
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
   setDecorateBody(input.decorateBody ?? (async (): Promise<void> => {}));
+  if (input.merchDecorators) setMerchDecorators(input.merchDecorators);
   // Normalize null → undefined so the stored state matches the
   // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
   setLingoLocaleConfig(input.lingoRegion ?? undefined);
@@ -202,6 +205,7 @@ export const renderGnavString = ({
   placeholders,
   localnav,
   brandConciergeEnabled,
+  notificationsEnabled,
 }: GlobalNavigationData
 ): string => {
   const menuComponents = components.filter((c) => c.type !== "Brand");
@@ -215,7 +219,20 @@ export const renderGnavString = ({
   const firstMegaMenu = localnav
     ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
     : null;
-  const localnavBarLabel = firstMegaMenu?.title ?? '';
+  const localnavBarSibling = firstMegaMenu !== null
+    ? menuComponents[menuComponents.indexOf(firstMegaMenu) + 1] ?? null
+    : null;
+  // The sibling's label lives in a different field per component type:
+  // MegaMenu/SmallMenu use `title`, Link/CTAs use `text`, Text uses `content`.
+  const localnavBarLabel = localnavBarSibling === null
+    ? ''
+    : 'title' in localnavBarSibling
+      ? localnavBarSibling.title
+      : 'text' in localnavBarSibling
+        ? localnavBarSibling.text
+        : 'content' in localnavBarSibling
+          ? localnavBarSibling.content
+          : '';
   // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
   // stays visible beside the hamburger, not only inside the drawer.
   const ctaComponents = components.filter(
@@ -268,8 +285,8 @@ export const renderGnavString = ({
 
       return `
         <li class="feds-brand-wrapper">
-          ${brandHTML}
           ${toggleButton}
+          ${brandHTML}
         </li>
         <li
           id="feds-menu-wrapper"
@@ -294,6 +311,7 @@ export const renderGnavString = ({
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${pinnedCtaHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
+  ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
