@@ -3,6 +3,15 @@
     visibility: hidden;
   }
 
+  /* A top-level nav CTA whose label resolves asynchronously through M@S is
+     hidden until decorated (removed by MerchLinks on `mas:ready`). `display:none`
+     keeps its long unresolved placeholder text from painting and from inflating
+     the overflow measurement that decides desktop vs. compact — so the nav no
+     longer briefly collapses to the hamburger/mobile layout on first load. */
+  & ul.feds-gnav-items > li.feds-nav-merch-pending {
+    display: none;
+  }
+
   /* =========================================
      Product Entry CTA — layout
      ========================================= */

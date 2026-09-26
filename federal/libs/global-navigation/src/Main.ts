@@ -1,5 +1,5 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
-import { component } from "./Components/Component";
+import { component, Component } from "./Components/Component";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
@@ -8,11 +8,11 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
-import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initMerchLinks, NAV_MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, isMasFieldLink, isMerchLink } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -266,8 +266,17 @@ export const renderGnavString = ({
       const brandHTML = brandComponent ? component(brandComponent) : "";
 
       const menuItemsHTMLList = ((): HTML[] => {
+        // A top-level CTA/link resolved via M@S renders its long placeholder
+        // text until decorated. Mark its `<li>` pending so CSS hides it
+        // (`display:none`) until MerchLinks reveals it on `mas:ready` — keeping
+        // the unresolved text from painting and from tipping the nav into the
+        // compact/mobile layout during the initial overflow measurement.
+        const isAsyncMerchCta = (c: Component): boolean =>
+          (c.type === 'Link' || c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA')
+          && (isMasFieldLink(c.href) || isMerchLink(c.href));
         const lis = menuComponents
-                       .map((c, index) => `<li>${component(c, index)}</li>`);
+          .map((c, index) =>
+            `<li${isAsyncMerchCta(c) ? ' class="feds-nav-merch-pending"' : ''}>${component(c, index)}</li>`);
         const [first, ...rest] = lis;
         return localnav ? [first, '<li class="divider"></li>', ...rest] : lis;
       })();
@@ -611,6 +620,12 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const observer = new ResizeObserver(check);
   observer.observe(header);
   isDesktop.addEventListener('change', check);
+  // A nav merch CTA that resolves after the initial measurement shrinks the
+  // items row (long placeholder text -> short label) without changing the
+  // header's own width, so the ResizeObserver above never fires. Re-run the
+  // same measurement when a CTA settles so the nav recovers from the compact
+  // layout it chose while the placeholder text was still present.
+  document.addEventListener(NAV_MERCH_RESOLVED_EVENT, check);
   check();
 };
 
