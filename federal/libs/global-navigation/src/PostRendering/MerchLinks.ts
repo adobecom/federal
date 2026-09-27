@@ -1,8 +1,23 @@
-import { getMiloConfig, isMerchLink, isMasLink, isMasFieldLink, getMerchDecorators } from '../Utils/Utils';
+import {
+  getMiloConfig,
+  isMerchLink,
+  isMasLink,
+  isMasFieldLink,
+  getMerchDecorators,
+} from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
 
 type MerchModule = {
   default?: (link: HTMLAnchorElement) => unknown;
+};
+
+export const MERCH_RESOLVED_EVENT = 'feds:merch-resolved';
+
+const PENDING_MERCH_ATTR = 'data-feds-merch-pending';
+const MILO_VISUAL_CLASS = /^(?:con-button|outline|button-.+)$/;
+
+const notifyMerchResolved = (mountpoint: HTMLElement): void => {
+  mountpoint.dispatchEvent(new CustomEvent(MERCH_RESOLVED_EVENT));
 };
 
 /**
@@ -15,13 +30,109 @@ type MerchModule = {
 const preserveCtaClasses = (
   link: HTMLAnchorElement,
   decorate: (link: HTMLAnchorElement) => unknown,
-): void => {
-  const ctaClasses = [...link.classList]
-    .filter((c) => c === 'feds-primary-cta' || c === 'feds-secondary-cta');
-  void Promise.resolve(decorate(link)).then((result) => {
-    if (ctaClasses.length === 0) return;
-    if (result instanceof HTMLElement) result.classList.add(...ctaClasses);
+): Promise<void> => {
+  const federalClasses = [...link.classList]
+    .filter((className) => className.startsWith('feds-'));
+  return Promise.resolve(decorate(link)).then((result) => {
+    if (federalClasses.length === 0 || !(result instanceof HTMLElement)) return;
+    const resolvedLink = result instanceof HTMLAnchorElement
+      ? result
+      : result.querySelector<HTMLAnchorElement>('a');
+    (resolvedLink ?? result).classList.add(...federalClasses);
   });
+};
+
+/** Resolve top-level MAS fields in their authored paragraph context. */
+const decorateTopLevelMasField = async (
+  link: HTMLAnchorElement,
+  decorate: (link: HTMLAnchorElement) => unknown,
+  mountpoint: HTMLElement,
+): Promise<void> => {
+  const federalClasses = [...link.classList]
+    .filter((className) => className.startsWith('feds-'));
+  const originalAttrs = [...link.attributes]
+    .filter(({ name }) =>
+      name === 'daa-ll'
+      || name === 'target'
+      || name.startsWith('aria-')
+      || name.startsWith('data-feds-')
+    );
+
+  link.setAttribute(PENDING_MERCH_ATTR, '');
+
+  const staging = document.createElement('div');
+  staging.hidden = true;
+  const paragraph = document.createElement('p');
+  const clone = link.cloneNode(true) as HTMLAnchorElement;
+  clone.removeAttribute(PENDING_MERCH_ATTR);
+
+  const wrapper = link.classList.contains('feds-primary-cta')
+    ? document.createElement('strong')
+    : link.classList.contains('feds-secondary-cta')
+      ? document.createElement('em')
+      : null;
+  if (wrapper === null) paragraph.append(clone);
+  else {
+    wrapper.append(clone);
+    paragraph.append(wrapper);
+  }
+  staging.append(paragraph);
+  document.body.append(staging);
+
+  let complete = false;
+  const cleanup = (): void => {
+    document.removeEventListener('mas:ready', onMasReady);
+    staging.remove();
+  };
+  const revealOriginal = (): void => {
+    link.removeAttribute(PENDING_MERCH_ATTR);
+    notifyMerchResolved(mountpoint);
+  };
+  const finish = (candidate: unknown): boolean => {
+    if (complete) return true;
+    const resolvedLink = candidate instanceof HTMLAnchorElement
+      ? candidate
+      : candidate instanceof Element
+        ? candidate.querySelector<HTMLAnchorElement>('a')
+        : staging.querySelector<HTMLAnchorElement>('a');
+    if (resolvedLink === null || resolvedLink === clone) return false;
+
+    [...resolvedLink.classList].forEach((className) => {
+      if (MILO_VISUAL_CLASS.test(className) || className === 'merch') {
+        resolvedLink.classList.remove(className);
+      }
+    });
+    resolvedLink.classList.add(...federalClasses);
+    originalAttrs.forEach(({ name, value }) => {
+      resolvedLink.setAttribute(name, value);
+    });
+    resolvedLink.removeAttribute(PENDING_MERCH_ATTR);
+
+    complete = true;
+    link.replaceWith(resolvedLink);
+    cleanup();
+    notifyMerchResolved(mountpoint);
+    return true;
+  };
+  function onMasReady(event: Event): void {
+    const target = event.target;
+    if (!(target instanceof Element) || !staging.contains(target)) return;
+    finish(target);
+  }
+  document.addEventListener('mas:ready', onMasReady);
+
+  try {
+    const result = await Promise.resolve(decorate(clone));
+    if (finish(result)) return;
+    // Keep late mas-field results connected until mas:ready.
+    if (staging.querySelector('mas-field') !== null) return;
+    cleanup();
+    revealOriginal();
+  } catch (error) {
+    cleanup();
+    revealOriginal();
+    throw error;
+  }
 };
 
 /**
@@ -61,6 +172,16 @@ export const initMerchLinks = async (
   });
 
   const merchLinks = mountpoint.querySelectorAll<HTMLAnchorElement>('a.merch');
+  // Match C1 by resolving every top-level MAS field in authored context.
+  const stagedMasFieldLinks = [...merchLinks]
+    .filter((link) =>
+      isMasFieldLink(link.href)
+      && link.matches('ul.feds-gnav-items > li > a')
+    );
+  // Keep authored labels out of the initial compact measurement.
+  stagedMasFieldLinks.forEach((link) => {
+    link.setAttribute(PENDING_MERCH_ATTR, '');
+  });
   // Full M@S cards only; field links (tagged above) never build a merch-card.
   const masLinks = [...mountpoint.querySelectorAll<HTMLAnchorElement>('a[href]')]
     .filter((link) => isMasLink(link.href) && !isMasFieldLink(link.href));
@@ -75,6 +196,9 @@ export const initMerchLinks = async (
     const base = needsBase ? getMiloConfig().base : '';
 
     if (needsBase && base === '') {
+      stagedMasFieldLinks.forEach((link) => {
+        link.removeAttribute(PENDING_MERCH_ATTR);
+      });
       errors.add(
         new RecoverableError(
           'base not found in config, cannot initialize merch links'
@@ -90,9 +214,11 @@ export const initMerchLinks = async (
       if (decorateMerchLink === undefined) {
         errors.add(new RecoverableError('decorateMerchLink not found in merch module'));
       } else {
-        merchLinks.forEach((link) => {
-          preserveCtaClasses(link, decorateMerchLink);
-        });
+        await Promise.all([...merchLinks].map((link) =>
+          stagedMasFieldLinks.includes(link)
+            ? decorateTopLevelMasField(link, decorateMerchLink, mountpoint)
+            : preserveCtaClasses(link, decorateMerchLink)
+        ));
       }
     }
 
@@ -105,10 +231,18 @@ export const initMerchLinks = async (
       if (decorateMasLink === undefined) {
         errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
       } else {
-        masLinks.forEach((link) => { decorateMasLink(link); });
+        await Promise.all(masLinks.map((link) =>
+          Promise.resolve(decorateMasLink(link)).then(() => {
+            notifyMerchResolved(mountpoint);
+          })
+        ));
       }
     }
   } catch (error) {
+    stagedMasFieldLinks.forEach((link) => {
+      if (!link.isConnected) return;
+      link.removeAttribute(PENDING_MERCH_ATTR);
+    });
     errors.add(new RecoverableError(`Error initializing merch links: ${error}`));
   }
 
