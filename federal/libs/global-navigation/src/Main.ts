@@ -236,7 +236,7 @@ export const renderGnavString = ({
   return `
 <nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
-  <a href="#main-content" class="feds-skip-link"><span class="feds-skip-link-text">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</span>${icons.chevronRight}</a>
+  <a href="#main-content" class="feds-skip-link"><span class="feds-skip-link-text">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</span>${icons.chevronRightBold}</a>
   <ul role="presentation">
     ${((): string => {
       const brandComponent = components.find((c) =>
