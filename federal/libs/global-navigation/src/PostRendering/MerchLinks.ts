@@ -26,12 +26,12 @@ const notifyMerchResolved = (mountpoint: HTMLElement): void => {
   mountpoint.dispatchEvent(new CustomEvent(MERCH_RESOLVED_EVENT));
 };
 
-const federalLinkClasses = (link: HTMLAnchorElement): string[] =>
+const getFederalLinkClasses = (link: HTMLAnchorElement): string[] =>
   [...link.classList].filter((className) =>
     FEDERAL_LINK_CLASSES.has(className)
   );
 
-const revealPendingLinks = (
+const revealPendingMerchLinks = (
   mountpoint: HTMLElement,
   links: Iterable<HTMLAnchorElement>,
 ): void => {
@@ -44,11 +44,11 @@ const revealPendingLinks = (
   if (revealed) notifyMerchResolved(mountpoint);
 };
 
-const preserveCtaClasses = (
+const preserveFederalLinkClasses = (
   link: HTMLAnchorElement,
   decorate: (link: HTMLAnchorElement) => unknown,
 ): Promise<void> => {
-  const federalClasses = federalLinkClasses(link);
+  const federalClasses = getFederalLinkClasses(link);
   return Promise.resolve(decorate(link)).then((result) => {
     if (federalClasses.length === 0 || !(result instanceof HTMLElement)) return;
     const resolvedLink = result instanceof HTMLAnchorElement
@@ -64,7 +64,7 @@ const decorateTopLevelMasField = async (
   decorate: (link: HTMLAnchorElement) => unknown,
   mountpoint: HTMLElement,
 ): Promise<void> => {
-  const federalClasses = federalLinkClasses(link);
+  const federalClasses = getFederalLinkClasses(link);
   const originalAttrs = [...link.attributes]
     .filter(({ name }) =>
       name === 'daa-ll'
@@ -75,38 +75,44 @@ const decorateTopLevelMasField = async (
 
   link.setAttribute(PENDING_MERCH_ATTR, '');
 
-  const staging = document.createElement('div');
-  staging.hidden = true;
+  // Copy the authored link into hidden paragraph/CTA markup so Milo can
+  // decorate the MAS field without replacing the visible navigation link.
+  const masFieldStagingContainer = document.createElement('div');
+  masFieldStagingContainer.hidden = true;
   const paragraph = document.createElement('p');
-  const clone = link.cloneNode(true) as HTMLAnchorElement;
-  clone.removeAttribute(PENDING_MERCH_ATTR);
+  const stagedMasFieldLink = link.cloneNode(true) as HTMLAnchorElement;
+  stagedMasFieldLink.removeAttribute(PENDING_MERCH_ATTR);
 
-  const wrapper = link.classList.contains('feds-primary-cta')
+  const authoredSemanticWrapper = link.classList.contains('feds-primary-cta')
     ? document.createElement('strong')
     : link.classList.contains('feds-secondary-cta')
       ? document.createElement('em')
       : null;
-  if (wrapper === null) paragraph.append(clone);
+  if (authoredSemanticWrapper === null) paragraph.append(stagedMasFieldLink);
   else {
-    wrapper.append(clone);
-    paragraph.append(wrapper);
+    authoredSemanticWrapper.append(stagedMasFieldLink);
+    paragraph.append(authoredSemanticWrapper);
   }
-  staging.append(paragraph);
-  document.body.append(staging);
+  masFieldStagingContainer.append(paragraph);
+  document.body.append(masFieldStagingContainer);
 
-  let complete = false;
-  const cleanup = (): void => {
+  let isResolutionComplete = false;
+  // Remove the temporary markup and its late MAS resolution listener after
+  // decoration finishes or fails.
+  const removeMasFieldStaging = (): void => {
     document.removeEventListener('mas:ready', onMasReady);
-    staging.remove();
+    masFieldStagingContainer.remove();
   };
-  const finish = (candidate: unknown): boolean => {
-    if (complete) return true;
-    const resolvedLink = candidate instanceof HTMLAnchorElement
-      ? candidate
-      : candidate instanceof Element
-        ? candidate.querySelector<HTMLAnchorElement>('a')
-        : staging.querySelector<HTMLAnchorElement>('a');
-    if (resolvedLink === null || resolvedLink === clone) return false;
+  const finalizeResolvedLink = (resolvedCandidate: unknown): boolean => {
+    if (isResolutionComplete) return true;
+    const resolvedLink = resolvedCandidate instanceof HTMLAnchorElement
+      ? resolvedCandidate
+      : resolvedCandidate instanceof Element
+        ? resolvedCandidate.querySelector<HTMLAnchorElement>('a')
+        : masFieldStagingContainer.querySelector<HTMLAnchorElement>('a');
+    if (resolvedLink === null || resolvedLink === stagedMasFieldLink) {
+      return false;
+    }
 
     [...resolvedLink.classList].forEach((className) => {
       if (MILO_VISUAL_CLASS.test(className) || className === 'merch') {
@@ -119,28 +125,31 @@ const decorateTopLevelMasField = async (
     });
     resolvedLink.removeAttribute(PENDING_MERCH_ATTR);
 
-    complete = true;
+    isResolutionComplete = true;
     link.replaceWith(resolvedLink);
-    cleanup();
+    removeMasFieldStaging();
     notifyMerchResolved(mountpoint);
     return true;
   };
   function onMasReady(event: Event): void {
     const target = event.target;
-    if (!(target instanceof Element) || !staging.contains(target)) return;
-    finish(target);
+    if (
+      !(target instanceof Element)
+      || !masFieldStagingContainer.contains(target)
+    ) return;
+    finalizeResolvedLink(target);
   }
   document.addEventListener('mas:ready', onMasReady);
 
   try {
-    const result = await Promise.resolve(decorate(clone));
-    if (finish(result)) return;
+    const result = await Promise.resolve(decorate(stagedMasFieldLink));
+    if (finalizeResolvedLink(result)) return;
     // Keep late mas-field results connected until mas:ready.
-    if (staging.querySelector('mas-field') !== null) return;
-    cleanup();
-    revealPendingLinks(mountpoint, [link]);
+    if (masFieldStagingContainer.querySelector('mas-field') !== null) return;
+    removeMasFieldStaging();
+    revealPendingMerchLinks(mountpoint, [link]);
   } catch (error) {
-    cleanup();
+    removeMasFieldStaging();
     throw error;
   }
 };
@@ -199,14 +208,14 @@ export const initMerchLinks = async (
   if (merchLinks.length === 0 && masLinks.length === 0) return errors;
 
   try {
-    const injected = getMerchDecorators();
+    const injectedDecorators = getMerchDecorators();
     // base is only needed for the fallback import; injected decorators skip it.
-    const needsBase = (merchLinks.length > 0 && !injected.merch)
-      || (masLinks.length > 0 && !injected.masCard);
+    const needsBase = (merchLinks.length > 0 && !injectedDecorators.merch)
+      || (masLinks.length > 0 && !injectedDecorators.masCard);
     const base = needsBase ? getMiloConfig().base : '';
 
     if (needsBase && base === '') {
-      revealPendingLinks(mountpoint, stagedMasFieldLinks);
+      revealPendingMerchLinks(mountpoint, stagedMasFieldLinks);
       errors.add(
         new RecoverableError(
           'base not found in config, cannot initialize merch links'
@@ -217,23 +226,23 @@ export const initMerchLinks = async (
 
     // OST / miniplans + inline M@S field links: Milo `merch` block
     if (merchLinks.length > 0) {
-      const decorateMerchLink = injected.merch
+      const decorateMerchLink = injectedDecorators.merch
         ?? (await import(`${base}/blocks/merch/merch.js`) as MerchModule).default;
       if (decorateMerchLink === undefined) {
-        revealPendingLinks(mountpoint, stagedMasFieldLinks);
+        revealPendingMerchLinks(mountpoint, stagedMasFieldLinks);
         errors.add(new RecoverableError('decorateMerchLink not found in merch module'));
       } else {
         await Promise.all([...merchLinks].map((link) =>
           stagedMasFieldLinks.includes(link)
             ? decorateTopLevelMasField(link, decorateMerchLink, mountpoint)
-            : preserveCtaClasses(link, decorateMerchLink)
+            : preserveFederalLinkClasses(link, decorateMerchLink)
         ));
       }
     }
 
     // Full M@S cards: Milo `merch-card-autoblock` block
     if (masLinks.length > 0) {
-      const decorateMasLink = injected.masCard
+      const decorateMasLink = injectedDecorators.masCard
         ?? (await import(
           `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
         ) as MerchModule).default;
@@ -246,7 +255,7 @@ export const initMerchLinks = async (
       }
     }
   } catch (error) {
-    revealPendingLinks(mountpoint, stagedMasFieldLinks);
+    revealPendingMerchLinks(mountpoint, stagedMasFieldLinks);
     errors.add(new RecoverableError(`Error initializing merch links: ${error}`));
   }
 
