@@ -330,11 +330,9 @@ export const postRenderingTasks = async (
   initPopoverCloseOnResize(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-  // Hide unresolved MAS labels before compact measurement.
-  const merchLinkErrorsPromise = initMerchLinks(input.mountpoint);
   initCompactOverflow(input.mountpoint);
   initPromoCountdownInMinimizedBar();
-  const merchLinkErrors = await merchLinkErrorsPromise;
+  const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
     lanaLog(error.message);

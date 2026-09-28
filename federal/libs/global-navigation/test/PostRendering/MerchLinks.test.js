@@ -130,6 +130,97 @@ describe('initMerchLinks — commerce link routing', () => {
     }
   });
 
+  it('does not add generated analytics to an OST result', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <a class="merch feds-link" href="${OST}">Price</a>
+    `;
+    document.body.appendChild(mountpoint);
+    setMerchDecorators({
+      merch: (link) => {
+        const resolved = document.createElement('span');
+        resolved.textContent = 'US$9.99/mo';
+        link.replaceWith(resolved);
+        return resolved;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+
+      expect(mountpoint.querySelector('span').hasAttribute('daa-ll'))
+        .to.equal(false);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('replaces a generated MAS analytics label with the resolved link text', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li>
+          <a
+            class="feds-link"
+            href="${MAS_CTA}"
+            daa-ll="Mas-field: long authoring label"
+          >Mas-field: long authoring label</a>
+        </li>
+      </ul>
+    `;
+    document.body.appendChild(mountpoint);
+    setMerchDecorators({
+      merch: async (link) => {
+        const resolved = document.createElement('a');
+        resolved.textContent = 'Buy now';
+        link.replaceWith(resolved);
+        return resolved;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+
+      const resolved = mountpoint.querySelector('a');
+      expect(resolved.getAttribute('daa-ll')).to.equal('Buy now');
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('preserves an explicit MAS analytics label', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li>
+          <a
+            class="feds-link"
+            href="${MAS_CTA}"
+            daa-ll="localnav-buy-now"
+          >Mas-field: long authoring label</a>
+        </li>
+      </ul>
+    `;
+    document.body.appendChild(mountpoint);
+    setMerchDecorators({
+      merch: async (link) => {
+        const resolved = document.createElement('a');
+        resolved.textContent = 'Buy now';
+        link.replaceWith(resolved);
+        return resolved;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+
+      const resolved = mountpoint.querySelector('a');
+      expect(resolved.getAttribute('daa-ll')).to.equal('localnav-buy-now');
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
   it('waits for a late mas:ready CTA before replacing the hidden authored label', async () => {
     const mountpoint = document.createElement('div');
     mountpoint.innerHTML = `
@@ -169,7 +260,126 @@ describe('initMerchLinks — commerce link routing', () => {
     }
   });
 
-  it('reveals all connected pending links and dispatches one event on failure', async () => {
+  it('waits for Milo to hoist a late plain link before finalizing it', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li><a class="feds-link" href="${MAS_CTA}">Mas-field: Buy now</a></li>
+      </ul>
+    `;
+    document.body.appendChild(mountpoint);
+    let masField;
+    const onMasReady = async (event) => {
+      if (event.target !== masField) return;
+      if (masField.closest('em, strong') === null) return;
+      await Promise.resolve();
+      const content = masField.querySelector('[data-role="mas-field-content"]');
+      const resolved = content.querySelector('a');
+      resolved.dataset.miloDecorated = 'true';
+      masField.replaceChildren(resolved);
+    };
+    document.addEventListener('mas:ready', onMasReady);
+    setMerchDecorators({
+      merch: async (link) => {
+        masField = document.createElement('mas-field');
+        link.replaceWith(masField);
+        return masField;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+      masField.innerHTML = `
+        <span data-role="mas-field-content">
+          <a class="con-button button-l">Buy now</a>
+        </span>
+      `;
+      masField.dispatchEvent(new CustomEvent('mas:ready', { bubbles: true }));
+      await Promise.resolve();
+      await Promise.resolve();
+
+      const resolved = mountpoint.querySelector('a');
+      expect(resolved.dataset.miloDecorated).to.equal('true');
+      expect(resolved.classList.contains('feds-link')).to.equal(true);
+      expect(resolved.getAttribute('daa-ll')).to.equal('Buy now');
+    } finally {
+      document.removeEventListener('mas:ready', onMasReady);
+      mountpoint.remove();
+    }
+  });
+
+  it('removes the navigation item when a staged MAS field resolves empty', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li><a class="feds-link" href="${MAS_FIELD}">Mas-field: Missing field</a></li>
+      </ul>
+    `;
+    document.body.appendChild(mountpoint);
+    let masField;
+    let resolvedEvents = 0;
+    mountpoint.addEventListener('feds:merch-resolved', () => {
+      resolvedEvents += 1;
+    });
+    setMerchDecorators({
+      merch: async (link) => {
+        masField = document.createElement('mas-field');
+        link.replaceWith(masField);
+        return masField;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+      masField.dispatchEvent(new CustomEvent('mas:ready', { bubbles: true }));
+
+      expect(mountpoint.querySelector('li')).to.equal(null);
+      expect(mountpoint.textContent).to.not.include('Mas-field: Missing field');
+      expect(resolvedEvents).to.equal(1);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('removes the navigation item when a staged MAS field reports an AEM error', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li><a class="feds-link" href="${MAS_FIELD}">Mas-field: Card title</a></li>
+      </ul>
+    `;
+    document.body.appendChild(mountpoint);
+    let masField;
+    let stagingContainer;
+    let resolvedEvents = 0;
+    mountpoint.addEventListener('feds:merch-resolved', () => {
+      resolvedEvents += 1;
+    });
+    setMerchDecorators({
+      merch: async (link) => {
+        stagingContainer = link.closest('div');
+        masField = document.createElement('mas-field');
+        masField.append(document.createElement('aem-fragment'));
+        link.replaceWith(masField);
+        return masField;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+      masField.querySelector('aem-fragment')
+        .dispatchEvent(new CustomEvent('aem:error', { bubbles: true }));
+
+      expect(mountpoint.querySelector('li')).to.equal(null);
+      expect(mountpoint.textContent).to.not.include('Mas-field: Card title');
+      expect(stagingContainer.isConnected).to.equal(false);
+      expect(resolvedEvents).to.equal(1);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('removes only the failed pending navigation item', async () => {
     const mountpoint = document.createElement('div');
     mountpoint.innerHTML = `
       <ul class="feds-gnav-items">
@@ -179,28 +389,37 @@ describe('initMerchLinks — commerce link routing', () => {
     `;
     document.body.appendChild(mountpoint);
     let resolvedEvents = 0;
+    let decoratedLinks = 0;
     mountpoint.addEventListener('feds:merch-resolved', () => {
       resolvedEvents += 1;
     });
     setMerchDecorators({
-      merch: () => {
-        throw new Error('decoration failed');
+      merch: (link) => {
+        decoratedLinks += 1;
+        if (decoratedLinks === 1) throw new Error('decoration failed');
+        const masField = document.createElement('mas-field');
+        link.replaceWith(masField);
+        return masField;
       },
     });
 
     try {
       const errors = await initMerchLinks(mountpoint);
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
-      expect(errors.size).to.equal(1);
+      expect(errors.size).to.equal(0);
+      expect(mountpoint.querySelectorAll('li').length).to.equal(1);
       expect(mountpoint.querySelectorAll('[data-feds-merch-pending]').length)
-        .to.equal(0);
+        .to.equal(1);
+      expect(mountpoint.textContent).to.not.include('First field');
+      expect(mountpoint.textContent).to.include('Second field');
       expect(resolvedEvents).to.equal(1);
     } finally {
       mountpoint.remove();
     }
   });
 
-  it('awaits a full MAS card without dispatching a compact event', async () => {
+  it('does not await a full MAS card or dispatch a compact event', async () => {
     const mountpoint = document.createElement('div');
     mountpoint.innerHTML = `
       <div class="feds-popup"><a href="${MAS_CARD}">Full card</a></div>
@@ -211,23 +430,24 @@ describe('initMerchLinks — commerce link routing', () => {
       finishDecoration = resolve;
     });
     let resolvedEvents = 0;
+    let decorationStarted = false;
     mountpoint.addEventListener('feds:merch-resolved', () => {
       resolvedEvents += 1;
     });
     setMerchDecorators({
-      masCard: () => decorationFinished,
+      masCard: () => {
+        decorationStarted = true;
+        return decorationFinished;
+      },
     });
 
     try {
-      let initialized = false;
-      const initialization = initMerchLinks(mountpoint).then(() => {
-        initialized = true;
-      });
-      await Promise.resolve();
-      expect(initialized).to.equal(false);
+      await initMerchLinks(mountpoint);
+      expect(decorationStarted).to.equal(true);
+      expect(resolvedEvents).to.equal(0);
 
       finishDecoration();
-      await initialization;
+      await Promise.resolve();
       expect(resolvedEvents).to.equal(0);
     } finally {
       mountpoint.remove();

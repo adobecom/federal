@@ -6,6 +6,7 @@ import {
   getMerchDecorators,
 } from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
+import { lanaLog } from '../Utils/Log';
 
 type MerchModule = {
   default?: (link: HTMLAnchorElement) => unknown;
@@ -31,17 +32,39 @@ const getFederalLinkClasses = (link: HTMLAnchorElement): string[] =>
     FEDERAL_LINK_CLASSES.has(className)
   );
 
-const revealPendingMerchLinks = (
+const applyAnalyticsLabel = (
+  authoredLink: HTMLAnchorElement,
+  resolvedLink: HTMLElement,
+): void => {
+  const authoredLabel = authoredLink.getAttribute('daa-ll')?.trim() ?? '';
+  const authoredText = authoredLink.textContent?.trim() ?? '';
+  const resolvedLabel = resolvedLink.textContent?.trim() ?? '';
+  if (authoredLabel !== '' && authoredLabel !== authoredText) {
+    resolvedLink.setAttribute('daa-ll', authoredLabel);
+  }
+  else if (resolvedLabel !== '') {
+    resolvedLink.setAttribute('daa-ll', resolvedLabel);
+  } else {
+    resolvedLink.removeAttribute('daa-ll');
+  }
+};
+
+const removeFailedMerchItems = (
   mountpoint: HTMLElement,
   links: Iterable<HTMLAnchorElement>,
 ): void => {
-  let revealed = false;
+  let removed = false;
   for (const link of links) {
     if (!link.isConnected || !link.hasAttribute(PENDING_MERCH_ATTR)) continue;
-    link.removeAttribute(PENDING_MERCH_ATTR);
-    revealed = true;
+    const item = link.parentElement;
+    if (
+      !(item instanceof HTMLLIElement)
+      || !item.matches('ul.feds-gnav-items > li')
+    ) continue;
+    item.remove();
+    removed = true;
   }
-  if (revealed) notifyMerchResolved(mountpoint);
+  if (removed) notifyMerchResolved(mountpoint);
 };
 
 const preserveFederalLinkClasses = (
@@ -83,24 +106,23 @@ const decorateTopLevelMasField = async (
   const stagedMasFieldLink = link.cloneNode(true) as HTMLAnchorElement;
   stagedMasFieldLink.removeAttribute(PENDING_MERCH_ATTR);
 
-  const authoredSemanticWrapper = link.classList.contains('feds-primary-cta')
+  // A wrapper also keeps plain top-level links in Milo's late CTA path.
+  const masFieldCtaWrapper = link.classList.contains('feds-primary-cta')
     ? document.createElement('strong')
-    : link.classList.contains('feds-secondary-cta')
-      ? document.createElement('em')
-      : null;
-  if (authoredSemanticWrapper === null) paragraph.append(stagedMasFieldLink);
-  else {
-    authoredSemanticWrapper.append(stagedMasFieldLink);
-    paragraph.append(authoredSemanticWrapper);
-  }
+    : document.createElement('em');
+  masFieldCtaWrapper.append(stagedMasFieldLink);
+  paragraph.append(masFieldCtaWrapper);
   masFieldStagingContainer.append(paragraph);
   document.body.append(masFieldStagingContainer);
 
   let isResolutionComplete = false;
+  let stagingObserver: MutationObserver | null = null;
   // Remove the temporary markup and its late MAS resolution listener after
   // decoration finishes or fails.
   const removeMasFieldStaging = (): void => {
     document.removeEventListener('mas:ready', onMasReady);
+    document.removeEventListener('aem:error', onStagedMasFieldError);
+    stagingObserver?.disconnect();
     masFieldStagingContainer.remove();
   };
   const finalizeResolvedLink = (resolvedCandidate: unknown): boolean => {
@@ -113,6 +135,9 @@ const decorateTopLevelMasField = async (
     if (resolvedLink === null || resolvedLink === stagedMasFieldLink) {
       return false;
     }
+    if (resolvedLink.closest('[data-role="mas-field-content"]') !== null) {
+      return false;
+    }
 
     [...resolvedLink.classList].forEach((className) => {
       if (MILO_VISUAL_CLASS.test(className) || className === 'merch') {
@@ -123,6 +148,7 @@ const decorateTopLevelMasField = async (
     originalAttrs.forEach(({ name, value }) => {
       resolvedLink.setAttribute(name, value);
     });
+    applyAnalyticsLabel(link, resolvedLink);
     resolvedLink.removeAttribute(PENDING_MERCH_ATTR);
 
     isResolutionComplete = true;
@@ -137,9 +163,34 @@ const decorateTopLevelMasField = async (
       !(target instanceof Element)
       || !masFieldStagingContainer.contains(target)
     ) return;
-    finalizeResolvedLink(target);
+    if (finalizeResolvedLink(target)) return;
+    if (target.querySelector('a') === null) {
+      isResolutionComplete = true;
+      removeMasFieldStaging();
+      removeFailedMerchItems(mountpoint, [link]);
+    }
   }
+  // Remove the navigation item if its staged content fails to load.
+  function onStagedMasFieldError(event: Event): void {
+    const target = event.target;
+    if (
+      isResolutionComplete
+      || !(target instanceof Node)
+      || !masFieldStagingContainer.contains(target)
+    ) return;
+    isResolutionComplete = true;
+    removeMasFieldStaging();
+    removeFailedMerchItems(mountpoint, [link]);
+  }
+  stagingObserver = new MutationObserver(() => {
+    finalizeResolvedLink(masFieldStagingContainer);
+  });
+  stagingObserver.observe(masFieldStagingContainer, {
+    childList: true,
+    subtree: true,
+  });
   document.addEventListener('mas:ready', onMasReady);
+  document.addEventListener('aem:error', onStagedMasFieldError);
 
   try {
     const result = await Promise.resolve(decorate(stagedMasFieldLink));
@@ -147,7 +198,7 @@ const decorateTopLevelMasField = async (
     // Keep late mas-field results connected until mas:ready.
     if (masFieldStagingContainer.querySelector('mas-field') !== null) return;
     removeMasFieldStaging();
-    revealPendingMerchLinks(mountpoint, [link]);
+    removeFailedMerchItems(mountpoint, [link]);
   } catch (error) {
     removeMasFieldStaging();
     throw error;
@@ -215,7 +266,7 @@ export const initMerchLinks = async (
     const base = needsBase ? getMiloConfig().base : '';
 
     if (needsBase && base === '') {
-      revealPendingMerchLinks(mountpoint, stagedMasFieldLinks);
+      removeFailedMerchItems(mountpoint, stagedMasFieldLinks);
       errors.add(
         new RecoverableError(
           'base not found in config, cannot initialize merch links'
@@ -229,14 +280,23 @@ export const initMerchLinks = async (
       const decorateMerchLink = injectedDecorators.merch
         ?? (await import(`${base}/blocks/merch/merch.js`) as MerchModule).default;
       if (decorateMerchLink === undefined) {
-        revealPendingMerchLinks(mountpoint, stagedMasFieldLinks);
+        removeFailedMerchItems(mountpoint, stagedMasFieldLinks);
         errors.add(new RecoverableError('decorateMerchLink not found in merch module'));
       } else {
-        await Promise.all([...merchLinks].map((link) =>
-          stagedMasFieldLinks.includes(link)
-            ? decorateTopLevelMasField(link, decorateMerchLink, mountpoint)
-            : preserveFederalLinkClasses(link, decorateMerchLink)
-        ));
+        merchLinks.forEach((link) => {
+          let merchLinkDecorationTask: Promise<void>;
+          try {
+            merchLinkDecorationTask = stagedMasFieldLinks.includes(link)
+              ? decorateTopLevelMasField(link, decorateMerchLink, mountpoint)
+              : preserveFederalLinkClasses(link, decorateMerchLink);
+          } catch (error) {
+            merchLinkDecorationTask = Promise.reject(error);
+          }
+          void merchLinkDecorationTask.catch((error) => {
+            removeFailedMerchItems(mountpoint, [link]);
+            lanaLog(`Failed to decorate merch link: ${String(error)}`);
+          });
+        });
       }
     }
 
@@ -249,13 +309,19 @@ export const initMerchLinks = async (
       if (decorateMasLink === undefined) {
         errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
       } else {
-        await Promise.all(masLinks.map((link) =>
-          Promise.resolve(decorateMasLink(link))
-        ));
+        masLinks.forEach((link) => {
+          try {
+            void Promise.resolve(decorateMasLink(link)).catch((error) => {
+              lanaLog(`Failed to decorate M@S card: ${String(error)}`);
+            });
+          } catch (error) {
+            lanaLog(`Failed to decorate M@S card: ${String(error)}`);
+          }
+        });
       }
     }
   } catch (error) {
-    revealPendingMerchLinks(mountpoint, stagedMasFieldLinks);
+    removeFailedMerchItems(mountpoint, stagedMasFieldLinks);
     errors.add(new RecoverableError(`Error initializing merch links: ${error}`));
   }
 
