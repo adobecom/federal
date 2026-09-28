@@ -41,4 +41,26 @@ describe('compact overflow measurement', () => {
     expect(getIntrinsicItemsWidth(list)).to.equal(100);
     list.remove();
   });
+
+  it('excludes zero-width direct items from margins and gap count', () => {
+    const list = document.createElement('ul');
+    list.style.columnGap = '24px';
+    const visible = document.createElement('li');
+    const pending = document.createElement('li');
+    pending.style.marginLeft = '40px';
+    pending.style.marginRight = '40px';
+    Object.defineProperties(visible, {
+      offsetWidth: { value: 100 },
+      scrollWidth: { value: 100 },
+    });
+    Object.defineProperties(pending, {
+      offsetWidth: { value: 0 },
+      scrollWidth: { value: 0 },
+    });
+    list.append(visible, pending);
+    document.body.append(list);
+
+    expect(getIntrinsicItemsWidth(list)).to.equal(100);
+    list.remove();
+  });
 });

@@ -37,7 +37,7 @@
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 
-.global-navigation [data-feds-merch-pending] {
+.global-navigation ul.feds-gnav-items > li > [data-feds-merch-pending] {
   display: none !important;
 }
 

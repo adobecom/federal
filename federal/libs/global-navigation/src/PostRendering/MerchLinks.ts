@@ -15,24 +15,40 @@ export const MERCH_RESOLVED_EVENT = 'feds:merch-resolved';
 
 const PENDING_MERCH_ATTR = 'data-feds-merch-pending';
 const MILO_VISUAL_CLASS = /^(?:con-button|outline|button-.+)$/;
+const FEDERAL_LINK_CLASSES = new Set([
+  'feds-link',
+  'feds-link--highlight',
+  'feds-primary-cta',
+  'feds-secondary-cta',
+]);
 
 const notifyMerchResolved = (mountpoint: HTMLElement): void => {
   mountpoint.dispatchEvent(new CustomEvent(MERCH_RESOLVED_EVENT));
 };
 
-/**
- * Milo's merch block replaces the authored `<a>` outright with its own
- * checkout-link/price element (`el.replaceWith(merch)`), which drops
- * whatever classes the original anchor had. CTA-authored merch links rely on
- * `feds-primary-cta`/`feds-secondary-cta` for gnav button styling, so those
- * need to survive onto the replacement element.
- */
+const federalLinkClasses = (link: HTMLAnchorElement): string[] =>
+  [...link.classList].filter((className) =>
+    FEDERAL_LINK_CLASSES.has(className)
+  );
+
+const revealPendingLinks = (
+  mountpoint: HTMLElement,
+  links: Iterable<HTMLAnchorElement>,
+): void => {
+  let revealed = false;
+  for (const link of links) {
+    if (!link.isConnected || !link.hasAttribute(PENDING_MERCH_ATTR)) continue;
+    link.removeAttribute(PENDING_MERCH_ATTR);
+    revealed = true;
+  }
+  if (revealed) notifyMerchResolved(mountpoint);
+};
+
 const preserveCtaClasses = (
   link: HTMLAnchorElement,
   decorate: (link: HTMLAnchorElement) => unknown,
 ): Promise<void> => {
-  const federalClasses = [...link.classList]
-    .filter((className) => className.startsWith('feds-'));
+  const federalClasses = federalLinkClasses(link);
   return Promise.resolve(decorate(link)).then((result) => {
     if (federalClasses.length === 0 || !(result instanceof HTMLElement)) return;
     const resolvedLink = result instanceof HTMLAnchorElement
@@ -48,8 +64,7 @@ const decorateTopLevelMasField = async (
   decorate: (link: HTMLAnchorElement) => unknown,
   mountpoint: HTMLElement,
 ): Promise<void> => {
-  const federalClasses = [...link.classList]
-    .filter((className) => className.startsWith('feds-'));
+  const federalClasses = federalLinkClasses(link);
   const originalAttrs = [...link.attributes]
     .filter(({ name }) =>
       name === 'daa-ll'
@@ -83,10 +98,6 @@ const decorateTopLevelMasField = async (
   const cleanup = (): void => {
     document.removeEventListener('mas:ready', onMasReady);
     staging.remove();
-  };
-  const revealOriginal = (): void => {
-    link.removeAttribute(PENDING_MERCH_ATTR);
-    notifyMerchResolved(mountpoint);
   };
   const finish = (candidate: unknown): boolean => {
     if (complete) return true;
@@ -127,10 +138,9 @@ const decorateTopLevelMasField = async (
     // Keep late mas-field results connected until mas:ready.
     if (staging.querySelector('mas-field') !== null) return;
     cleanup();
-    revealOriginal();
+    revealPendingLinks(mountpoint, [link]);
   } catch (error) {
     cleanup();
-    revealOriginal();
     throw error;
   }
 };
@@ -196,9 +206,7 @@ export const initMerchLinks = async (
     const base = needsBase ? getMiloConfig().base : '';
 
     if (needsBase && base === '') {
-      stagedMasFieldLinks.forEach((link) => {
-        link.removeAttribute(PENDING_MERCH_ATTR);
-      });
+      revealPendingLinks(mountpoint, stagedMasFieldLinks);
       errors.add(
         new RecoverableError(
           'base not found in config, cannot initialize merch links'
@@ -212,6 +220,7 @@ export const initMerchLinks = async (
       const decorateMerchLink = injected.merch
         ?? (await import(`${base}/blocks/merch/merch.js`) as MerchModule).default;
       if (decorateMerchLink === undefined) {
+        revealPendingLinks(mountpoint, stagedMasFieldLinks);
         errors.add(new RecoverableError('decorateMerchLink not found in merch module'));
       } else {
         await Promise.all([...merchLinks].map((link) =>
@@ -232,17 +241,12 @@ export const initMerchLinks = async (
         errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
       } else {
         await Promise.all(masLinks.map((link) =>
-          Promise.resolve(decorateMasLink(link)).then(() => {
-            notifyMerchResolved(mountpoint);
-          })
+          Promise.resolve(decorateMasLink(link))
         ));
       }
     }
   } catch (error) {
-    stagedMasFieldLinks.forEach((link) => {
-      if (!link.isConnected) return;
-      link.removeAttribute(PENDING_MERCH_ATTR);
-    });
+    revealPendingLinks(mountpoint, stagedMasFieldLinks);
     errors.add(new RecoverableError(`Error initializing merch links: ${error}`));
   }
 

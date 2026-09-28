@@ -103,6 +103,33 @@ describe('initMerchLinks — commerce link routing', () => {
     }
   });
 
+  it('preserves only supported Federal link classes', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <a class="merch feds-link feds-link--highlight feds-unrelated" href="${OST}">Price</a>
+    `;
+    document.body.appendChild(mountpoint);
+    setMerchDecorators({
+      merch: (link) => {
+        const resolved = document.createElement('a');
+        resolved.textContent = 'US$9.99/mo';
+        link.replaceWith(resolved);
+        return resolved;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+
+      const resolved = mountpoint.querySelector('a');
+      expect(resolved.classList.contains('feds-link')).to.equal(true);
+      expect(resolved.classList.contains('feds-link--highlight')).to.equal(true);
+      expect(resolved.classList.contains('feds-unrelated')).to.equal(false);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
   it('waits for a late mas:ready CTA before replacing the hidden authored label', async () => {
     const mountpoint = document.createElement('div');
     mountpoint.innerHTML = `
@@ -137,6 +164,71 @@ describe('initMerchLinks — commerce link routing', () => {
       expect(resolved.classList.contains('button-l')).to.equal(false);
       expect(resolved.hasAttribute('data-feds-merch-pending')).to.equal(false);
       expect(resolved.getAttribute('daa-ll')).to.equal('Free trial');
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('reveals all connected pending links and dispatches one event on failure', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li><a href="${MAS_FIELD}">First field</a></li>
+        <li><a href="${MAS_CTA}">Second field</a></li>
+      </ul>
+    `;
+    document.body.appendChild(mountpoint);
+    let resolvedEvents = 0;
+    mountpoint.addEventListener('feds:merch-resolved', () => {
+      resolvedEvents += 1;
+    });
+    setMerchDecorators({
+      merch: () => {
+        throw new Error('decoration failed');
+      },
+    });
+
+    try {
+      const errors = await initMerchLinks(mountpoint);
+
+      expect(errors.size).to.equal(1);
+      expect(mountpoint.querySelectorAll('[data-feds-merch-pending]').length)
+        .to.equal(0);
+      expect(resolvedEvents).to.equal(1);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('awaits a full MAS card without dispatching a compact event', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <div class="feds-popup"><a href="${MAS_CARD}">Full card</a></div>
+    `;
+    document.body.appendChild(mountpoint);
+    let finishDecoration;
+    const decorationFinished = new Promise((resolve) => {
+      finishDecoration = resolve;
+    });
+    let resolvedEvents = 0;
+    mountpoint.addEventListener('feds:merch-resolved', () => {
+      resolvedEvents += 1;
+    });
+    setMerchDecorators({
+      masCard: () => decorationFinished,
+    });
+
+    try {
+      let initialized = false;
+      const initialization = initMerchLinks(mountpoint).then(() => {
+        initialized = true;
+      });
+      await Promise.resolve();
+      expect(initialized).to.equal(false);
+
+      finishDecoration();
+      await initialization;
+      expect(resolvedEvents).to.equal(0);
     } finally {
       mountpoint.remove();
     }

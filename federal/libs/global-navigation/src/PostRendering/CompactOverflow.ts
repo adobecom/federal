@@ -3,8 +3,9 @@ export const getIntrinsicItemsWidth = (list: HTMLElement | null): number => {
 
   const items = [...list.children].filter(
     (child): child is HTMLElement =>
-      child instanceof HTMLElement
-      && getComputedStyle(child).display !== 'none',
+      child instanceof HTMLLIElement
+      && getComputedStyle(child).display !== 'none'
+      && Math.max(child.offsetWidth, child.scrollWidth) > 0,
   );
   const width = items.reduce((total, item) => {
     const style = getComputedStyle(item);
