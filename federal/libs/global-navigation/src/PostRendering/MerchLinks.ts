@@ -170,7 +170,7 @@ const decorateTopLevelMasField = async (
       removeFailedMerchItems(mountpoint, [link]);
     }
   }
-  // Remove the navigation item if its staged content fails to load.
+  // Fallback: if staged content fails to load.
   function onStagedMasFieldError(event: Event): void {
     const target = event.target;
     if (
