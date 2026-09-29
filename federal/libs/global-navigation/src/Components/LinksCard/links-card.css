@@ -152,6 +152,8 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
 
 .feds-popup .links-card .links-card-title {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: var(--s2a-typography-font-size-heading-5);
   line-height: var(--s2a-typography-line-height-heading-5);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-5);
