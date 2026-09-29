@@ -1,6 +1,9 @@
 import { expect } from '@esm-bundle/chai';
 import { initMerchLinks } from '../../src/PostRendering/MerchLinks';
-import { setMerchDecorators } from '../../src/Utils/Utils';
+import {
+  setMerchDecorators,
+  setMiloConfig,
+} from '../../src/Utils/Utils';
 
 const MAS_FIELD =
   'https://mas.adobe.com/studio.html#content-type=merch-card&path=acom-cc&field=cardTitle';
@@ -449,6 +452,43 @@ describe('initMerchLinks — commerce link routing', () => {
       finishDecoration();
       await Promise.resolve();
       expect(resolvedEvents).to.equal(0);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('keeps a resolved top-level link when the full-card module fails', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li><a class="feds-link" href="${MAS_CTA}">Mas-field: Buy now</a></li>
+      </ul>
+      <div class="feds-popup"><a href="${MAS_CARD}">Full card</a></div>
+    `;
+    document.body.appendChild(mountpoint);
+    setMiloConfig({
+      base: '/missing-milo',
+      env: { name: 'stage' },
+      locale: { prefix: '', ietf: 'en-US' },
+    });
+    setMerchDecorators({
+      merch: (link) => {
+        const resolved = document.createElement('a');
+        resolved.textContent = 'Buy now';
+        link.replaceWith(resolved);
+        return resolved;
+      },
+    });
+
+    try {
+      const errors = await initMerchLinks(mountpoint);
+
+      expect(errors.size).to.equal(1);
+      expect([...errors][0].message).to.include('Error initializing M@S cards');
+      expect(mountpoint.querySelectorAll('ul.feds-gnav-items > li').length)
+        .to.equal(1);
+      expect(mountpoint.querySelector('ul.feds-gnav-items > li > a').textContent)
+        .to.equal('Buy now');
     } finally {
       mountpoint.remove();
     }

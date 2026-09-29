@@ -302,22 +302,28 @@ export const initMerchLinks = async (
 
     // Full M@S cards: Milo `merch-card-autoblock` block
     if (masLinks.length > 0) {
-      const decorateMasLink = injectedDecorators.masCard
-        ?? (await import(
-          `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
-        ) as MerchModule).default;
-      if (decorateMasLink === undefined) {
-        errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
-      } else {
-        masLinks.forEach((link) => {
-          try {
-            void Promise.resolve(decorateMasLink(link)).catch((error) => {
+      try {
+        const decorateMasLink = injectedDecorators.masCard
+          ?? (await import(
+            `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
+          ) as MerchModule).default;
+        if (decorateMasLink === undefined) {
+          errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
+        } else {
+          masLinks.forEach((link) => {
+            try {
+              void Promise.resolve(decorateMasLink(link)).catch((error) => {
+                lanaLog(`Failed to decorate M@S card: ${String(error)}`);
+              });
+            } catch (error) {
               lanaLog(`Failed to decorate M@S card: ${String(error)}`);
-            });
-          } catch (error) {
-            lanaLog(`Failed to decorate M@S card: ${String(error)}`);
-          }
-        });
+            }
+          });
+        }
+      } catch (error) {
+        errors.add(
+          new RecoverableError(`Error initializing M@S cards: ${error}`)
+        );
       }
     }
   } catch (error) {
