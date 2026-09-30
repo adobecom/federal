@@ -17,6 +17,7 @@ export const icons = {
   chevronLeft: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" focusable="false"><path d="M12.5 4l-5 6 5 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   chevronRight: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="3" height="6" viewBox="0 0 3 6" focusable="false"><path d="M.5.5 2.5 3 .5 5.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>',
   chevronDown: '<svg class="chevron-down" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="6" height="3.375" viewBox="0 0 6 3.375" focusable="false"><path d="M.5.5 3 2.875 5.5.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>',
+  chevronRightBold: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" focusable="false"><path d="M3.64278 11.3573C3.42347 11.3573 3.20417 11.2736 3.03676 11.1062C2.70194 10.7714 2.70194 10.229 3.03676 9.89418L6.93073 6.00021L3.03676 2.10623C2.70194 1.77141 2.70194 1.229 3.03676 0.894179C3.37157 0.559362 3.91399 0.559362 4.24881 0.894179L8.74881 5.39418C9.08363 5.729 9.08363 6.27141 8.74881 6.60623L4.24881 11.1062C4.0814 11.2736 3.86209 11.3573 3.64278 11.3573Z" fill="currentColor"/></svg>',
 };
 
 // URL path segments that should receive the `merch` class
@@ -41,6 +42,21 @@ const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
  */
 export const isMasLink = (href: string): boolean =>
   href.includes(MAS_LINK_PATH);
+
+/**
+ * Checks if a URL is an inline M@S field link (studio.html#...&field=...) that
+ * renders a single value via the `merch` block, not a full merch-card.
+ * @param href - The URL to check
+ * @returns true if the URL is an inline mas field link
+ */
+export const isMasFieldLink = (href: string): boolean => {
+  if (!isMasLink(href)) return false;
+  try {
+    return new URL(href).hash.includes('field=');
+  } catch (_error) {
+    return href.includes('field=');
+  }
+};
 
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
@@ -254,6 +270,27 @@ export const [setDecorateBody, getDecorateBody] =
     ];
   })();
 
+// Host-injected Milo commerce block decorators (loaded from Milo's base)
+export type MerchDecorators = {
+  merch?: (link: HTMLAnchorElement) => unknown;    // `merch` block default
+  masCard?: (link: HTMLAnchorElement) => unknown;  // `merch-card-autoblock`
+};
+
+type MerchDecoratorsStateFunctions = [
+  (decorators: MerchDecorators) => void,
+  () => MerchDecorators,
+];
+
+export const [setMerchDecorators, getMerchDecorators] =
+  ((): MerchDecoratorsStateFunctions => {
+    let merchDecorators: MerchDecorators = {};
+
+    return [
+      (next: MerchDecorators): void => { merchDecorators = next ?? {}; },
+      (): MerchDecorators => merchDecorators,
+    ];
+  })();
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
@@ -460,13 +497,13 @@ export const replaceDotMedia = (path: string, ele: Element): void => {
   resetAttributeBase('source', 'srcset');
 };
 
-export const inlineNestedFragments = async (
-  element: Element | HTMLElement
-): Promise<Element | HTMLElement | IrrecoverableError> => {
+export const inlineNestedFragments = async <T extends Element>(
+  element: T
+): Promise<T | IrrecoverableError> => {
   const processElement = async (
-    currentElem: Element | HTMLElement | IrrecoverableError,
+    currentElem: Element | IrrecoverableError,
     visitedUrls: Set<string>
-  ): Promise<Element | HTMLElement | IrrecoverableError> => {
+  ): Promise<Element | IrrecoverableError> => {
     if (currentElem instanceof IrrecoverableError)
       return currentElem;
     try {
@@ -498,7 +535,9 @@ export const inlineNestedFragments = async (
       return new IrrecoverableError(JSON.stringify(error));
     }
   }
-  return processElement(element, new Set());
+  // processElement always resolves to the same object reference it was
+  // given (mutated in place via `replaceWith`), so this is safe.
+  return processElement(element, new Set()) as Promise<T | IrrecoverableError>;
 };
 
 export const renderListItems = <T>(

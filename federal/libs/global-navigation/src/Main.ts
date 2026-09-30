@@ -8,12 +8,13 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
-import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
+import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -56,6 +57,8 @@ export type Input = {
   // Async companion to localizeLink — runs milo's decorateLinksAsync over the
   // raw fetched body pre-parse (lingo regionalization + mep-lingo prefix).
   decorateBody?: DecorateBody;
+  // Host-injected Milo commerce decorators; falls back to a config.base import.
+  merchDecorators?: MerchDecorators;
   convertStageLinks?: (args: {
     anchors: HTMLAnchorElement[];
     hostname: string;
@@ -92,6 +95,7 @@ export const main = async (
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
   setDecorateBody(input.decorateBody ?? (async (): Promise<void> => {}));
+  if (input.merchDecorators) setMerchDecorators(input.merchDecorators);
   // Normalize null → undefined so the stored state matches the
   // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
   setLingoLocaleConfig(input.lingoRegion ?? undefined);
@@ -248,7 +252,7 @@ export const renderGnavString = ({
   return `
 <nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
-  <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
+  <a href="#main-content" class="feds-skip-link"><span class="feds-skip-link-text">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</span>${icons.chevronRightBold}</a>
   <ul role="presentation">
     ${((): string => {
       const brandComponent = components.find((c) =>
@@ -626,13 +630,17 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
     // then restore via toggle at the end.
     header.classList.remove('is-compact');
 
-    // Sum individual li widths inside gnav-items — these are not flex-grow so
-    // their offsetWidth reflects their true content width. Brand and utilities
-    // are fixed-size flex items so offsetWidth is correct for them too.
-    const brandWidth = brandWrapper?.offsetWidth ?? 0;
-    const itemsWidth = gnavItems?.offsetWidth ?? 0;
-    const utilitiesWidth = utilities?.offsetWidth ?? 0;
-    const ctaWidth = productCta?.offsetWidth ?? 0;
+    // The flex list's offsetWidth can be smaller than its content.
+    const brandWidth = brandWrapper === null
+      ? 0
+      : Math.max(brandWrapper.offsetWidth, brandWrapper.scrollWidth);
+    const itemsWidth = getIntrinsicItemsWidth(gnavItems);
+    const utilitiesWidth = utilities === null
+      ? 0
+      : Math.max(utilities.offsetWidth, utilities.scrollWidth);
+    const ctaWidth = productCta === null
+      ? 0
+      : Math.max(productCta.offsetWidth, productCta.scrollWidth);
     const contentWidth = brandWidth + itemsWidth +
       utilitiesWidth + ctaWidth + 40;
 
@@ -641,7 +649,10 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
 
   const observer = new ResizeObserver(check);
   observer.observe(header);
+  // UNAV can resize without changing the header's border box.
+  if (utilities !== null) observer.observe(utilities);
   isDesktop.addEventListener('change', check);
+  mountpoint.addEventListener(MERCH_RESOLVED_EVENT, check);
   check();
 };
 
