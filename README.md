@@ -8,7 +8,7 @@ run `npm install` in the root of the project so the `prepare` script can put the
 
 ## Submodules
 
-This project uses submodules. You may want to do
+This project uses submodules. You may want to do:
 
 ```bash
 git submodule update --init --recursive
