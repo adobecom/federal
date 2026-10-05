@@ -353,6 +353,7 @@ export const postRenderingTasks = async (
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
   initPromoCountdownInMinimizedBar();
+  initPromoCountdownInMaximizedBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -782,6 +783,23 @@ const initPromoCountdownInMinimizedBar = (): void => {
     initPromoCountdown(inner, textEl, isDark);
   });
 };
+
+const initPromoCountdownInMaximizedBar = (): void => {
+  const promoBar = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar--maximized, '
+    + '.feds-promo-aside-wrapper .feds-promo-bar--maximized-release',
+  ); 
+  if (promoBar === null) return;
+  const isDark = promoBar.classList.contains('feds-promo-bar--dark');
+  const columns = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-column');
+  columns.forEach((column) => {
+    const headlineEl = column.querySelector<HTMLElement>(':scope > .feds-promo-bar-headline');
+    if (headlineEl === null) return;
+    initPromoCountdown(column, headlineEl, isDark);
+    column.querySelector<HTMLElement>('.feds-promo-product-container .feds-promo-bar-product')?.remove();
+  });
+
+}
 
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
