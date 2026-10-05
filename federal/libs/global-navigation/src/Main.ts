@@ -796,6 +796,7 @@ const initPromoCountdownInMaximizedBar = (): void => {
     const headlineEl = column.querySelector<HTMLElement>(':scope > .feds-promo-bar-headline');
     if (headlineEl === null) return;
     initPromoCountdown(column, headlineEl, isDark);
+    if (column.querySelector('.feds-cdt') === null) return;
     column.querySelector<HTMLElement>('.feds-promo-product-container .feds-promo-bar-product')?.remove();
   });
 
