@@ -17,6 +17,7 @@ export const icons = {
   chevronLeft: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" focusable="false"><path d="M12.5 4l-5 6 5 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   chevronRight: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="3" height="6" viewBox="0 0 3 6" focusable="false"><path d="M.5.5 2.5 3 .5 5.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>',
   chevronDown: '<svg class="chevron-down" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="6" height="3.375" viewBox="0 0 6 3.375" focusable="false"><path d="M.5.5 3 2.875 5.5.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>',
+  chevronRightBold: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" focusable="false"><path d="M3.64278 11.3573C3.42347 11.3573 3.20417 11.2736 3.03676 11.1062C2.70194 10.7714 2.70194 10.229 3.03676 9.89418L6.93073 6.00021L3.03676 2.10623C2.70194 1.77141 2.70194 1.229 3.03676 0.894179C3.37157 0.559362 3.91399 0.559362 4.24881 0.894179L8.74881 5.39418C9.08363 5.729 9.08363 6.27141 8.74881 6.60623L4.24881 11.1062C4.0814 11.2736 3.86209 11.3573 3.64278 11.3573Z" fill="currentColor"/></svg>',
 };
 
 // URL path segments that should receive the `merch` class
@@ -41,6 +42,21 @@ const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
  */
 export const isMasLink = (href: string): boolean =>
   href.includes(MAS_LINK_PATH);
+
+/**
+ * Checks if a URL is an inline M@S field link (studio.html#...&field=...) that
+ * renders a single value via the `merch` block, not a full merch-card.
+ * @param href - The URL to check
+ * @returns true if the URL is an inline mas field link
+ */
+export const isMasFieldLink = (href: string): boolean => {
+  if (!isMasLink(href)) return false;
+  try {
+    return new URL(href).hash.includes('field=');
+  } catch (_error) {
+    return href.includes('field=');
+  }
+};
 
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
@@ -162,8 +178,21 @@ export type PersonalizationConfig = {
   commands: unknown[];
   handleCommands: (
     commands: unknown[],
-    rootEl: Document | HTMLElement
+    rootEl: Document | HTMLElement,
+    forceInline?: boolean,
+    forceRootEl?: boolean
   ) => unknown;
+  /**
+   * Resolves a nested fragment href (e.g. a `#_inline` product-card link) to
+   * a MEP-swapped href, if the host's manifest overrides it. Milo's own
+   * fragment loader consults `config.mep.fragments` (a page-wide map, not the
+   * `in-block:`-scoped one) via `handleFragmentCommand`, which also carries
+   * the `#_inline` marker over to the replacement — mirror that here. Falls
+   * back to the original href when omitted or when there's no override. May
+   * be async since a real implementation typically lazy-imports milo's
+   * personalization module.
+   */
+  resolveFragmentHref?: (href: string) => string | Promise<string>;
 };
 
 export type LocalizeLink = (link: string) => string;
@@ -241,6 +270,27 @@ export const [setDecorateBody, getDecorateBody] =
     ];
   })();
 
+// Host-injected Milo commerce block decorators (loaded from Milo's base)
+export type MerchDecorators = {
+  merch?: (link: HTMLAnchorElement) => unknown;    // `merch` block default
+  masCard?: (link: HTMLAnchorElement) => unknown;  // `merch-card-autoblock`
+};
+
+type MerchDecoratorsStateFunctions = [
+  (decorators: MerchDecorators) => void,
+  () => MerchDecorators,
+];
+
+export const [setMerchDecorators, getMerchDecorators] =
+  ((): MerchDecoratorsStateFunctions => {
+    let merchDecorators: MerchDecorators = {};
+
+    return [
+      (next: MerchDecorators): void => { merchDecorators = next ?? {}; },
+      (): MerchDecorators => merchDecorators,
+    ];
+  })();
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
@@ -263,14 +313,32 @@ export const getTargetAttrs = (
 };
 
 /**
- * Lingo locale config — federal-specific locale data (currently just `ietf`,
- * e.g. `'fr-LU'`) that may override the milo config locale for downstream
- * consumers (AUP SDK, UNav). Optional; consumers must fall back to
- * `getMiloConfig().locale.ietf` when `getLingoLocaleConfig()` returns
- * `undefined`.
+ * Authored links can end with `#_hide-when-registered` to be removed once the
+ * visitor is confirmed registered; the suffix is stripped here and resolved
+ * post-render in `initEventRegistrationGating`.
+ */
+export const HIDE_WHEN_REGISTERED_SUFFIX = '#_hide-when-registered';
+
+export const getRegistrationGateAttrs = (
+  href: string,
+): { href: string; hideWhenRegistered: boolean } => {
+  if (href.includes(HIDE_WHEN_REGISTERED_SUFFIX))
+    return { href: href.replace(HIDE_WHEN_REGISTERED_SUFFIX, ''), hideWhenRegistered: true };
+  return { href, hideWhenRegistered: false };
+};
+
+/**
+ * Lingo locale config — federal-specific locale data derived from the milo
+ * lingo region that may override the milo config locale for downstream
+ * consumers (AUP SDK, UNav). `ietf` (e.g. `'fr-LU'`) is the language tag used
+ * by the AUP SDK; `prefix` (e.g. `'/ie'`) is the region path used to build the
+ * UNav locale so routing follows the region, not the language tag. Optional;
+ * consumers must fall back to the milo config locale when
+ * `getLingoLocaleConfig()` returns `undefined`.
  */
 export type LingoLocaleConfig = {
   ietf: string;
+  prefix: string;
 };
 
 type LingoLocaleConfigStateFunctions = [
@@ -309,10 +377,14 @@ export const fetchAndProcessPlainHTML = async (
     const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);
     const { body } = new DOMParser().parseFromString(processedHtml, "text/html");
 
-    // Apply personalization to the fetched HTML
+    // Apply personalization to the fetched HTML. forceRootEl=true scopes
+    // selector matching to this freshly-fetched, detached `body` instead of
+    // the live `document` (which wouldn't contain it); forceInline=true
+    // mirrors milo's own nested-fragment fetch (see gnav utilities.js) so a
+    // fragment-type replacement's content keeps the `#_inline` marker.
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
-      await handleCommands(commands, body);
+      await handleCommands(commands, body, true, true);
       // Milo-provided async link decoration (lingo regionalization + QI +
       // mep-lingo prefix). Runs pre-parse on the raw body so localizeLinkAsync
       // resolves before parseNavigation reads hrefs. Non-fatal — shares this
@@ -357,9 +429,10 @@ export const getFederatedContentRoot = (): string => {
   });
 
   federatedContentRoot = isAllowedOrigin ? origin : 'https://www.adobe.com';
+  const isStandaloneTestApp = window.location.hostname === 'adobecom.github.io';
 
   const SLD = window.location.hostname.includes('.aem.') ? 'aem' : 'hlx';
-  if (origin.includes('localhost') || origin.includes(`.${SLD}.`)) {
+  if (origin.includes('localhost') || origin.includes(`.${SLD}.`) || isStandaloneTestApp) {
     federatedContentRoot = `https://main--federal--adobecom.aem.${origin.endsWith('.live') ? 'live' : 'page'}`;
   }
 
@@ -370,13 +443,6 @@ export const getFederatedContentRoot = (): string => {
 // at the start of the url
 // and make the check more strict.
 export const federateUrl = (url = ''): string => {
-  // TEMPORARY REMOVE LATER
-  if (url.includes('stage.adobe.com')) {
-    return url.replace('c2-poc--milo--adobecom', 'main--federal--adobecom');
-  }
-  if (url.includes('c2-poc-feds-gnav--milo--adobecom')) {
-    return url.replace('c2-poc-feds-gnav--milo--adobecom', 'main--federal--adobecom');
-  }
   if (url.includes('localhost:3000')) {
     return url.replace('localhost:3000', 'main--federal--adobecom.aem.page');
   }
@@ -431,13 +497,13 @@ export const replaceDotMedia = (path: string, ele: Element): void => {
   resetAttributeBase('source', 'srcset');
 };
 
-export const inlineNestedFragments = async (
-  element: Element | HTMLElement
-): Promise<Element | HTMLElement | IrrecoverableError> => {
+export const inlineNestedFragments = async <T extends Element>(
+  element: T
+): Promise<T | IrrecoverableError> => {
   const processElement = async (
-    currentElem: Element | HTMLElement | IrrecoverableError,
+    currentElem: Element | IrrecoverableError,
     visitedUrls: Set<string>
-  ): Promise<Element | HTMLElement | IrrecoverableError> => {
+  ): Promise<Element | IrrecoverableError> => {
     if (currentElem instanceof IrrecoverableError)
       return currentElem;
     try {
@@ -448,7 +514,9 @@ export const inlineNestedFragments = async (
         .map(async (anchorElement: HTMLAnchorElement) => {
           try {
             if (visitedUrls.has(anchorElement.href)) return;
-            const federatedUrl = federateUrl(anchorElement.href);
+            const resolvedHref = await (getPersonalizationConfig()
+              .resolveFragmentHref?.(anchorElement.href) ?? anchorElement.href);
+            const federatedUrl = federateUrl(resolvedHref);
             const fragmentUrl = new URL(federatedUrl);
             const fragmentBody = await fetchAndProcessPlainHTML(fragmentUrl);
             visitedUrls.add(anchorElement.href);
@@ -467,7 +535,9 @@ export const inlineNestedFragments = async (
       return new IrrecoverableError(JSON.stringify(error));
     }
   }
-  return processElement(element, new Set());
+  // processElement always resolves to the same object reference it was
+  // given (mutated in place via `replaceWith`), so this is safe.
+  return processElement(element, new Set()) as Promise<T | IrrecoverableError>;
 };
 
 export const renderListItems = <T>(

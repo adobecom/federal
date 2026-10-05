@@ -1,4 +1,11 @@
-import { getAnalyticsAttrs, getAriaAttrs, getTargetAttrs, localizeHref } from "../../Utils/Utils";
+import {
+  getAnalyticsAttrs,
+  getAriaAttrs,
+  getTargetAttrs,
+  getRegistrationGateAttrs,
+  isMasFieldLink,
+  localizeHref,
+} from "../../Utils/Utils";
 import { PrimaryCTA, ProductEntryCTA, SecondaryCTA } from "./Parse";
 
 export const primaryCTA = ({
@@ -8,15 +15,19 @@ export const primaryCTA = ({
   ariaLabel,
   ariaAttrs,
 }: PrimaryCTA): HTML => {
-  const { href: strippedHref, target } = getTargetAttrs(href);
+  const { href: unblankedHref, target } = getTargetAttrs(href);
+  const { href: strippedHref, hideWhenRegistered } =
+    getRegistrationGateAttrs(unblankedHref);
+  const pendingMerchAttr = isMasFieldLink(strippedHref)
+    ? ' data-feds-merch-pending'
+    : '';
   return `
 <a href="${localizeHref(strippedHref)}"
-  class="feds-primary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  class="feds-primary-cta"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
+  ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
->
-  ${text}
-</a>
+>${text}</a>
 `;
 };
 
@@ -27,15 +38,19 @@ export const secondaryCTA = ({
   ariaLabel,
   ariaAttrs,
 }: SecondaryCTA): HTML => {
-  const { href: strippedHref, target } = getTargetAttrs(href);
+  const { href: unblankedHref, target } = getTargetAttrs(href);
+  const { href: strippedHref, hideWhenRegistered } =
+    getRegistrationGateAttrs(unblankedHref);
+  const pendingMerchAttr = isMasFieldLink(strippedHref)
+    ? ' data-feds-merch-pending'
+    : '';
   return `
 <a href="${localizeHref(strippedHref)}"
-  class="feds-secondary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  class="feds-secondary-cta"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
+  ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
->
-  ${text}
-</a>
+>${text}</a>
 `;
 };
 
@@ -44,4 +59,3 @@ export const productEntryCTA = (
 ): HTML => `<div class="feds-product-entry-cta">${
   cta.type === "PrimaryCTA" ? primaryCTA(cta) : secondaryCTA(cta)
 }</div>`;
-

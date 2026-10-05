@@ -1,14 +1,12 @@
 import { primaryCTA, secondaryCTA } from "../CTA/Render";
 import { PrimaryCTA, SecondaryCTA } from "../CTA/Parse";
 import { PromoBar, PromoBarContent, PromoBarViewport } from "./Parse";
-import { federateUrl } from "../../Utils/Utils";
+import { svgIcon } from "../SvgIcon/Render";
 
 const iconHTML = (
   src: string | null,
   alt: string | null,
-): HTML => src !== null
-  ? `<img class="feds-promo-bar-icon" src="${federateUrl(src)}" alt="${alt ?? ''}" width="40" height="40" loading="lazy">`
-  : '';
+): HTML => svgIcon({ src, alt }, { imgClass: 'feds-promo-bar-icon', width: 40, height: 40 });
 
 const ctasHTML = (
   p: PrimaryCTA | null,
@@ -99,7 +97,7 @@ const maximizedReleaseSlot = (
     ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
     ${ctasHTML(col.primaryCta, col.secondaryCta)}
     </div>
-    ${col.bgImage !== null ? `<picture class="feds-promo-bar-bg"><img loading="lazy" src="${federateUrl(col.bgImage)}" alt=""></picture>` : ''}
+    ${col.bgImage ?? ''}
   </div>
 </div>`.trim();
 };

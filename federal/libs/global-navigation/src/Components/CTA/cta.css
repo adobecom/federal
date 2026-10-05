@@ -1,4 +1,8 @@
 .global-navigation {
+  & [data-feds-registration-pending] {
+    visibility: hidden;
+  }
+
   /* =========================================
      Product Entry CTA — layout
      ========================================= */
@@ -6,12 +10,9 @@
   & .feds-product-entry-cta {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
     margin-left: auto;
     margin-right: var(--s2a-spacing-sm);
-
-    @media (max-width: 1024px) {
-      display: none;
-    }
 
     & + .feds-utilities {
       margin-left: 0;
@@ -30,6 +31,69 @@
   }
 
   /* =========================================
+     Pinned CTA — toolbar clone of the trailing nav CTA,
+     shown next to the hamburger at compact/mobile
+     ========================================= */
+
+  & .feds-pinned-cta {
+    display: none;
+    align-items: center;
+    flex-shrink: 0;
+    /* Right-align the trailing CTA group (drawer is out of flow here). */
+    margin-left: auto;
+    margin-right: var(--s2a-spacing-sm);
+
+    /* Native mobile: below the drawer breakpoint */
+    @media (max-width: 1023px) {
+      display: flex;
+    }
+  }
+
+  /* Desktop-width overflow collapse */
+  &.is-compact .feds-pinned-cta {
+    display: flex;
+  }
+
+  /* Dynamic reflow: JS adds .feds-cta-overflow when the brand + CTAs +
+     utilities can't all fit, hiding both toolbar CTAs so they never overlap
+     the hamburger (they stay reachable in the drawer). */
+  &.feds-cta-overflow :is(.feds-pinned-cta, .feds-product-entry-cta) {
+    display: none;
+  }
+
+  /* Pinned CTA owns the right-align margin; product CTA just needs a gap */
+  & .feds-pinned-cta + .feds-product-entry-cta {
+    margin-left: 0;
+  }
+
+  [dir="rtl"] & .feds-pinned-cta {
+    margin-left: var(--s2a-spacing-sm);
+    margin-right: auto;
+  }
+
+  [dir="rtl"] & .feds-pinned-cta + .feds-product-entry-cta {
+    margin-right: 0;
+  }
+
+  /* Drawer open: pinned copy hidden, drawer's own copy shows instead */
+  &:has(.feds-menu-wrapper.is-open) .feds-pinned-cta {
+    display: none;
+  }
+
+  /* Compact/mobile pill sizing; :is()/:not() specificity beats the base rule */
+  &.is-compact :is(.feds-pinned-cta, .feds-product-entry-cta) :is(.feds-primary-cta, .feds-secondary-cta) {
+    padding: 8px var(--s2a-spacing-md);
+    font-size: var(--s2a-typography-font-size-body-sm);
+  }
+
+  @media (max-width: 1023px) {
+    &:not(.is-compact) :is(.feds-pinned-cta, .feds-product-entry-cta) :is(.feds-primary-cta, .feds-secondary-cta) {
+      padding: 8px var(--s2a-spacing-md);
+      font-size: var(--s2a-typography-font-size-body-sm);
+    }
+  }
+
+  /* =========================================
      Gnav + product entry CTA — shared base
      ========================================= */
 
@@ -41,7 +105,9 @@
     ul.feds-gnav-items > li > .feds-primary-cta,
     ul.feds-gnav-items > li > .feds-secondary-cta,
     .feds-product-entry-cta .feds-primary-cta,
-    .feds-product-entry-cta .feds-secondary-cta
+    .feds-product-entry-cta .feds-secondary-cta,
+    .feds-pinned-cta .feds-primary-cta,
+    .feds-pinned-cta .feds-secondary-cta
   ) {
     display: inline-flex;
     align-items: center;
@@ -65,7 +131,7 @@
      Default: white pill, dark text (transparent gnav over imagery)
      ========================================= */
 
-  & :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
+  & :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta, .feds-pinned-cta .feds-primary-cta) {
     background-color: var(--s2a-color-gray-25);
     color: var(--s2a-color-gray-1000);
     border-color: var(--s2a-color-gray-25);
@@ -77,23 +143,55 @@
     }
   }
 
-  /* Dark font: invert to dark pill, white text */
-   @media (min-width: 1024px) {
-    &.dark-font:not(.is-compact) :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
-      background-color: var(--s2a-color-gray-1000);
-      color: var(--s2a-color-gray-25);
-      border-color: var(--s2a-color-gray-1000);
+  @media (width < 1024px) {
+    &:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
+      margin: 0;
+      margin-top: var(--s2a-spacing-sm);
+      width: calc(100% - 2 * var(--s2a-spacing-lg));
+    }
+  }
 
-      &:hover {
-        background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
-        color: var(--s2a-color-gray-25);
-        border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
-      }
+  @media (width <= 768px) {
+    &:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta),
+    &.is-compact:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
+      width: 100%;
+    }
+  }
+
+  &.is-compact:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
+    margin: 0;
+    margin-top: var(--s2a-spacing-sm);
+    width: calc(100% - 2 * var(--s2a-spacing-lg));
+  }
+
+  &:is(.dark-font, .is-compact) .feds-product-entry-cta .feds-primary-cta,
+  &:is(.dark-font, .is-compact):not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) ul.feds-gnav-items > li > .feds-primary-cta {
+    background-color: var(--s2a-color-gray-1000);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-1000);
+
+    &:hover {
+      background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+    }
+  }
+
+  /* Dark font: dark pill for the toolbar CTAs at any width (they show over the hero) */
+  &.dark-font :is(.feds-product-entry-cta .feds-primary-cta, .feds-pinned-cta .feds-primary-cta) {
+    background-color: var(--s2a-color-gray-1000);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-1000);
+
+    &:hover {
+      background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
     }
   }
 
   /* Scrolled: dark pill regardless of font theme */
-  &.feds-header-scrolled :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
+  &.feds-header-scrolled :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta, .feds-pinned-cta .feds-primary-cta) {
     background-color: var(--s2a-color-gray-1000);
     color: var(--s2a-color-gray-25);
     border-color: var(--s2a-color-gray-1000);
@@ -106,7 +204,7 @@
   }
 
   /* Menu active: invert primary to dark — desktop only, not compact */
-  @media (min-width: 1024px) {
+  @media (width >= 1024px) {
     &:not(.is-compact):has(.feds-menu-active):not(:has(.small-menu.is-open)) :is(
       ul.feds-gnav-items > li > .feds-primary-cta,
       .feds-product-entry-cta .feds-primary-cta
@@ -122,7 +220,7 @@
      Default: outlined white, transparent fill
      ========================================= */
 
-  & :is(ul.feds-gnav-items > li > .feds-secondary-cta, .feds-product-entry-cta .feds-secondary-cta) {
+  & :is(ul.feds-gnav-items > li > .feds-secondary-cta, .feds-product-entry-cta .feds-secondary-cta, .feds-pinned-cta .feds-secondary-cta) {
     background-color: transparent;
     color: var(--s2a-color-gray-25);
     border-color: var(--s2a-color-gray-25);
@@ -135,7 +233,7 @@
     }
   }
 
-  &.dark-font :is(ul.feds-gnav-items > li > .feds-secondary-cta, .feds-product-entry-cta .feds-secondary-cta) {
+  &.dark-font :is(ul.feds-gnav-items > li > .feds-secondary-cta, .feds-product-entry-cta .feds-secondary-cta, .feds-pinned-cta .feds-secondary-cta) {
     border-color: var(--s2a-color-gray-1000);
     color: var(--s2a-color-gray-1000);
 
@@ -147,7 +245,8 @@
 
   &.feds-header-scrolled :is(
     ul.feds-gnav-items > li > .feds-secondary-cta,
-    .feds-product-entry-cta .feds-secondary-cta
+    .feds-product-entry-cta .feds-secondary-cta,
+    .feds-pinned-cta .feds-secondary-cta
   ) {
     color: var(--s2a-color-gray-1000);
     border-color: var(--s2a-color-gray-1000);
@@ -160,13 +259,50 @@
     border-color: var(--s2a-color-gray-1000);
   }
 
-  /* Open popup / mobile drawer: force dark-outline on product entry CTA
-     regardless of scroll state (gnav backdrop turns light/grey). */
-  &:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta {
-    & :is(.feds-primary-cta, .feds-secondary-cta) {
+  /* Open popup / drawer: light backdrop, so dark-on-light — primary stays a
+     solid dark pill, secondary switches to a transparent dark outline */
+  &:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) :is(.feds-product-entry-cta, .feds-pinned-cta) {
+    & .feds-primary-cta {
+      background-color: var(--s2a-color-gray-1000);
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-gray-1000);
+    }
+
+    & .feds-secondary-cta {
       background-color: transparent;
       color: var(--s2a-color-gray-1000);
       border-color: var(--s2a-color-gray-1000);
+    }
+  }
+
+  /* CTA nav item in the open hamburger drawer: black fill (primary) / dark
+     outline (secondary) for contrast on the light drawer, left-aligned.
+     Applies to every gnav consumer's drawer CTA, not just MAX. */
+  &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > :is(.feds-primary-cta, .feds-secondary-cta) {
+    margin-left: 0;
+    /* Drawer nav links get their spacing from a large line-height; a CTA
+       doesn't, so add top spacing so it doesn't hug the last link. */
+    margin-top: var(--s2a-spacing-sm);
+  }
+
+  &:has(.feds-menu-wrapper.is-open):not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) ul.feds-gnav-items > li > .feds-primary-cta {
+    background-color: var(--s2a-color-gray-1000);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-1000);
+  }
+
+  &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > .feds-secondary-cta {
+    background-color: transparent;
+    color: var(--s2a-color-gray-1000);
+    border-color: var(--s2a-color-gray-1000);
+  }
+
+  /* Full-width only on small screens; stays a natural-width pill from 769px up. */
+  @media (max-width: 768px) {
+    &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > :is(.feds-primary-cta, .feds-secondary-cta) {
+      display: flex;
+      width: 100%;
+      box-sizing: border-box;
     }
   }
 

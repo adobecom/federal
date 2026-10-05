@@ -7,10 +7,13 @@ import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
-import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
+import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
+import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -37,22 +40,26 @@ export type Input = {
   unavEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
+  // Geo-validated market for the unav and drives the cart. String or a
+  // promise the host resolves in parallel;
+  countryCode?: string | Promise<string | undefined>;
   lingoRegion?: LingoLocaleConfig;
-  // for now we only support inBlock commands.
-  // Since MEP on gnav is relatively rare we'll
-  // keep it at this and see if any problems crop up.
-  // The Milo gnav MEP implementation is a little
-  // more entangled than what we have here.
-  // For example we're not dealing with adding manifestId to the body
-  // and so on. But the whole idea behind this refactor is
-  // that we want to reduce coupling.
-  // So we'll keep it at this for now and re-evaluate at a
-  // later date.
+  // We deliberately stay less entangled with MEP than milo's own gnav
+  // implementation (e.g. we don't add manifestId to the body). The host is
+  // expected to supply `handleCommands` (applied to each freshly-fetched,
+  // detached fragment body) and, if fragment-swap manifests targeting
+  // content nested inside the gnav are needed (e.g. a product-card
+  // fragment), `resolveFragmentHref` — see PersonalizationConfig in Utils.ts.
   personalization: PersonalizationConfig;
   localizeLink?: LocalizeLink;
   // Async companion to localizeLink — runs milo's decorateLinksAsync over the
   // raw fetched body pre-parse (lingo regionalization + mep-lingo prefix).
   decorateBody?: DecorateBody;
+  // Host-injected Milo commerce decorators; falls back to a config.base import.
+  merchDecorators?: MerchDecorators;
+  // Milo's appendHtmlToLink: adds `.html` to extensionless internal links
+  // when config.useDotHtml is on. Runs pre-localize to mirror c1.
+  appendHtmlToLink?: (link: HTMLAnchorElement) => void;
   convertStageLinks?: (args: {
     anchors: HTMLAnchorElement[];
     hostname: string;
@@ -88,7 +95,17 @@ export const main = async (
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
-  setDecorateBody(input.decorateBody ?? (async (): Promise<void> => {}));
+  setDecorateBody(async (body): Promise<void> => {
+    const anchors = [...body.querySelectorAll<HTMLAnchorElement>('a')];
+    anchors.forEach((anchor) => input.appendHtmlToLink?.(anchor));
+    await input.decorateBody?.(body);
+    input.convertStageLinks?.({
+      anchors,
+      hostname: window.location.hostname,
+      href: window.location.href,
+    });
+  });
+  if (input.merchDecorators) setMerchDecorators(input.merchDecorators);
   // Normalize null → undefined so the stored state matches the
   // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
   setLingoLocaleConfig(input.lingoRegion ?? undefined);
@@ -125,12 +142,6 @@ export const main = async (
   }
 
   await renderGnav(gnavData)(mountpoint);
-
-  input.convertStageLinks?.({
-    anchors: [...mountpoint.querySelectorAll('a')],
-    hostname: window.location.hostname,
-    href: window.location.href,
-  });
 
   return postRenderingTasks(input);
 };
@@ -201,36 +212,55 @@ export const renderGnavString = ({
   placeholders,
   localnav,
   brandConciergeEnabled,
+  notificationsEnabled,
 }: GlobalNavigationData
 ): string => {
+  const menuComponents = components.filter((c) => c.type !== "Brand");
   // In localnav mobile, the menu-wrapper is repurposed as the localnav bar
   // (a thin clickable strip below the main nav row that expands inline to
-  // reveal the remaining mega-menu entries). Its label mirrors the last
-  // breadcrumb crumb so it reads as the current section.
-  const lastBreadcrumb = localnav && breadcrumbs !== null &&
-    breadcrumbs.items.length > 0
-      ? breadcrumbs.items[breadcrumbs.items.length - 1]
-      : null;
-  const localnavBarLabel = lastBreadcrumb === null
+  // reveal the remaining mega-menu entries), and the hamburger opens that
+  // same mega menu's popup directly. Its label mirrors the mega menu's own
+  // title rather than the breadcrumbs, matching how milo global-navigation
+  // sources a standalone local nav's label from the nav's own first item -
+  // clients without breadcrumbs can still have a localnav.
+  const firstMegaMenu = localnav
+    ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
+    : null;
+  const localnavBarSibling = firstMegaMenu !== null
+    ? menuComponents[menuComponents.indexOf(firstMegaMenu) + 1] ?? null
+    : null;
+  // The sibling's label lives in a different field per component type:
+  // MegaMenu/SmallMenu use `title`, Link/CTAs use `text`, Text uses `content`.
+  const localnavBarLabel = localnavBarSibling === null
     ? ''
-    : typeof lastBreadcrumb === 'string'
-      ? lastBreadcrumb
-      : lastBreadcrumb.text;
+    : 'title' in localnavBarSibling
+      ? localnavBarSibling.title
+      : 'text' in localnavBarSibling
+        ? localnavBarSibling.text
+        : 'content' in localnavBarSibling
+          ? localnavBarSibling.content
+          : '';
+  // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
+  // stays visible beside the hamburger, not only inside the drawer.
+  const ctaComponents = components.filter(
+    (c) => c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA'
+  );
+  const trailingCta = ctaComponents[ctaComponents.length - 1];
+  const pinnedCtaHTML = trailingCta !== undefined
+    ? `<div class="feds-pinned-cta">${component(trailingCta)}</div>`
+    : '';
+
   return `
 <nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
-  <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
+  <a href="#main-content" class="feds-skip-link"><span class="feds-skip-link-text">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</span>${icons.chevronRightBold}</a>
   <ul role="presentation">
     ${((): string => {
       const brandComponent = components.find((c) =>
         c.type === "Brand"
       ) ?? null;
-      const menuComponents = components.filter((c) => c.type !== "Brand");
       // In localnav mode the hamburger should open the first mega menu's
       // popup directly rather than the menu wrapper / gnav-items list.
-      const firstMegaMenu = localnav
-        ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
-        : null;
       const toggleControlsId = firstMegaMenu !== null
         ? sanitize(firstMegaMenu.title)
         : 'feds-menu-wrapper';
@@ -262,8 +292,8 @@ export const renderGnavString = ({
 
       return `
         <li class="feds-brand-wrapper">
-          ${brandHTML}
           ${toggleButton}
+          ${brandHTML}
         </li>
         <li
           id="feds-menu-wrapper"
@@ -286,7 +316,9 @@ export const renderGnavString = ({
     })()}
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
+  ${pinnedCtaHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
+  ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
@@ -298,13 +330,6 @@ export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
-  const unav = await loadUnav(input.mountpoint);
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
-  }
-  else
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
@@ -313,21 +338,35 @@ export const postRenderingTasks = async (
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initPromoBarHeight(input.mountpoint);
   initLanguageBannerOffset(input.mountpoint);
+  initBranchBannerOffset(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
   initKeyboardNav(input.mountpoint);
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
-  initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
+  initPromoCountdownInMinimizedBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
     lanaLog(error.message);
   });
+
+  // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
+  initEventRegistrationGating(input.mountpoint);
+  const unav = await loadUnav(input.mountpoint, {
+    countryCode: input.countryCode,
+  });
+  if (unav instanceof RecoverableError) {
+    errors.add(unav);
+    lanaLog(unav.message);
+  }
+  else
+    unav.errors.forEach((error: RecoverableError) => errors.add(error));
+  initPopoverCloseOnUnavInteraction(input.mountpoint);
 
   const reloadUnav
     = unav instanceof RecoverableError
@@ -544,40 +583,75 @@ const initHeaderAnalytics = (
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
 
+// Min gap (px) between the brand/hamburger and the trailing CTA group.
+const CTA_OVERFLOW_GAP = 32;
+
 const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const header = mountpoint.closest<HTMLElement>('header.global-navigation');
   if (!header) return;
 
+  const nav = mountpoint.querySelector<HTMLElement>('nav');
   const brandWrapper = mountpoint.querySelector<HTMLElement>('.feds-brand-wrapper');
   const gnavItems = mountpoint.querySelector<HTMLElement>('.feds-gnav-items');
   const utilities = mountpoint.querySelector<HTMLElement>('.feds-utilities');
+  const bcWrapper = mountpoint.querySelector<HTMLElement>('.feds-bc-wrapper');
+  const pinnedCta = mountpoint.querySelector<HTMLElement>('.feds-pinned-cta');
   const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
 
   const check = (): void => {
-    if (!isDesktop.matches) {
-      header.classList.remove('is-compact');
-      return;
-    }
-    // Temporarily strip is-compact so we measure the natural desktop widths,
-    // then restore via toggle at the end.
+    // Skip re-measuring while a menu/popup is open. Stripping the state classes
+    // below (even momentarily) drops the compact-scoped body scroll-lock (see
+    // `body:has(header.global-navigation.is-compact ...)` in styles.css), which
+    // lets the scrollbar flash back in and changes `header`'s width — the very
+    // thing this function's ResizeObserver watches — retriggering check() in an
+    // infinite loop that resets the gnav reveal animation mid-flight. Nothing
+    // about open/closed state changes whether the content overflows, so just
+    // wait for the next real resize or breakpoint change.
+    if (header.querySelector('.feds-menu-wrapper.is-open, .feds-popup.is-open')) return;
+
+    const mobile = !isDesktop.matches;
+
+    // Strip both classes first so measurements read natural (all-shown) widths.
     header.classList.remove('is-compact');
+    header.classList.remove('feds-cta-overflow');
 
-    // Sum individual li widths inside gnav-items — these are not flex-grow so
-    // their offsetWidth reflects their true content width. Brand and utilities
-    // are fixed-size flex items so offsetWidth is correct for them too.
-    const brandWidth = brandWrapper?.offsetWidth ?? 0;
-    const itemsWidth = gnavItems?.offsetWidth ?? 0;
-    const utilitiesWidth = utilities?.offsetWidth ?? 0;
-    const ctaWidth = productCta?.offsetWidth ?? 0;
-    const contentWidth = brandWidth + itemsWidth +
-      utilitiesWidth + ctaWidth + 40;
+    // Stage 1: is-compact (desktop overflow collapse; mobile uses the drawer).
+    if (!mobile) {
+      // The flex list's offsetWidth can be smaller than its content.
+      const brandWidth = brandWrapper === null
+        ? 0
+        : Math.max(brandWrapper.offsetWidth, brandWrapper.scrollWidth);
+      const itemsWidth = getIntrinsicItemsWidth(gnavItems);
+      const utilitiesWidth = utilities === null
+        ? 0
+        : Math.max(utilities.offsetWidth, utilities.scrollWidth);
+      const ctaWidth = productCta === null
+        ? 0
+        : Math.max(productCta.offsetWidth, productCta.scrollWidth);
+      const contentWidth = brandWidth + itemsWidth +
+        utilitiesWidth + ctaWidth + 40;
+      header.classList.toggle('is-compact', contentWidth > header.clientWidth);
+    }
 
-    header.classList.toggle('is-compact', contentWidth > header.clientWidth);
+    // Stage 2: when collapsed, hide both toolbar CTAs if they'd overlap the
+    // hamburger (they stay reachable in the drawer).
+    const collapsed = mobile || header.classList.contains('is-compact');
+    if (!collapsed || (!pinnedCta && !productCta)) return;
+    const needed = (brandWrapper?.offsetWidth ?? 0)
+      + (bcWrapper?.offsetWidth ?? 0)
+      + (pinnedCta?.offsetWidth ?? 0)
+      + (productCta?.offsetWidth ?? 0)
+      + (utilities?.offsetWidth ?? 0) + CTA_OVERFLOW_GAP;
+    const available = nav?.clientWidth ?? header.clientWidth;
+    header.classList.toggle('feds-cta-overflow', needed > available);
   };
 
   const observer = new ResizeObserver(check);
   observer.observe(header);
+  // UNAV can resize without changing the header's border box.
+  if (utilities !== null) observer.observe(utilities);
   isDesktop.addEventListener('change', check);
+  mountpoint.addEventListener(MERCH_RESOLVED_EVENT, check);
   check();
 };
 
@@ -591,8 +665,14 @@ const isCurrentPageHref = (href: string): boolean => {
 const findActiveLink = (
   mountpoint: HTMLElement
 ): HTMLAnchorElement | null => {
+  // In localnav the first top-level <li> (before the divider) is the mega
+  // menu whose title also labels the localnav bar — it represents the
+  // section itself rather than a sibling destination, so it's excluded here
+  // and only links after the divider are eligible to be marked active.
+  const isLocalnav = mountpoint.querySelector('nav.localnav') !== null;
   return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
     .filter(a => !a.closest('.feds-breadcrumbs'))
+    .filter(a => !isLocalnav || a.closest('ul.feds-gnav-items > li:first-child') === null)
     .find(a => isCurrentPageHref(a.href)) ?? null;
 };
 
@@ -676,6 +756,28 @@ const waitUntilVisible = (callback: () => void): void => {
   check();
 };
 
+/**
+ * Injects a countdown timer into every `.feds-promo-bar-inner` slot of a
+ * `minimized` PromoBar.  Reads the `gnav-promo-countdown` meta tag for the
+ * start/end window; no-ops silently when the tag is absent, malformed, or
+ * the current time is outside the window.
+ */
+const initPromoCountdownInMinimizedBar = (): void => {
+  const promoBar = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar--minimized',
+  );
+  if (promoBar === null) return;
+
+  const isDark = promoBar.classList.contains('feds-promo-bar--dark');
+  const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
+
+  inners.forEach((inner) => {
+    const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
+    if (textEl === null) return;
+    initPromoCountdown(inner, textEl, isDark);
+  });
+};
+
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
@@ -753,4 +855,79 @@ const initLanguageBannerOffset = (mountpoint: HTMLElement): void => {
     observe(el);
   });
   mo.observe(document.body, { childList: true });
+};
+
+const BRANCH_BANNER_ID = 'branch-banner-iframe';
+
+// #branch-banner-iframe is injected by the branch/PR preview overlay
+// (unrelated to gnav's own render) and can be added or removed at any point.
+// It's either `position: fixed` (must stay on screen permanently, e.g. "now
+// previewing branch X") or in normal flow (pushes header down, then scrolls
+// away once header's `position: sticky` takes over — same as the promo bar /
+// language banner above). Unlike those two, the branch banner isn't measured
+// against a hardcoded height — it's authored by an external tool, so its
+// height is read live via ResizeObserver, same as the promo bar.
+const initBranchBannerOffset = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+
+  let resizeObserver: ResizeObserver | null = null;
+  let intersectionObserver: IntersectionObserver | null = null;
+
+  const teardown = (): void => {
+    resizeObserver?.disconnect();
+    intersectionObserver?.disconnect();
+    resizeObserver = null;
+    intersectionObserver = null;
+    header.classList.remove('feds-branch-banner-fixed', 'feds-branch-banner-showing');
+    document.documentElement.style.removeProperty('--feds-branch-banner-height');
+  };
+
+  const setup = (banner: HTMLElement): void => {
+    const updateHeight = (): void => {
+      document.documentElement.style.setProperty(
+        '--feds-branch-banner-height',
+        `${banner.offsetHeight}px`,
+      );
+    };
+    resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(banner);
+    updateHeight();
+
+    // A fixed banner never leaves the viewport, so its offset is permanent —
+    // no IntersectionObserver needed. An in-flow banner behaves like the
+    // promo bar / language banner: only "showing" until it scrolls past.
+    if (window.getComputedStyle(banner).position === 'fixed') {
+      header.classList.add('feds-branch-banner-fixed');
+      return;
+    }
+    intersectionObserver = new IntersectionObserver(([entry]) => {
+      header.classList.toggle('feds-branch-banner-showing', entry.isIntersecting);
+    });
+    intersectionObserver.observe(banner);
+  };
+
+  const existing = document.getElementById(BRANCH_BANNER_ID);
+  if (existing) setup(existing);
+
+  // The preview overlay can add/remove the banner at any point in the page's
+  // lifetime (not just once, like the language banner), so this observer is
+  // kept running indefinitely rather than disconnecting after first sight.
+  new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        const isBanner = node instanceof HTMLElement
+          && node.id === BRANCH_BANNER_ID;
+        if (!isBanner) return;
+        // Let the banner's own styles/layout settle before reading its
+        // computed position/height.
+        requestAnimationFrame(() => setup(node));
+      });
+      mutation.removedNodes.forEach((node) => {
+        const isBanner = node instanceof HTMLElement
+          && node.id === BRANCH_BANNER_ID;
+        if (isBanner) teardown();
+      });
+    });
+  }).observe(document.body, { childList: true });
 };

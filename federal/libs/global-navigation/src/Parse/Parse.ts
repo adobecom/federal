@@ -16,6 +16,7 @@ export type GlobalNavigationData = {
   unavEnabled: boolean;
   placeholders: Map<string, string>;
   brandConciergeEnabled: boolean;
+  notificationsEnabled: boolean;
 };
 
 export const parseNavigation = (
@@ -50,15 +51,19 @@ export const parseNavigation = (
   // rendered to the right of the gnav (immediately to the left of the
   // unav) rather than inside the menu list, so we lift the first
   // ProductEntryCTA out of the components array.
-  const productCTA = parsedComponents.find(
-    (c): c is ProductEntryCTA => c.type === "ProductEntryCTA"
-  ) ?? null;
+  const productEntryCtaEnabled = getMetadata('product-entry-cta')?.toLowerCase() === 'on';
+  const productCTA = productEntryCtaEnabled
+    ? parsedComponents.find(
+      (c): c is ProductEntryCTA => c.type === "ProductEntryCTA"
+    ) ?? null
+    : null;
   const components = parsedComponents.filter(
     (c) => c.type !== "ProductEntryCTA"
   );
   const localnav = getMetadata('localnav') === 'true';
   const darkFont = getMetadata('gnav-dark-font') === 'true';
   const brandConciergeEnabled = getMetadata('gnav-brand-concierge') === 'on';
+  const notificationsEnabled = getMetadata('gnav-notifications') === 'on';
   const errors = [
     breadcrumbErrors,
     componentErrors,
@@ -75,5 +80,6 @@ export const parseNavigation = (
     unavEnabled,
     placeholders,
     brandConciergeEnabled,
+    notificationsEnabled,
   }
 };
