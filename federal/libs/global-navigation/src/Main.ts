@@ -57,8 +57,8 @@ export type Input = {
   decorateBody?: DecorateBody;
   // Host-injected Milo commerce decorators; falls back to a config.base import.
   merchDecorators?: MerchDecorators;
-  // Milo's appendHtmlToLink — adds `.html` to extensionless internal links when
-  // config.useDotHtml is on; runs pre-localize to mirror c1's decorateLinksAsync.
+  // Milo's appendHtmlToLink: adds `.html` to extensionless internal links
+  // when config.useDotHtml is on. Runs pre-localize to mirror c1.
   appendHtmlToLink?: (link: HTMLAnchorElement) => void;
   convertStageLinks?: (args: {
     anchors: HTMLAnchorElement[];
