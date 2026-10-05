@@ -819,6 +819,43 @@ const initPromoCountdownInPromoBar = (): void => {
   
 };
 
+<<<<<<< HEAD
+=======
+const initPromoCountdownInMaximizedBar = (): void => {
+  const promoBar = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar--maximized, '
+    + '.feds-promo-aside-wrapper .feds-promo-bar--maximized-release',
+  ); 
+  if (promoBar === null) return;
+  const isDark = promoBar.classList.contains('feds-promo-bar--dark');
+  const columns = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-column');
+  columns.forEach((column) => {
+    const headlineEl = column.querySelector<HTMLElement>(':scope > .feds-promo-bar-headline');
+    if (headlineEl === null) return;
+    initPromoCountdown(column, headlineEl, isDark);
+    if (column.querySelector('.feds-cdt') === null) return;
+    const productEL = column.querySelector<HTMLElement>('.feds-promo-product-container .feds-promo-bar-product');
+    if (productEL === null) return;
+
+    productEL.hidden = true;
+    const restore = new MutationObserver(() => {
+      if (column.querySelector('.feds-cts') != null) return;
+      productEL.hidden = false;
+      restore.disconnect();
+    });
+    restore.observe(column, { childList: true, subtree: true});
+
+    const cleanup = new MutationObserver(() => {
+      if (document.contains(column)) return;
+      restore.disconnect();
+      cleanup.disconnect();
+    });
+    cleanup.observe(document.body, { childList: true, subtree: true});
+  });
+
+}
+
+>>>>>>> c2bfbb0 (Added logic to show product when time ends)
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
