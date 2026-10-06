@@ -767,10 +767,6 @@ const waitUntilVisible = (callback: () => void): void => {
  * meta tag for the start/end window; no-ops silently when the tag is absent,
  * malformed, or the current time is outside the window.
  */
-<<<<<<< HEAD
-=======
-
->>>>>>> b2e4ea2 (Updated the timer function for maximized promo)
 const initPromoCountdownInPromoBar = (): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
@@ -788,7 +784,6 @@ const initPromoCountdownInPromoBar = (): void => {
     });
     return;
   }
-<<<<<<< HEAD
 
   // Maximized / maximized-release: the icon lives inside the product
   // container, so the timer is grouped there, before the product name.
@@ -824,61 +819,6 @@ const initPromoCountdownInPromoBar = (): void => {
   
 };
 
-<<<<<<< HEAD
-=======
-const initPromoCountdownInMaximizedBar = (): void => {
-  const promoBar = document.querySelector<HTMLElement>(
-    '.feds-promo-aside-wrapper .feds-promo-bar--maximized, '
-    + '.feds-promo-aside-wrapper .feds-promo-bar--maximized-release',
-  ); 
-  if (promoBar === null) return;
-  const isDark = promoBar.classList.contains('feds-promo-bar--dark');
-  const columns = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-column');
-  columns.forEach((column) => {
-    const headlineEl = column.querySelector<HTMLElement>(':scope > .feds-promo-bar-headline');
-    if (headlineEl === null) return;
-    initPromoCountdown(column, headlineEl, isDark);
-    if (column.querySelector('.feds-cdt') === null) return;
-    const productEL = column.querySelector<HTMLElement>('.feds-promo-product-container .feds-promo-bar-product');
-    if (productEL === null) return;
-=======
-
-  // Maximized / maximized-release: the icon lives inside the product
-  // container, so the timer is grouped there, before the product name.
-  const containers = promoBar.querySelectorAll<HTMLElement>(
-    '.feds-promo-product-container',
-  );
-  
-  containers.forEach((container) => {
-    const productName = container.querySelector<HTMLElement>(
-      ':scope > .feds-promo-bar-product',
-    );
-    if (productName === null) return;
-    initPromoCountdown(container, productName, isDark);
-    const cdt = isDark ? '.feds-cdt--dark' : '.feds-cdt'
-    if (container.querySelector(cdt) == null) return;
-    productName.style.setProperty('display', 'none');
->>>>>>> b2e4ea2 (Updated the timer function for maximized promo)
-
-    const restore = new MutationObserver(() => {
-      if (container.querySelector(cdt) != null) return;
-      productName.style.removeProperty('display');
-      restore.disconnect();
-    });
-    restore.observe(container, { childList: true, subtree: true});
-
-    const cleanup = new MutationObserver(() => {
-      if (document.contains(container)) return;
-      restore.disconnect();
-      cleanup.disconnect();
-    });
-    cleanup.observe(document.body, { childList: true, subtree: true});
-
-  });
-  
-};
-
->>>>>>> c2bfbb0 (Added logic to show product when time ends)
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
