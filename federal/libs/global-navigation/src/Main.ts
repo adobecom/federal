@@ -348,7 +348,7 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
-  initPromoCountdownInMinimizedBar();
+  initPromoCountdownInPromoBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -757,24 +757,43 @@ const waitUntilVisible = (callback: () => void): void => {
 };
 
 /**
- * Injects a countdown timer into every `.feds-promo-bar-inner` slot of a
- * `minimized` PromoBar.  Reads the `gnav-promo-countdown` meta tag for the
- * start/end window; no-ops silently when the tag is absent, malformed, or
+ * Injects a countdown timer into a `minimized`, `maximized`, or
+ * `maximized-release` PromoBar. Reads the `gnav-promo-countdown` meta tag for
+ * the start/end window; no-ops silently when the tag is absent, malformed, or
  * the current time is outside the window.
+ *
+ * The timer is grouped beside the product icon: in the minimized bar that's
+ * the `.feds-promo-bar-inner` row (before the text), and in the maximized
+ * variants it's the `.feds-promo-product-container` (before the product name).
  */
-const initPromoCountdownInMinimizedBar = (): void => {
+const initPromoCountdownInPromoBar = (): void => {
   const promoBar = document.querySelector<HTMLElement>(
-    '.feds-promo-aside-wrapper .feds-promo-bar--minimized',
+    '.feds-promo-aside-wrapper .feds-promo-bar',
   );
   if (promoBar === null) return;
 
   const isDark = promoBar.classList.contains('feds-promo-bar--dark');
-  const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
 
-  inners.forEach((inner) => {
-    const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
-    if (textEl === null) return;
-    initPromoCountdown(inner, textEl, isDark);
+  if (promoBar.classList.contains('feds-promo-bar--minimized')) {
+    const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
+    inners.forEach((inner) => {
+      const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
+      if (textEl === null) return;
+      initPromoCountdown(inner, textEl, isDark);
+    });
+    return;
+  }
+
+  // Maximized / maximized-release: the icon lives inside the product
+  // container, so the timer is grouped there, before the product name.
+  const containers = promoBar.querySelectorAll<HTMLElement>(
+    '.feds-promo-product-container',
+  );
+  containers.forEach((container) => {
+    const productName = container.querySelector<HTMLElement>(
+      '.feds-promo-bar-product',
+    );
+    initPromoCountdown(container, productName, isDark);
   });
 };
 

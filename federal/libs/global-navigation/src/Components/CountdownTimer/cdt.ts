@@ -178,14 +178,18 @@ function startTimer(
  * the promo + remaining time as the countdown crosses each threshold in
  * CDT_ANNOUNCE_MINUTES, plus a final "… has ended".
  *
- * @param inner          - A `.feds-promo-bar-inner` element
+ * @param inner          - The container the icon lives in and that hosts the
+ *                         live region (`.feds-promo-bar-inner` for minimized,
+ *                         `.feds-promo-product-container` for maximized)
  * @param insertBeforeEl - The element before which the wrapper is injected
- *                         (the `.feds-promo-bar-text` paragraph)
+ *                         (e.g. the `.feds-promo-bar-text` paragraph or the
+ *                         `.feds-promo-bar-product` name). When null the
+ *                         wrapper is appended to the end of `inner`.
  * @param isDark         - Whether the parent promo bar uses the dark theme
  */
 export function initPromoCountdown(
   inner: HTMLElement,
-  insertBeforeEl: HTMLElement,
+  insertBeforeEl: HTMLElement | null,
   isDark: boolean,
 ): void {
   const range = getCDTRange();
@@ -227,7 +231,7 @@ export function initPromoCountdown(
   // Polite live region for the scheduled screen-reader announcements. It lives
   // on `inner` (not the wrapper) so it survives teardown and can announce the
   // final "has ended" message. Empty on init so nothing fires on page load.
-  const promoText = (insertBeforeEl.textContent ?? '').trim();
+  const promoText = (insertBeforeEl?.textContent ?? '').trim();
   const liveEl = document.createElement('div');
   liveEl.className = 'feds-cdt-sr feds-cdt-live';
   liveEl.setAttribute('aria-live', 'polite');

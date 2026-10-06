@@ -450,5 +450,93 @@ describe('CDT — initPromoCountdown', () => {
       expect(inner.querySelectorAll('.feds-promo-bar-icon-cdt').length).to.equal(1);
     });
   });
+
+  // ── Maximized promo (product container) ───────────────────────────────────────
+
+  describe('maximized promo — product container placement', () => {
+    // Mirrors the maximized / maximized-release DOM: the icon lives inside a
+    // .feds-promo-product-container alongside an optional product name, and
+    // the timer is grouped with the icon before the product name.
+    function buildProductContainer({ withProductName = true } = {}) {
+      const container = document.createElement('div');
+      container.className = 'feds-promo-product-container';
+
+      const icon = document.createElement('img');
+      icon.className = 'feds-promo-bar-icon';
+      icon.src = 'icon.svg';
+      icon.alt = 'icon';
+      container.append(icon);
+
+      let productName = null;
+      if (withProductName) {
+        productName = document.createElement('p');
+        productName.className = 'feds-promo-bar-product';
+        productName.textContent = 'Photoshop';
+        container.append(productName);
+      }
+
+      document.body.append(container);
+      return { container, icon, productName };
+    }
+
+    it('injects the timer when within range', () => {
+      setMeta(activeRange());
+      const { container, productName } = buildProductContainer();
+      initPromoCountdown(container, productName, false);
+
+      expect(container.querySelector('.feds-cdt')).to.not.equal(null);
+    });
+
+    it('groups the icon and timer in the wrapper before the product name', () => {
+      setMeta(activeRange());
+      const { container, icon, productName } = buildProductContainer();
+      initPromoCountdown(container, productName, false);
+
+      const wrapper = container.querySelector('.feds-promo-bar-icon-cdt');
+      expect(wrapper).to.not.equal(null);
+      expect(wrapper.querySelector('.feds-promo-bar-icon')).to.equal(icon);
+      expect(wrapper.querySelector('.feds-cdt')).to.not.equal(null);
+      expect(wrapper.nextElementSibling).to.equal(productName);
+    });
+
+    it('injects the timer when the product name is absent (null anchor)', () => {
+      setMeta(activeRange());
+      const { container, icon } = buildProductContainer({ withProductName: false });
+      initPromoCountdown(container, null, false);
+
+      const wrapper = container.querySelector('.feds-promo-bar-icon-cdt');
+      expect(wrapper).to.not.equal(null);
+      expect(wrapper.querySelector('.feds-promo-bar-icon')).to.equal(icon);
+      expect(wrapper.querySelector('.feds-cdt')).to.not.equal(null);
+    });
+
+    it('does not inject the timer when outside the window', () => {
+      setMeta(pastRange());
+      const { container, productName } = buildProductContainer();
+      initPromoCountdown(container, productName, false);
+
+      expect(container.querySelector('.feds-cdt')).to.equal(null);
+    });
+
+    it('restores the icon before the product name when the end is reached', () => {
+      setMeta('2026-09-01T00:00:00,2026-09-30T23:59:59');
+      const url = new URL(window.location.href);
+      url.searchParams.set('instant', '2026-09-30T23:59:59');
+      window.history.replaceState({}, '', url);
+
+      const { container, icon, productName } = buildProductContainer();
+      initPromoCountdown(container, productName, false);
+
+      expect(container.querySelector('.feds-cdt')).to.equal(null);
+      expect(container.querySelector('.feds-promo-bar-icon-cdt')).to.equal(null);
+      expect(container.querySelector(':scope > .feds-promo-bar-icon')).to.equal(icon);
+      expect(icon.nextElementSibling).to.equal(productName);
+    });
+
+    afterEach(() => {
+      document.querySelectorAll('.feds-promo-product-container')
+        .forEach((el) => el.remove());
+    });
+  });
 });
 

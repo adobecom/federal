@@ -1,8 +1,10 @@
 /* =========================================
    Promo Bar — Countdown Timer (CDT)
-   Appears only inside .feds-promo-bar--minimized
-   Rendered as a single "DD:HH:MM:SS" text node,
-   displayed as a flex item in .feds-promo-bar-inner
+   Appears in the minimized bar (grouped with the
+   icon in .feds-promo-bar-inner) and in the
+   maximized / maximized-release bars (grouped with
+   the icon in .feds-promo-product-container).
+   Rendered as a single "DD:HH:MM:SS" text node.
    ========================================= */
 
 /* Groups the product icon and the countdown timer side-by-side */
