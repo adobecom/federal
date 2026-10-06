@@ -763,10 +763,14 @@ const waitUntilVisible = (callback: () => void): void => {
 
 /**
  * Injects a countdown timer into every `.feds-promo-bar-inner` slot of a
- * `minimized` PromoBar.  Reads the `gnav-promo-countdown` meta tag for the
- * start/end window; no-ops silently when the tag is absent, malformed, or
- * the current time is outside the window.
+ * `minimized` / `maximized` PromoBar.  Reads the `gnav-promo-countdown`
+ * meta tag for the start/end window; no-ops silently when the tag is absent,
+ * malformed, or the current time is outside the window.
  */
+<<<<<<< HEAD
+=======
+
+>>>>>>> b2e4ea2 (Updated the timer function for maximized promo)
 const initPromoCountdownInPromoBar = (): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
@@ -784,6 +788,7 @@ const initPromoCountdownInPromoBar = (): void => {
     });
     return;
   }
+<<<<<<< HEAD
 
   // Maximized / maximized-release: the icon lives inside the product
   // container, so the timer is grouped there, before the product name.
@@ -836,24 +841,42 @@ const initPromoCountdownInMaximizedBar = (): void => {
     if (column.querySelector('.feds-cdt') === null) return;
     const productEL = column.querySelector<HTMLElement>('.feds-promo-product-container .feds-promo-bar-product');
     if (productEL === null) return;
+=======
 
-    productEL.hidden = true;
+  // Maximized / maximized-release: the icon lives inside the product
+  // container, so the timer is grouped there, before the product name.
+  const containers = promoBar.querySelectorAll<HTMLElement>(
+    '.feds-promo-product-container',
+  );
+  
+  containers.forEach((container) => {
+    const productName = container.querySelector<HTMLElement>(
+      ':scope > .feds-promo-bar-product',
+    );
+    if (productName === null) return;
+    initPromoCountdown(container, productName, isDark);
+    const cdt = isDark ? '.feds-cdt--dark' : '.feds-cdt'
+    if (container.querySelector(cdt) == null) return;
+    productName.style.setProperty('display', 'none');
+>>>>>>> b2e4ea2 (Updated the timer function for maximized promo)
+
     const restore = new MutationObserver(() => {
-      if (column.querySelector('.feds-cts') != null) return;
-      productEL.hidden = false;
+      if (container.querySelector(cdt) != null) return;
+      productName.style.removeProperty('display');
       restore.disconnect();
     });
-    restore.observe(column, { childList: true, subtree: true});
+    restore.observe(container, { childList: true, subtree: true});
 
     const cleanup = new MutationObserver(() => {
-      if (document.contains(column)) return;
+      if (document.contains(container)) return;
       restore.disconnect();
       cleanup.disconnect();
     });
     cleanup.observe(document.body, { childList: true, subtree: true});
-  });
 
-}
+  });
+  
+};
 
 >>>>>>> c2bfbb0 (Added logic to show product when time ends)
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
