@@ -1,3 +1,4 @@
+
 /* =========================================
    Promo Bar — shared base 
    ========================================= */
@@ -483,9 +484,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   .feds-promo-bar--maximized-release .feds-promo-bar-headline{
     letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
   }
-
 }
-
 
 @media (width >= 768px) {
   .feds-promo-bar--maximized-release .feds-promo-bar-inner {
