@@ -17,7 +17,7 @@ version="1.0" encoding="UTF-8"?>
       <span class="feds-brand-image desktop-brand">
         ${w}
         ${C}
-        ${M}
+        ${T}
         ${ae}
       </span>
       <span class="feds-brand-image mobile-brand">
@@ -145,9 +145,9 @@ version="1.0" encoding="UTF-8"?>
       </div>
     `,c=t.length===0?"":`
       <div class="feds-product-card__badges">
-        ${t.map(({text:b,isFilled:f})=>`
+        ${t.map(({text:v,isFilled:f})=>`
           <span class="feds-product-card__badge${f?" feds-product-card__badge--filled":""}">
-            ${b}
+            ${v}
           </span>
         `).join("")}
       </div>
@@ -277,7 +277,7 @@ version="1.0" encoding="UTF-8"?>
   daa-lh="promo-bar"
 >
   ${r.map(({content:n,viewports:t})=>En(n,t)).join("")}
-</div>`.trim(),Mn=(e,a)=>`
+</div>`.trim(),Tn=(e,a)=>`
 <div class="feds-promo-bar-slot ${Xe(a)}">
   <div class="feds-promo-bar-inner">
     <div class="feds-promo-bar-column">
@@ -291,7 +291,7 @@ version="1.0" encoding="UTF-8"?>
     </div>
     ${e.bgImage??""}
   </div>
-</div>`.trim(),Tn=({theme:e,bgColor:a,slots:r})=>`
+</div>`.trim(),Mn=({theme:e,bgColor:a,slots:r})=>`
 <div
   class="feds-promo-bar feds-promo-bar--maximized-release feds-promo-bar--${e}"
   ${Ye(a)}
@@ -305,7 +305,7 @@ version="1.0" encoding="UTF-8"?>
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link"><span class="feds-skip-link-text">${t.get("skip-to-main")??"Skip to main content"}</span>${V.chevronRightBold}</a>
   <ul role="presentation">
-    ${(()=>{let m=e.find(v=>v.type==="Brand")??null,L=`
+    ${(()=>{let m=e.find(b=>b.type==="Brand")??null,L=`
         <button
           class="feds-nav-toggle"
           type="button"
@@ -322,7 +322,7 @@ version="1.0" encoding="UTF-8"?>
       `.trim(),M=m?Ie(m):"",p=(()=>{let b=l.map((C,T)=>`<li>${Ie(C,T)}</li>`),[x,...w]=b;return o?[x,'<li class="divider"></li>',...w]:b})().join("");return`
         <li class="feds-brand-wrapper">
           ${L}
-          ${T}
+          ${M}
         </li>
         <li
           id="feds-menu-wrapper"
