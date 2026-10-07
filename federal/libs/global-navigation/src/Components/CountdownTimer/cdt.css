@@ -41,13 +41,13 @@
 }
 
 /* for maximized countdown time */
-.feds-promo-bar--maximized-release .feds-cdt {
+.feds-promo-bar--maximized .feds-cdt, .feds-promo-bar--maximized .feds-cdt--dark  {
   font-size: var(--s2a-typography-font-size-body-md);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
 
 @media (width >= 1024px) {
-  .feds-promo-bar--maximized-release .feds-cdt {
+  .feds-promo-bar--maximized .feds-cdt, .feds-promo-bar--maximized .feds-cdt--dark {
     font-size: var(--s2a-typography-font-size-body-lg);
   }
 }

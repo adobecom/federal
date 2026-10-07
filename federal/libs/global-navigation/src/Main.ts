@@ -352,8 +352,7 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
-  initPromoCountdownInMinimizedBar();
-  initPromoCountdownInMaximizedBar();
+  initPromoCountdownInPromoBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -768,39 +767,57 @@ const waitUntilVisible = (callback: () => void): void => {
  * start/end window; no-ops silently when the tag is absent, malformed, or
  * the current time is outside the window.
  */
-const initPromoCountdownInMinimizedBar = (): void => {
+const initPromoCountdownInPromoBar = (): void => {
   const promoBar = document.querySelector<HTMLElement>(
-    '.feds-promo-aside-wrapper .feds-promo-bar--minimized',
+    '.feds-promo-aside-wrapper .feds-promo-bar',
   );
   if (promoBar === null) return;
 
   const isDark = promoBar.classList.contains('feds-promo-bar--dark');
-  const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
 
-  inners.forEach((inner) => {
-    const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
-    if (textEl === null) return;
-    initPromoCountdown(inner, textEl, isDark);
+  if (promoBar.classList.contains('feds-promo-bar--minimized')) {
+    const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
+    inners.forEach((inner) => {
+      const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
+      if (textEl === null) return;
+      initPromoCountdown(inner, textEl, isDark);
+    });
+    return;
+  }
+
+  // Maximized / maximized-release: the icon lives inside the product
+  // container, so the timer is grouped there, before the product name.
+  const containers = promoBar.querySelectorAll<HTMLElement>(
+    '.feds-promo-product-container',
+  );
+  
+  containers.forEach((container) => {
+    const productName = container.querySelector<HTMLElement>(
+      ':scope > .feds-promo-bar-product',
+    );
+    if (productName === null) return;
+    initPromoCountdown(container, productName, isDark);
+    const cdt = isDark ? '.feds-cdt--dark' : '.feds-cdt'
+    if (container.querySelector(cdt) == null) return;
+    productName.style.setProperty('display', 'none');
+
+    const restore = new MutationObserver(() => {
+      if (container.querySelector(cdt) != null) return;
+      productName.style.removeProperty('display');
+      restore.disconnect();
+    });
+    restore.observe(container, { childList: true, subtree: true});
+
+    const cleanup = new MutationObserver(() => {
+      if (document.contains(container)) return;
+      restore.disconnect();
+      cleanup.disconnect();
+    });
+    cleanup.observe(document.body, { childList: true, subtree: true});
+
   });
+  
 };
-
-const initPromoCountdownInMaximizedBar = (): void => {
-  const promoBar = document.querySelector<HTMLElement>(
-    '.feds-promo-aside-wrapper .feds-promo-bar--maximized, '
-    + '.feds-promo-aside-wrapper .feds-promo-bar--maximized-release',
-  ); 
-  if (promoBar === null) return;
-  const isDark = promoBar.classList.contains('feds-promo-bar--dark');
-  const columns = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-column');
-  columns.forEach((column) => {
-    const headlineEl = column.querySelector<HTMLElement>(':scope > .feds-promo-bar-headline');
-    if (headlineEl === null) return;
-    initPromoCountdown(column, headlineEl, isDark);
-    if (column.querySelector('.feds-cdt') === null) return;
-    column.querySelector<HTMLElement>('.feds-promo-product-container .feds-promo-bar-product')?.remove();
-  });
-
-}
 
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
