@@ -659,8 +659,11 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
       const ctaWidth = productCta === null
         ? 0
         : Math.max(productCta.offsetWidth, productCta.scrollWidth);
+      const bcWidth = bcWrapper === null
+        ? 0
+        : Math.max(bcWrapper.offsetWidth, bcWrapper.scrollWidth);
       const contentWidth = brandWidth + itemsWidth +
-        utilitiesWidth + ctaWidth + 40;
+        utilitiesWidth + ctaWidth + bcWidth + 40;
       header.classList.toggle('is-compact', contentWidth > header.clientWidth);
     }
 
@@ -681,6 +684,7 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   observer.observe(header);
   // UNAV can resize without changing the header's border box.
   if (utilities !== null) observer.observe(utilities);
+  if (bcWrapper !== null) observer.observe(bcWrapper);
   isDesktop.addEventListener('change', check);
   mountpoint.addEventListener(MERCH_RESOLVED_EVENT, check);
   check();
