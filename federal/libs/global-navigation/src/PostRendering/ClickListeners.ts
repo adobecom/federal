@@ -255,6 +255,9 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
       // On desktop we strip these attributes so the heading reads as a
       // plain heading (no spurious button role).
       const updateExpanded = (): void => {
+        const isClosed = !isNavDesktop() && article.classList.contains('closed');
+        article.querySelectorAll<HTMLElement>('.links-card-links, .links-card-footer')
+          .forEach(content => { content.inert = isClosed; });
         articleTitle.setAttribute(
           'aria-expanded',
           String(!article.classList.contains('closed')),
@@ -266,6 +269,8 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
           articleTitle.removeAttribute('tabindex');
           articleTitle.removeAttribute('role');
           articleTitle.removeAttribute('aria-expanded');
+          article.querySelectorAll<HTMLElement>('.links-card-links, .links-card-footer')
+            .forEach(content => { content.inert = false; });
         } else {
           articleTitle.setAttribute('tabindex', '0');
           articleTitle.setAttribute('role', 'button');
