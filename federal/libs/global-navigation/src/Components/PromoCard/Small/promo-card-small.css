@@ -25,6 +25,20 @@
   object-fit: cover;
 }
 
+.feds-gnav-cards .promo-card-small__bg > a {
+  display: none;
+}
+
+.feds-gnav-cards .promo-card-small__bg :is(mas-field, picture, img) {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.feds-gnav-cards .promo-card-small__bg img {
+  object-fit: cover;
+}
+
 /* Dark gradient overlay */
 .feds-gnav-cards .promo-card-small::after {
   content: '';
@@ -73,6 +87,11 @@
   line-height: var(--s2a-typography-line-height-body-sm);
   letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
   color: inherit;
+}
+
+.global-navigation .feds-gnav-cards .promo-card-small__body a {
+  color: inherit;
+  text-decoration: underline;
 }
 
 .global-navigation .feds-gnav-cards .promo-card-small__cta .feds-secondary-cta {
