@@ -39,16 +39,13 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   margin: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
 }
 
-.feds-brand-image svg {
-  width: 100%;
-  display: block;
-}
-
 /* =========================================
    Brand Image (Mobile / Desktop variants)
    ========================================= */
 
 .feds-brand-image svg {
+  width: 100%;
+  display: block;
   color: var(--s2a-color-gray-25);
 }
 
