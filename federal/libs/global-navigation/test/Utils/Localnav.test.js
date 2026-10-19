@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
 import { link } from '../../src/Components/Link/Render';
+import { megaMenu } from '../../src/Components/MegaMenu/Render';
 import { withLocalnavOverviewLabel } from '../../src/Utils/Localnav';
 
 const render = (component) => {
@@ -41,5 +42,24 @@ describe('withLocalnavOverviewLabel', () => {
 
     expect(withLocalnavOverviewLabel(component, new Map([['overview', 'Overview']])))
       .to.equal(component);
+  });
+
+  it('relabels a first small menu as Overview on mobile', () => {
+    const container = document.createElement('div');
+    container.innerHTML = megaMenu(withLocalnavOverviewLabel(
+      {
+        type: 'SmallMenu',
+        title: 'Technical Communication',
+        content: [{ type: 'GnavCards', megaMenuTitle: 'Technical Communication', sections: [] }, []],
+      },
+      new Map([['overview', 'Overview']]),
+    ));
+
+    const trigger = container.querySelector('button.mega-menu');
+    expect(trigger.getAttribute('aria-controls')).to.equal('technical-communication');
+    expect(trigger.querySelector('.feds-link__desktop-text').textContent)
+      .to.equal('Technical Communication');
+    expect(trigger.querySelector('.feds-link__mobile-text').textContent)
+      .to.equal('Overview');
   });
 });

@@ -320,20 +320,25 @@ export const renderGnavString = ({
   const firstMegaMenu = localnav
     ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
     : null;
-  const localnavBarSibling = firstMegaMenu !== null
-    ? menuComponents[menuComponents.indexOf(firstMegaMenu) + 1] ?? null
-    : null;
-  // The sibling's label lives in a different field per component type:
+  // Like milo, a localnav without a mega menu has no hamburger: the bar is
+  // labeled by the first item, which stays in the list relabeled "Overview".
+  const isLocalnavWithoutMegaMenu = localnav && firstMegaMenu === null;
+  const localnavBarItem = ((): Component | null => {
+    if (firstMegaMenu !== null)
+      return menuComponents[menuComponents.indexOf(firstMegaMenu) + 1] ?? null;
+    return isLocalnavWithoutMegaMenu ? menuComponents[0] ?? null : null;
+  })();
+  // The bar item's label lives in a different field per component type:
   // MegaMenu/SmallMenu use `title`, Link/CTAs use `text`, Text uses `content`.
   const localnavBarLabel = ((): string => {
-    if (localnavBarSibling === null) return '';
-    if ('title' in localnavBarSibling) return localnavBarSibling.title;
-    if ('text' in localnavBarSibling) return localnavBarSibling.text;
-    if ('content' in localnavBarSibling) return localnavBarSibling.content;
+    if (localnavBarItem === null) return '';
+    if ('title' in localnavBarItem) return localnavBarItem.title;
+    if ('text' in localnavBarItem) return localnavBarItem.text;
+    if ('content' in localnavBarItem) return localnavBarItem.content;
     return '';
   })();
   const renderMenuComponent = (c: Component, index: number): HTML => (
-    c === localnavBarSibling
+    c === localnavBarItem
       ? component(withLocalnavOverviewLabel(c, placeholders), index)
       : component(c, index)
   );
@@ -348,7 +353,7 @@ export const renderGnavString = ({
     : '';
 
   return `
-<nav class="${localnav ? "localnav" : ""}">
+<nav class="${localnav ? "localnav" : ""}${isLocalnavWithoutMegaMenu ? " localnav--without-mega-menu" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link"><span class="feds-skip-link-text">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</span>${icons.chevronRightBold}</a>
   <ul role="presentation">
@@ -389,7 +394,7 @@ export const renderGnavString = ({
 
       return `
         <li class="feds-brand-wrapper">
-          ${toggleButton}
+          ${isLocalnavWithoutMegaMenu ? '' : toggleButton}
           ${brandHTML}
         </li>
         <li
