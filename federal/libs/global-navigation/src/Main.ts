@@ -14,7 +14,7 @@ import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, getLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -183,6 +183,17 @@ export const main = async (
     const anchors = [...body.querySelectorAll<HTMLAnchorElement>('a')];
     anchors.forEach((anchor) => input.appendHtmlToLink?.(anchor));
     await input.decorateBody?.(body);
+    // Localize before stage conversion so cross-domain prod links (helpx/
+    // business) carry a locale prefix convertStageLinks preserves; at render
+    // the host is already rewritten to *.stage and no longer matches
+    // prodDomains. Skipped when the host localized the body itself (e.g. the
+    // lingo decorateBody) to avoid re-processing regionalized links.
+    if (!input.decorateBody) {
+      const localize = getLocalizeLink();
+      anchors.forEach((a) => {
+        if (!a.href.includes('#_dnt')) a.href = localize(a.href);
+      });
+    }
     input.convertStageLinks?.({
       anchors,
       hostname: window.location.hostname,
