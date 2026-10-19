@@ -1,5 +1,5 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
-import { component } from "./Components/Component";
+import { Component, component } from "./Components/Component";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
@@ -18,6 +18,7 @@ import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, Personal
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
+import { withLocalnavOverviewLabel } from "./Utils/Localnav";
 import { popup } from "./Components/MegaMenu/Render";
 import { smallMenuPopup } from "./Components/SmallMenu/Render";
 import { MegaMenuExtraData } from "./Components/MegaMenu/Parse";
@@ -331,6 +332,11 @@ export const renderGnavString = ({
     if ('content' in localnavBarSibling) return localnavBarSibling.content;
     return '';
   })();
+  const renderMenuComponent = (c: Component, index: number): HTML => (
+    c === localnavBarSibling
+      ? component(withLocalnavOverviewLabel(c, placeholders), index)
+      : component(c, index)
+  );
   // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
   // stays visible beside the hamburger, not only inside the drawer.
   const ctaComponents = components.filter(
@@ -375,7 +381,7 @@ export const renderGnavString = ({
 
       const menuItemsHTMLList = ((): HTML[] => {
         const lis = menuComponents
-                       .map((c, index) => `<li>${component(c, index)}</li>`);
+                       .map((c, index) => `<li>${renderMenuComponent(c, index)}</li>`);
         const [first, ...rest] = lis;
         return localnav ? [first, '<li class="divider"></li>', ...rest] : lis;
       })();
