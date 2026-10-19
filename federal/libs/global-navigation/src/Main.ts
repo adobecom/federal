@@ -88,17 +88,19 @@ const resolveBrandConciergeBlock = async (
   let brandConciergeBlock
     = mainNav.querySelector<HTMLElement>('.brand-concierge-global');
 
-  const brandConciergeLink = brandConciergeEnabled
-    ? (brandConciergeBlock ?? mainNav).querySelector<HTMLAnchorElement>(
+  // Detected regardless of metadata so a disabled BC link is still stripped
+  // from the nav below rather than rendered as a stray item.
+  const brandConciergeLink = (brandConciergeBlock ?? mainNav)
+    .querySelector<HTMLAnchorElement>(
       'a[href*="/fragments/"][href*="brand-concierge"]',
-    )
-    : null;
+    );
   // Element stripped from the nav so the block/link isn't parsed as a nav item.
   let brandConciergeWrapper: HTMLElement | null
     = brandConciergeBlock ?? brandConciergeLink;
 
-  // brandConciergeLink is only set when enabled, so no extra guard is needed.
-  if (brandConciergeLink) {
+  // Only resolve/populate the block's content when enabled; when disabled the
+  // link is still stripped below so it never renders.
+  if (brandConciergeEnabled && brandConciergeLink) {
     try {
       const fragmentBody = await fetchAndProcessPlainHTML(
         new URL(brandConciergeLink.href.split('#')[0]),
