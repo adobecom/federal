@@ -232,12 +232,16 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-regular);
   display: inline-flex;
+  margin-left: 2px;
 }
 
 .feds-popup .links-card .links-card-links .links-card-links__item-link {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--s2a-spacing-2xs, 4px);
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .feds-popup .links-card .links-card-links .links-card-links__item-description {

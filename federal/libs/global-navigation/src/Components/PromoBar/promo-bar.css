@@ -1,3 +1,4 @@
+
 /* =========================================
    Promo Bar — shared base
    ========================================= */
@@ -13,6 +14,8 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
     > .section:first-child {
       border-top-left-radius: var(--s2a-border-radius-lg);
       border-top-right-radius: var(--s2a-border-radius-lg);
+      overflow: clip;
+      background-color: var(--s2a-color-background-default);
     }
   }
 }
@@ -25,38 +28,9 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   }
 }
 
+
 body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--reveal {
   visibility: hidden;
-}
-
-.feds-promo-aside-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-
-  &.feds-promo-bar--dark {
-    background-color: var(--s2a-color-gray-1000);
-  }
-
-  .feds-primary-cta {
-    color: var(--s2a-color-gray-25);
-    background-color: var(--s2a-color-blue-900);
-  }
-
-  .feds-secondary-cta {
-    color: var(--s2a-color-button-content-primary-outlined-default);
-    background-color: transparent;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: inherit;
-    z-index: -1;
-  }
 }
 
 .feds-promo-bar {
@@ -132,6 +106,29 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
 }
 
 .feds-promo-aside-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  &.feds-promo-bar--dark {
+    background-color: var(--s2a-color-gray-1000);
+  }
+
+  .feds-secondary-cta {
+    color: var(--s2a-color-button-content-primary-outlined-default);
+    background-color: transparent;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    z-index: -1;
+  }
+
   .feds-primary-cta,
   .feds-secondary-cta {
     display: inline-flex;
@@ -153,12 +150,14 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     background-color: var(--s2a-color-transparent-black-08);
   }
 
-  .feds-primary-cta:hover {
-    background-color: var(--s2a-color-blue-1000);
+  .feds-primary-cta {
+    color: var(--s2a-color-gray-25);
+    background-color: var(--s2a-color-blue-900);
+    border-color: var(--s2a-color-blue-900);
   }
 
-  .feds-primary-cta {
-    border-color: var(--s2a-color-blue-900);
+  .feds-primary-cta:hover {
+    background-color: var(--s2a-color-blue-1000);
   }
 
   .feds-promo-bar--dark {
@@ -216,10 +215,6 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
    Stacked: icon + product name + headline + body + CTA
    ========================================= */
 
-.feds-promo-bar--maximized {
-  padding: var(--s2a-spacing-3xl) var(--s2a-spacing-4xl);
-}
-
 .feds-promo-product-container {
   display: flex;
   flex-direction: row;
@@ -228,6 +223,8 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
 }
 
 .feds-promo-bar--maximized {
+  padding: var(--s2a-spacing-3xl) var(--s2a-spacing-4xl);
+
   .feds-promo-bar-right {
     display: flex;
     gap: var(--s2a-spacing-2xl);
@@ -285,8 +282,8 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     margin: 0;
     letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
     font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
-    font-size: var(--s2a-typography-font-size-heading-4);
-    line-height: var(--s2a-typography-line-height-heading-4);
+    font-size: var(--s2a-typography-font-size-heading-3);
+    line-height: var(--s2a-typography-line-height-heading-3);
     font-weight: var(--s2a-font-weight-adobe-clean-black);
   }
 
@@ -443,8 +440,6 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   }
 
   .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
-    /* max-height: 171px; */
-    /* object-fit: cover; */
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -472,7 +467,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   .feds-promo-bar-slot--desktop {
     display: contents;
   }
-  
+
   .feds-promo-bar--maximized-release .feds-promo-bar-body{
     max-width: 480px;
   }
@@ -480,9 +475,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   .feds-promo-bar--maximized-release .feds-promo-bar-headline{
     letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
   }
-
 }
-
 
 @media (width >= 768px) {
   .feds-promo-bar--maximized-release .feds-promo-bar-inner {
@@ -492,10 +485,28 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     min-height: 0;
     overflow: hidden;
   }
-  /* .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
-    object-fit: cover;
-    object-position: left;
-  } */
+  .feds-promo-bar--maximized .feds-promo-bar-headline {
+    max-width: 293px;
+  }
+}
+
+@media (width > 1279px) {
+  .feds-promo-bar--maximized .feds-promo-bar-headline {
+    letter-spacing: var(--s2a-font-letter-spacing-neg-1);
+    font-size: var(--s2a-font-size-4xl);
+    line-height: var(--s2a-font-line-height-lg);
+    max-width: 430px;
+  }
+}
+
+@media (width > 1440px) {
+  .feds-promo-bar--maximized .feds-promo-bar-left {
+    flex: 1;
+    max-inline-size: 1212px;
+  }
+  .feds-promo-bar--maximized .feds-promo-bar-headline {
+    max-width: 755px;
+  }
 }
 
 /* =========================================
