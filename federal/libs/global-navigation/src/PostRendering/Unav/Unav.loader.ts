@@ -30,12 +30,6 @@ import {
 import { getUnavComponents } from './Unav.config';
 
 // ============================================================================
-// Constants
-// ============================================================================
-
-const AUP_SDK_VERSION = '1.0.756';
-
-// ============================================================================
 // AUP SDK eager initialization
 // ============================================================================
 
@@ -86,7 +80,7 @@ export const preloadAupSdk = (): void => {
   : `shared-components.${environment}.adobe.com`;
 
   aupSdkPromise = loadScript(
-    `https://${aupHost}/aup-sdk/${AUP_SDK_VERSION}/main.js`,
+    `https://${aupHost}/aup-sdk/stable/main.js`,
     undefined,
     { mode: 'async' },
   ).then(async (): Promise<unknown> => {

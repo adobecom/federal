@@ -6,7 +6,7 @@ import {
   __resetAupSdkForTests,
 } from '../../src/PostRendering/Unav/Unav.loader';
 import { RecoverableError } from '../../src/Error/Error';
-import { setMiloConfig } from '../../src/Utils/Utils';
+import { setMiloConfig, getMiloConfig } from '../../src/Utils/Utils';
 
 /**
  * UNAV Loader Integration Tests
@@ -1097,6 +1097,28 @@ describe('UNAV Loader Integration Tests', () => {
           (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
         )
       ).to.equal(true);
+    });
+
+    [
+      { env: 'stage', url: 'https://shared-components.stage.adobe.com/aup-sdk/stable/main.js' },
+      { env: 'prod', url: 'https://shared-components.adobe.com/aup-sdk/stable/main.js' },
+    ].forEach(({ env, url }) => {
+      it(`should load the ${env} SDK from the stable channel`, () => {
+        // MiloConfig can only be set once per page, so switch its env in place.
+        const config = getMiloConfig();
+        const previousEnv = config.env.name;
+        config.env.name = env;
+        try {
+          preloadAupSdk();
+        } finally {
+          config.env.name = previousEnv;
+        }
+
+        const sources = appendedElements
+          .filter((el) => el.tagName === 'SCRIPT' && el.src.includes('/aup-sdk/'))
+          .map((el) => el.src);
+        expect(sources).to.deep.equal([url]);
+      });
     });
 
     describe('existing host instance', () => {
