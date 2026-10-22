@@ -254,7 +254,8 @@ const decorateSignedIn = async (
 };
 
 /**
- * Loads and decorates the legacy profile into the `.feds-profile-new` container.
+ * Loads and decorates the legacy profile into the `.feds-profile-new`
+ * container.
  *
  * @param nav - Navigation element containing the `.feds-profile-new` container
  * @param rawProfileElem - The authored `.profile` block captured pre-parse
