@@ -1,6 +1,6 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { Link, parseLink } from "../Link/Parse";
-import { parseListAndAccumulateErrors } from "../../Utils/Utils";
+import { localizeHref, parseListAndAccumulateErrors, stripDntMarker } from "../../Utils/Utils";
 
 export type Panels = {
   type: "Panels";
@@ -321,9 +321,14 @@ const parseImagePanel = (
   if (ctaText === "")
     errors.push(new RecoverableError(ERRORS.imagePanelMissingCtaText));
 
-  const ctaHref = getText(5);
-  if (ctaHref === "")
+  // The CTA href is authored as plain text, not an <a>, so the pre-parse
+  // link decoration never sees it; localize it here instead.
+  const rawCtaHref = getText(5);
+  if (rawCtaHref === "")
     errors.push(new RecoverableError(ERRORS.imagePanelMissingCtaHref));
+  const ctaHref = rawCtaHref === ""
+    ? rawCtaHref
+    : stripDntMarker(localizeHref(rawCtaHref));
 
   return [
     {

@@ -1,5 +1,5 @@
 import { productCard } from "../ProductCard/Render";
-import { getAnalyticsAttrs, icons, localizeHref } from "../../Utils/Utils";
+import { getAnalyticsAttrs, icons } from "../../Utils/Utils";
 import { ProductCategory, ProductList } from "./Parse";
 
 export const productlist = (
@@ -9,7 +9,7 @@ export const productlist = (
   const tabs = `
     <ul class="tabs" role="tablist">
       ${categories.map((category, i) => renderTab(category, i)).join('')}
-      ${links.length ? `<li class="product-links"><a class="feds-link" href="${localizeHref(lastLink.href)}"${getAnalyticsAttrs(null, lastLink.daaLl ?? lastLink.text)}>${lastLink.text}${icons.chevronRight}</a></li>` : ''}
+      ${links.length ? `<li class="product-links"><a class="feds-link" href="${lastLink.href}"${getAnalyticsAttrs(null, lastLink.daaLl ?? lastLink.text)}>${lastLink.text}${icons.chevronRight}</a></li>` : ''}
     </ul>
   `.trim();
   const tabcontent = `

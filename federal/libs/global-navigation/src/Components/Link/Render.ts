@@ -2,7 +2,6 @@ import {
   getAnalyticsAttrs,
   getAriaAttrs,
   isMasFieldLink,
-  localizeHref,
 } from "../../Utils/Utils";
 import { Link } from "./Parse";
 
@@ -22,5 +21,5 @@ export const link = ({
   const pendingMerchAttr = isMasFieldLink(href)
     ? ' data-feds-merch-pending'
     : '';
-  return `<a class="feds-link ${highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(href)}"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}${getAnalyticsAttrs(null, daaLl ?? text)}>${textHTML}${svgIcon}</a>`;
+  return `<a class="feds-link ${highlight ?? false ? 'feds-link--highlight' : ''}" href="${href}"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}${getAnalyticsAttrs(null, daaLl ?? text)}>${textHTML}${svgIcon}</a>`;
 };

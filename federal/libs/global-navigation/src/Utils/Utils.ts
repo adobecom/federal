@@ -246,11 +246,10 @@ export const [setLocalizeLink, getLocalizeLink] =
 
 // Async, whole-body link decoration provided by milo (lingo regionalization +
 // query-index existence check + mep-lingo prefix). This is the async companion
-// to the synchronous `localizeLink` above: `localizeLink` prefixes a single
-// href during render, whereas `decorateBody` runs once over the raw fetched
-// body pre-parse so `localizeLinkAsync` can resolve regional prefixes before
-// the navigation is parsed. Defaults to a no-op so callers that don't provide
-// it are unaffected.
+// to the synchronous `localizeLink` above. Either one is applied exactly once,
+// pre-parse, by `decorateGnavLinks`: `decorateBody` replaces the per-link
+// `localizeLink` pass so `localizeLinkAsync` can resolve regional prefixes.
+// Defaults to a no-op so callers that don't provide it are unaffected.
 export type DecorateBody = (body: HTMLElement) => Promise<void>;
 
 type DecorateBodyStateFunctions = [
@@ -321,6 +320,54 @@ export const localizeHref = (href: string): string => {
   } catch {
     return href;
   }
+};
+
+const DNT_MARKER = '#_dnt';
+
+export const stripDntMarker = (href: string): string => href.replace(DNT_MARKER, '');
+
+type GnavLinkDecorators = {
+  appendHtmlToLink?: (link: HTMLAnchorElement) => void;
+  decorateBody?: DecorateBody;
+  convertStageLinks?: (args: {
+    anchors: HTMLAnchorElement[];
+    hostname: string;
+    href: string;
+  }) => void;
+};
+
+// The single localization pass for gnav links. Runs on every fetched body
+// (gnav, promo, fragments) before parsing; renderers output hrefs verbatim.
+export const decorateGnavLinks = async (
+  body: HTMLElement,
+  { appendHtmlToLink, decorateBody, convertStageLinks }: GnavLinkDecorators,
+): Promise<void> => {
+  const anchors = [...body.querySelectorAll<HTMLAnchorElement>('a')];
+  anchors.forEach((anchor) => appendHtmlToLink?.(anchor));
+  if (decorateBody) {
+    await decorateBody(body);
+  } else {
+    const localize = getLocalizeLink();
+    anchors.forEach((anchor) => {
+      if (anchor.href.includes(DNT_MARKER)) return;
+      anchor.href = localize(anchor.href);
+    });
+  }
+  // Consume DNT markers here, whatever the host localizer did, so the marker
+  // never leaks into rendered URLs.
+  anchors.forEach((anchor) => {
+    const href = anchor.getAttribute('href');
+    if (href !== null && href.includes(DNT_MARKER)) {
+      anchor.setAttribute('href', stripDntMarker(href));
+    }
+  });
+  // Localize before stage conversion so cross-domain prod links (helpx/
+  // business) carry a locale prefix convertStageLinks preserves.
+  convertStageLinks?.({
+    anchors,
+    hostname: window.location.hostname,
+    href: window.location.href,
+  });
 };
 
 /**

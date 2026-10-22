@@ -1,5 +1,5 @@
 import { Brand, ImageData } from "./Parse";
-import { federateUrl, localizeHref } from "../../Utils/Utils";
+import { federateUrl } from "../../Utils/Utils";
 
 const DESKTOP_SVG = `
 <?xml
@@ -81,7 +81,7 @@ const { href, label, isDarkBg, imageData } = data;
   const mobileSvg = hasMobileLight && hasMobileDark ? '' : MOBILE_SVG;
 
   return `<div class="feds-brand-container${isDarkBg ? ' feds-dark-bg' : ''}">
-    <a href="${localizeHref(href)}" class="feds-brand" daa-ll="Brand" aria-label="${label}">
+    <a href="${href}" class="feds-brand" daa-ll="Brand" aria-label="${label}">
       <span class="feds-brand-image desktop-brand">
         ${desktopLightImg}
         ${desktopDarkImg}

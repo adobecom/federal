@@ -4,7 +4,6 @@ import {
   getTargetAttrs,
   getRegistrationGateAttrs,
   isMasFieldLink,
-  localizeHref,
 } from "../../Utils/Utils";
 import { PrimaryCTA, ProductEntryCTA, SecondaryCTA } from "./Parse";
 
@@ -22,7 +21,7 @@ export const primaryCTA = ({
     ? ' data-feds-merch-pending'
     : '';
   return `
-<a href="${localizeHref(strippedHref)}"
+<a href="${strippedHref}"
   class="feds-primary-cta"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
@@ -45,7 +44,7 @@ export const secondaryCTA = ({
     ? ' data-feds-merch-pending'
     : '';
   return `
-<a href="${localizeHref(strippedHref)}"
+<a href="${strippedHref}"
   class="feds-secondary-cta"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}

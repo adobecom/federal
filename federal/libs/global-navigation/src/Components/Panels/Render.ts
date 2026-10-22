@@ -2,7 +2,6 @@ import { secondaryCTA } from "../CTA/Render";
 import { Link } from "../Link/Parse";
 import { link } from "../Link/Render";
 import { Panels, FooterLink, LinkPanel, PanelPosition, Panel, ListWithImagePanel, ImagePanel } from "./Parse";
-import { localizeHref } from "../../Utils/Utils";
 
 export const panels = ({ layout, panels }: Panels): HTML => {
   const gridCSS = `
@@ -78,7 +77,7 @@ const imagepanel = ({
         <span>$${price}</span>
         <span>${title}</span>
       </div>
-      <a class="image-panel-button" href="${localizeHref(ctaHref)}">
+      <a class="image-panel-button" href="${ctaHref}">
         ${ctaText}
       </a>
     </div>
