@@ -54,11 +54,19 @@ let aupSdkPromise: Promise<unknown> | undefined;
  * promise) when prerequisites aren't met — signed-out, MiloConfig not ready,
  * or ARP disabled — so a later call can retry. The defensive call inside
  * loadUnav() covers the late-IMS case.
+ *
+ * An existing `window.aupsdk` belongs to the host: it is reused as-is,
+ * without loading another SDK bundle or overwriting its configuration.
  */
 export const preloadAupSdk = (): void => {
   if (aupSdkPromise) return;
 
   if (window.adobeIMS?.isSignedInUser() !== true) return;
+
+  if (window.aupsdk) {
+    aupSdkPromise = Promise.resolve(window.aupsdk);
+    return;
+  }
 
   let config: MiloConfig;
   try {
@@ -82,7 +90,9 @@ export const preloadAupSdk = (): void => {
     undefined,
     { mode: 'async' },
   ).then(async (): Promise<unknown> => {
-    window.aupsdk = window.aupsdk ?? await window.AUPSDK?.preloadSDK('adobe-com-stable', {
+    // The host may have created its instance while this bundle was loading.
+    if (window.aupsdk) return window.aupsdk;
+    window.aupsdk = await window.AUPSDK?.preloadSDK('adobe-com-stable', {
       appId: 'adobe_com',
       apiKey: clientId,
       getAccessToken: (): Promise<string | undefined> =>

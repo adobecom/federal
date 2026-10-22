@@ -1098,5 +1098,46 @@ describe('UNAV Loader Integration Tests', () => {
         )
       ).to.equal(true);
     });
+
+    describe('existing host instance', () => {
+      const aupScriptUrl = /shared-components\..*\.adobe\.com\/aup-sdk\//;
+      let hostInstance;
+      let updateConfigCalls;
+
+      beforeEach(() => {
+        updateConfigCalls = 0;
+        hostInstance = {
+          updateConfig: () => {
+            updateConfigCalls += 1;
+            return Promise.resolve();
+          },
+        };
+        window.AUPSDK = {
+          preloadSDK: () => Promise.reject(new Error('federal SDK must not be created')),
+        };
+      });
+
+      it('should reuse window.aupsdk without loading or reconfiguring the SDK', async () => {
+        window.aupsdk = hostInstance;
+        preloadAupSdk();
+
+        expect(await getAupSdkInstance()).to.equal(hostInstance);
+        expect(updateConfigCalls).to.equal(0);
+        expect(
+          appendedElements.some(
+            (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
+          )
+        ).to.equal(false);
+      });
+
+      it('should keep a host instance created while the SDK bundle was loading', async () => {
+        preloadAupSdk();
+        window.aupsdk = hostInstance;
+
+        expect(await getAupSdkInstance()).to.equal(hostInstance);
+        expect(window.aupsdk).to.equal(hostInstance);
+        expect(updateConfigCalls).to.equal(0);
+      });
+    });
   });
 });
