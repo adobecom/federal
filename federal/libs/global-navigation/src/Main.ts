@@ -1,5 +1,6 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
 import { Component, component } from "./Components/Component";
+import { convertRenderedNavigationLinks } from "./Utils/StageLinks";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
@@ -12,6 +13,7 @@ import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks
 import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
+import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
 import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, getLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
@@ -26,6 +28,7 @@ import { MegaMenuExtraData } from "./Components/MegaMenu/Parse";
 type GlobalNavigation = {
   closeEverything: () => void;
   reloadUnav: () => void;
+  reloadProfile: () => void;
   getGnavTopPosition: () => number;
   setGnavTopPosition: (_: number) => void;
   getGnavHeight: () => number;
@@ -225,11 +228,22 @@ export const main = async (
     throw mainNav;
   }
 
+  // The legacy profile sources its sign-in dropdown and "local menu" from an
+  // authored `.profile` block. Capture it (and remove it) before parse so the
+  // component parser doesn't misread it as a Link/Text component.
+  const rawProfileElem = mainNav.querySelector('.profile');
+  rawProfileElem?.remove();
+
+  // Mirror milo: the legacy profile is the non-UniversalNav path — it renders
+  // only when unav is off AND a `.profile` block was authored (a page opts out
+  // by not authoring one). Otherwise `loadUnav` owns the utilities slot.
+  const profileEnabled = !unavEnabled && rawProfileElem !== null;
   const brandConciergeBlock = await resolveBrandConciergeBlock(mainNav);
 
   const gnavData = parseNavigation(
     mainNav,
     unavEnabled,
+    profileEnabled,
     await getPlaceholders(),
     promoBarEl,
   );
@@ -249,7 +263,14 @@ export const main = async (
     }
   }
 
-  return postRenderingTasks(input);
+  convertRenderedNavigationLinks(
+    mountpoint,
+    input.convertStageLinks,
+    window.location.hostname,
+    window.location.href,
+  );
+
+  return postRenderingTasks(input, rawProfileElem);
 };
 
 export const renderGnav = (
@@ -316,6 +337,7 @@ export const renderGnavString = ({
   breadcrumbs,
   productCTA,
   unavEnabled,
+  profileEnabled,
   placeholders,
   localnav,
   brandConciergeEnabled,
@@ -434,7 +456,9 @@ export const renderGnavString = ({
   ${pinnedCtaHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
-  ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  ${profileEnabled
+    ? '<div data-cs-mask class="feds-profile-new"></div>'
+    : unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
 </nav>
@@ -443,6 +467,7 @@ export const renderGnavString = ({
 
 export const postRenderingTasks = async (
   input: Input,
+  rawProfileElem: Element | null = null,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
 
@@ -472,8 +497,19 @@ export const postRenderingTasks = async (
 
   // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
   initEventRegistrationGating(input.mountpoint);
+  const profileEnabled = !input.unavEnabled && rawProfileElem !== null;
   let reloadUnav = (): void => {};
-  if (input.unavEnabled) {
+  let reloadProfile = (): void => {};
+
+  if (profileEnabled) {
+    const profile = await loadProfile(input.mountpoint, rawProfileElem);
+    if (profile instanceof RecoverableError) {
+      errors.add(profile);
+      lanaLog(profile.message);
+    } else {
+      reloadProfile = (): void => { void profile.reloadProfile(); };
+    }
+  } else if (input.unavEnabled) {
     const unav = await loadUnav(input.mountpoint, {
       countryCode: input.countryCode,
       imsReady: input.imsReady,
@@ -481,8 +517,7 @@ export const postRenderingTasks = async (
     if (unav instanceof RecoverableError) {
       errors.add(unav);
       lanaLog(unav.message);
-    }
-    else {
+    } else {
       unav.errors.forEach((error: RecoverableError) => errors.add(error));
       reloadUnav = unav.reloadUnav;
     }
@@ -523,6 +558,7 @@ export const postRenderingTasks = async (
   return {
     closeEverything: () => closePopovers(input.mountpoint),
     reloadUnav,
+    reloadProfile,
     errors,
     setGnavTopPosition: (_): void => {},
     getGnavTopPosition: (): number => 0,
