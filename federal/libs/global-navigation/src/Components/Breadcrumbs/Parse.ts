@@ -5,6 +5,7 @@ import { parseListAndAccumulateErrors } from "../../Utils/Utils";
 export type Breadcrumbs = {
   type: 'Breadcrumbs';
   items: Array<Link | string>;
+  noTransform: boolean;
 };
 
 const ERRORS = {
@@ -40,6 +41,7 @@ export const parseBreadcrumbs = (
     {
       type: 'Breadcrumbs',
       items,
+      noTransform: element.classList.contains('no-transform'),
     },
     errors,
   ];

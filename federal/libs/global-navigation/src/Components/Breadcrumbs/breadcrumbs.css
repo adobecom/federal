@@ -58,6 +58,11 @@
      the backdrop turns light or gray. */
   color: var(--s2a-color-gray-25);
   text-decoration: none;
+  text-transform: capitalize;
+}
+
+.global-navigation .feds-breadcrumbs.no-transform > li > :is(a, span) {
+  text-transform: none;
 }
 
 .global-navigation.dark-font .feds-breadcrumbs > li > :is(a, span) {
