@@ -137,7 +137,7 @@ const parseProductCardLink = (
       const href = anchor.getAttribute('href') ?? '';
       const placeholder = document.createElement('span');
       placeholder.className = 'feds-commerce-placeholder';
-      placeholder.setAttribute('data-commerce-href', href);
+      placeholder.dataset.commerceHref = href;
       placeholder.replaceChildren(...anchor.childNodes);
       anchor.replaceWith(placeholder);
     });
