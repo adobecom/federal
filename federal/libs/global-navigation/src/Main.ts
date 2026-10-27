@@ -746,7 +746,7 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const nav = mountpoint.querySelector<HTMLElement>('nav');
   const brandWrapper = mountpoint.querySelector<HTMLElement>('.feds-brand-wrapper');
   const gnavItems = mountpoint.querySelector<HTMLElement>('.feds-gnav-items');
-  const utilities = mountpoint.querySelector<HTMLElement>('.feds-utilities');
+  const utilities = mountpoint.querySelector<HTMLElement>('.feds-utilities, .feds-profile-new');
   const bcWrapper = mountpoint.querySelector<HTMLElement>('.feds-bc-wrapper');
   const pinnedCta = mountpoint.querySelector<HTMLElement>('.feds-pinned-cta');
   const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
