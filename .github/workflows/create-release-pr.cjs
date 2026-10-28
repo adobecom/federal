@@ -2,6 +2,20 @@ module.exports = async ({ github, context, core }) => {
   const { owner, repo } = context.repo;
   const base = 'main';
   const head = 'stage';
+  const openPRs = await github.paginate(github.rest.pulls.list, {
+    owner,
+    repo,
+    state: 'open',
+    base,
+    head: `${owner}:${head}`,
+    per_page: 100,
+  });
+  const existingPR = openPRs[0];
+  if (context.eventName === 'push' && !existingPR) {
+    core.notice('No open Stage to Main release PR to update. Run the workflow manually to create one.');
+    return;
+  }
+
   const commits = [];
   let page = 1;
   let pageCommits;
@@ -57,16 +71,6 @@ module.exports = async ({ github, context, core }) => {
     core.warning('No merged PRs found in the main...stage comparison. Check the release diff.');
   }
 
-  const openPRs = await github.paginate(github.rest.pulls.list, {
-    owner,
-    repo,
-    state: 'open',
-    base,
-    head: `${owner}:${head}`,
-    per_page: 100,
-  });
-
-  const existingPR = openPRs[0];
   const { data: releasePR } = existingPR
     ? await github.rest.pulls.update({
       owner, repo, pull_number: existingPR.number, title, body,
