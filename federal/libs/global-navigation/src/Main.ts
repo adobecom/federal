@@ -1,6 +1,5 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
 import { Component, component } from "./Components/Component";
-import { convertRenderedNavigationLinks } from "./Utils/StageLinks";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
@@ -44,6 +43,10 @@ export type Input = {
   unavEnabled: boolean;
   // Host IMS readiness; only UNAV waits, not the navigation shell.
   imsReady?: Promise<void>;
+  // Host-owned AUP SDK (e.g. Milo's, which also renders AUP dialogs and
+  // publishes readiness for merch CTAs). When provided, UNAV uses it and
+  // federal does not load or configure its own SDK instance.
+  fetchAUPSDKInstance?: () => Promise<unknown>;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
@@ -157,6 +160,13 @@ const validateInput = (input: Input): IrrecoverableError | null => {
   return null;
 };
 
+// Non-function values from JS callers are ignored.
+const getHostFetchAUPSDKInstance = (
+  input: Input,
+): (() => Promise<unknown>) | undefined => (
+  typeof input.fetchAUPSDKInstance === 'function' ? input.fetchAUPSDKInstance : undefined
+);
+
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
@@ -215,7 +225,8 @@ export const main = async (
   // Kick off AUP SDK init in parallel with gnav fetch/parse/render and the
   // UniversalNav.js download when the host has no pending IMS initialization.
   // Otherwise loadUnav() starts AUP after the host's readiness promise settles.
-  if (unavEnabled && input.imsReady === undefined) preloadAupSdk();
+  if (unavEnabled && input.imsReady === undefined
+    && getHostFetchAUPSDKInstance(input) === undefined) preloadAupSdk();
 
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError) {
@@ -238,6 +249,15 @@ export const main = async (
   // only when unav is off AND a `.profile` block was authored (a page opts out
   // by not authoring one). Otherwise `loadUnav` owns the utilities slot.
   const profileEnabled = !unavEnabled && rawProfileElem !== null;
+  const breadcrumbAnchors = [
+    ...document.querySelectorAll<HTMLAnchorElement>('.breadcrumbs ul > li > a')
+  ];
+  input.convertStageLinks?.({
+    anchors: breadcrumbAnchors,
+    hostname: window.location.hostname,
+    href: window.location.href,
+  });
+
   const brandConciergeBlock = await resolveBrandConciergeBlock(mainNav);
 
   const gnavData = parseNavigation(
@@ -262,13 +282,6 @@ export const main = async (
       lanaLog(`Failed to load brand concierge: ${error}`);
     }
   }
-
-  convertRenderedNavigationLinks(
-    mountpoint,
-    input.convertStageLinks,
-    window.location.hostname,
-    window.location.href,
-  );
 
   return postRenderingTasks(input, rawProfileElem);
 };
@@ -513,6 +526,7 @@ export const postRenderingTasks = async (
     const unav = await loadUnav(input.mountpoint, {
       countryCode: input.countryCode,
       imsReady: input.imsReady,
+      fetchAUPSDKInstance: getHostFetchAUPSDKInstance(input),
     });
     if (unav instanceof RecoverableError) {
       errors.add(unav);
@@ -554,6 +568,13 @@ export const postRenderingTasks = async (
     }
     return 0;
   };
+
+  const fedsWindow = window as unknown as {
+    feds?: { nav?: Partial<Pick<GlobalNavigation, "getGnavHeight">> };
+  };
+  fedsWindow.feds ??= {};
+  fedsWindow.feds.nav ??= {};
+  fedsWindow.feds.nav.getGnavHeight = getGnavHeight;
 
   return {
     closeEverything: () => closePopovers(input.mountpoint),
