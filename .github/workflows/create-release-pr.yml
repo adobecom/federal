@@ -2,6 +2,9 @@ name: Create Stage to Main PR
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - stage
 
 permissions:
   contents: read
