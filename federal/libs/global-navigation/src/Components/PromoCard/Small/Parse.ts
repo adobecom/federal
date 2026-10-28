@@ -44,8 +44,8 @@ export const parsePromoCardSmall = (
 ): Parsed<PromoCardSmall, RecoverableError> => {
   const errors = new Set<RecoverableError>();
 
-  const requireFields = (valid: boolean, message: string): void => {
-    if (valid) return;
+  const requireFields = (inValid: boolean, message: string): void => {
+    if (!inValid) return;
     errors.add(new RecoverableError(message));
   };
 
@@ -67,17 +67,17 @@ export const parsePromoCardSmall = (
     : null;
   const hasFieldLink = bgImageFieldLink === null;
   requireFields(
-    bgImageElement !== null || hasFieldLink, ERRORS.MissingBackgroundImage,
+    bgImageElement === null && hasFieldLink, ERRORS.MissingBackgroundImage,
   );
 
   const bgImageAlt = bgImageElement?.getAttribute('alt') ?? "";
   requireFields(
-    bgImageAlt !== "" || hasFieldLink, ERRORS.MissingBackgroundImageAlt,
+    bgImageAlt === "" && hasFieldLink, ERRORS.MissingBackgroundImageAlt,
   );
 
   const bgImageSrc = bgImageElement?.getAttribute('src') ?? "";
   requireFields(
-    bgImageSrc !== "" || hasFieldLink, ERRORS.MissingBackgroundImageSrc,
+    bgImageSrc === "" && hasFieldLink, ERRORS.MissingBackgroundImageSrc,
   );
 
   if (contentSection === undefined)
