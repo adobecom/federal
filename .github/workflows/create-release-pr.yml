@@ -1,0 +1,31 @@
+name: Create Stage to Main PR
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - stage
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: stage-to-main-release-pr
+  cancel-in-progress: false
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Create or update release PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const createReleasePR = require('./.github/workflows/create-release-pr.cjs');
+            await createReleasePR({ github, context, core });
