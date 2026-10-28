@@ -66,13 +66,19 @@ export const parsePromoCardSmall = (
       ) ?? null
     : null;
   const hasFieldLink = bgImageFieldLink === null;
-  requireFields(bgImageElement !== null || hasFieldLink, ERRORS.MissingBackgroundImage,);
+  requireFields(
+    bgImageElement !== null || hasFieldLink, ERRORS.MissingBackgroundImage,
+  );
 
   const bgImageAlt = bgImageElement?.getAttribute('alt') ?? "";
-  requireFields(bgImageAlt !== "" || hasFieldLink, ERRORS.MissingBackgroundImageAlt,);
+  requireFields(
+    bgImageAlt !== "" || hasFieldLink, ERRORS.MissingBackgroundImageAlt,
+  );
 
   const bgImageSrc = bgImageElement?.getAttribute('src') ?? "";
-  requireFields(bgImageSrc !== "" || hasFieldLink, ERRORS.MissingBackgroundImageSrc,);
+  requireFields(
+    bgImageSrc !== "" || hasFieldLink, ERRORS.MissingBackgroundImageSrc,
+  );
 
   if (contentSection === undefined)
     throw new IrrecoverableError(ERRORS.MissingContentSection);
