@@ -5,3 +5,18 @@ current navigation height, including visible breadcrumbs or the compact local
 navigation row. Call it when measuring rather than caching the result.
 Federal temporarily exposes this method directly; the host can own the
 assignment later.
+
+To disable automatic active-link highlighting in C2 navigation, append
+`#_noActiveItem` to the `gnav-source` URL, matching legacy Milo:
+
+```text
+/federal/site-redesign/gnav#_noActiveItem
+```
+
+This applies to both global navigation and localnav. Without the marker,
+URL-based active-link detection is unchanged. The marker does not change
+link destinations or localnav click behavior.
+
+CTA links are excluded from active-link detection, including primary and
+secondary CTAs, pinned and product-entry CTAs, promo-card CTAs, and image-panel
+buttons. Ordinary navigation links remain eligible.
