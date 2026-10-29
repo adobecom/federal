@@ -14,14 +14,12 @@ const findActiveLink = (
     'a:not(.feds-skip-link)'
   )]
     .filter(a => !a.closest('.feds-breadcrumbs'))
-    .filter(a => !a.closest([
+    // Like C1, nested CTA links can activate their containing menu.
+    .filter(a => a.closest('.feds-popup') !== null || !a.closest([
       '.feds-primary-cta',
       '.feds-secondary-cta',
       '.feds-pinned-cta',
       '.feds-product-entry-cta',
-      '.promo-card__cta',
-      '.promo-card-small__cta',
-      '.image-panel-button',
     ].join(', ')))
     .filter(a => !isLocalnav
       || a.closest('ul.feds-gnav-items > li:first-child') === null)

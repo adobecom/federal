@@ -59,7 +59,6 @@ describe('active navigation link detection', () => {
   for (const className of [
     'feds-primary-cta',
     'feds-secondary-cta',
-    'image-panel-button',
   ]) {
     it(`does not mark a matching ${className} active`, () => {
       matchingItem().querySelector('a').className = className;
@@ -73,23 +72,60 @@ describe('active navigation link detection', () => {
       initialize();
       expect(activeItem()).to.equal(matchingItem());
     });
+
+    it(`marks the parent menu active for a nested ${className}`, () => {
+      matchingItem().innerHTML = `
+        <div class="feds-popup">
+          <a class="${className}" href="${currentPage}">CTA</a>
+        </div>`;
+      initialize();
+      expect(activeItem()).to.equal(matchingItem());
+    });
   }
 
   for (const className of [
     'feds-pinned-cta',
     'feds-product-entry-cta',
+  ]) {
+    it(`excludes toolbar links inside ${className}`, () => {
+      mountpoint.querySelector('nav').insertAdjacentHTML('afterbegin',
+        `<div class="${className}"><a href="${currentPage}">CTA</a></div>`);
+      initialize();
+      expect(activeItem()).to.equal(matchingItem());
+    });
+  }
+
+  for (const className of [
     'promo-card__cta',
     'promo-card-small__cta',
   ]) {
-    it(`excludes links inside ${className}, including nested menu CTAs`, () => {
+    it(`marks the parent menu active for links inside ${className}`, () => {
       matchingItem().innerHTML = `
         <div class="feds-popup">
           <div class="${className}"><a href="${currentPage}">CTA</a></div>
         </div>`;
       initialize();
-      expect(activeItem()).to.equal(null);
+      expect(activeItem()).to.equal(matchingItem());
     });
   }
+
+  it('marks the parent menu active for an image-panel button', () => {
+    matchingItem().innerHTML = `
+      <div class="feds-popup">
+        <a class="image-panel-button" href="${currentPage}">CTA</a>
+      </div>`;
+    initialize();
+    expect(activeItem()).to.equal(matchingItem());
+  });
+
+  it('disables nested CTA detection with the source marker', () => {
+    matchingItem().innerHTML = `
+      <div class="feds-popup">
+        <a class="feds-primary-cta" href="${currentPage}">CTA</a>
+      </div>`;
+    initialize('#_noActiveItem');
+    expect(activeItem()).to.equal(null);
+  });
 
   it('excludes CTAs in localnav without suppressing ordinary links', () => {
     mountpoint.querySelector('nav').classList.add('localnav');
