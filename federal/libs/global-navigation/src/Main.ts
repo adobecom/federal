@@ -2,6 +2,7 @@ import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Rende
 import { Component, component } from "./Components/Component";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
+import { link } from "./Components/Link/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
@@ -17,7 +18,7 @@ import { isUnavEnabled } from "./PostRendering/Unav/Unav.config";
 import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setSanitizedHTML, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, getLocalizeLink, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, getLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -297,14 +298,14 @@ mountpoint: HTMLElement
 ): Promise<HTMLElement> => {
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
-  setSanitizedHTML(mountpoint, navHTML);
+  mountpoint.innerHTML = navHTML;
   const promoBar = await data.promoBar;
   if (promoBar !== null) {
     const promoWrapper = document.querySelector<HTMLElement>(
       '.feds-promo-aside-wrapper',
     );
     if (promoWrapper !== null) {
-      setSanitizedHTML(promoWrapper, renderPromoBar(promoBar));
+      promoWrapper.innerHTML = renderPromoBar(promoBar);
       promoWrapper.style.display = 'none';
       promoWrapper.classList.add(`feds-promo-bar--${promoBar.theme}`);
 
@@ -322,7 +323,7 @@ mountpoint: HTMLElement
     ...mountpoint.querySelectorAll('.mega-menu:not(.small-menu) ~ .feds-popup:not(.small-menu)')
   ]
   megaMenus.forEach(mm => {
-    mm.replaceChildren();
+    mm.innerHTML = '';
   });
   const megaMenuComponents = data.components.filter(com => com.type === "MegaMenu");
   const mmPromises = megaMenuComponents.map(com => com.content);
@@ -330,10 +331,7 @@ mountpoint: HTMLElement
     try {
       const [content] = await mmPromise;
       const extraData: MegaMenuExtraData = { type: "MegaMenuExtraData", breadcrumbs: data.breadcrumbs };
-      setSanitizedHTML(
-        megaMenus[idx],
-        popup(content, megaMenus[idx].id, extraData),
-      );
+      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, extraData);
     } catch (error) {
       lanaLog(`Failed to render mega menu: ${error}`);
     }
@@ -345,10 +343,7 @@ mountpoint: HTMLElement
   const smallMenuComponents = data.components.filter(com => com.type === "SmallMenu");
   smallMenuComponents.forEach((com, idx) => {
     const [content] = com.content;
-    setSanitizedHTML(
-      smallMenus[idx],
-      smallMenuPopup(content, smallMenus[idx].id),
-    );
+    smallMenus[idx].innerHTML = smallMenuPopup(content, smallMenus[idx].id);
   });
 
   return mountpoint;
@@ -359,6 +354,7 @@ export const renderGnavString = ({
   components,
   breadcrumbs,
   productCTA,
+  telephone,
   unavEnabled,
   profileEnabled,
   placeholders,
@@ -400,14 +396,24 @@ export const renderGnavString = ({
       ? component(withLocalnavOverviewLabel(c, placeholders), index)
       : component(c, index)
   );
-  // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
-  // stays visible beside the hamburger, not only inside the drawer.
+  // Clone the trailing CTA into a toolbar slot so it stays by the hamburger.
+  // The telephone has its own pinned slot, so exclude it from the trailing CTA.
   const ctaComponents = components.filter(
-    (c) => c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA'
+    (c) => (c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA') && c !== telephone
   );
   const [trailingCta] = ctaComponents.slice(-1);
   const pinnedCtaHTML = trailingCta !== undefined
     ? `<div class="feds-pinned-cta">${component(trailingCta)}</div>`
+    : '';
+  // Pin the telephone beside the hamburger as a plain link (no CTA pill).
+  const pinnedTelHTML = telephone !== null
+    ? `<div class="feds-pinned-tel">${link({
+        type: 'Link',
+        text: telephone.text,
+        href: telephone.href,
+        daaLl: telephone.daaLl,
+        ariaLabel: telephone.ariaLabel,
+      })}</div>`
     : '';
 
   return `
@@ -477,6 +483,7 @@ export const renderGnavString = ({
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${pinnedCtaHTML}
+  ${pinnedTelHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${profileEnabled
@@ -779,6 +786,7 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const bcWrapper = mountpoint.querySelector<HTMLElement>('.feds-bc-wrapper, .feds-profile-new');
   const pinnedCta = mountpoint.querySelector<HTMLElement>('.feds-pinned-cta');
   const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
+  const pinnedTel = mountpoint.querySelector<HTMLElement>('.feds-pinned-tel');
 
   const check = (): void => {
     // Skip re-measuring while a menu/popup is open. Stripping the state classes
@@ -820,10 +828,11 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
     // Stage 2: when collapsed, hide both toolbar CTAs if they'd overlap the
     // hamburger (they stay reachable in the drawer).
     const collapsed = mobile || header.classList.contains('is-compact');
-    if (!collapsed || (!pinnedCta && !productCta)) return;
+    if (!collapsed || (!pinnedCta && !productCta && !pinnedTel)) return;
     const needed = (brandWrapper?.offsetWidth ?? 0)
       + (bcWrapper?.offsetWidth ?? 0)
       + (pinnedCta?.offsetWidth ?? 0)
+      + (pinnedTel?.offsetWidth ?? 0)
       + (productCta?.offsetWidth ?? 0)
       + (utilities?.offsetWidth ?? 0) + CTA_OVERFLOW_GAP;
     const available = nav?.clientWidth ?? header.clientWidth;
@@ -912,9 +921,7 @@ const waitUntilVisible = (callback: () => void): void => {
 
   const check = (): void => {
     if (isBodyVisible()) {
-      // Inline arrow so the timer can only ever receive a function, never a
-      // string that would be evaluated as code.
-      setTimeout(() => callback(), 1000);
+      setTimeout(callback, 1000);
     } else {
       requestAnimationFrame(check);
     }
