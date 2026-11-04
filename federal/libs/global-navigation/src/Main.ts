@@ -12,6 +12,7 @@ import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
 import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
+import { initScrollDismiss } from "./PostRendering/ScrollDismiss";
 
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { isUnavEnabled } from "./PostRendering/Unav/Unav.config";
@@ -519,6 +520,7 @@ export const postRenderingTasks = async (
   initKeyboardNav(input.mountpoint);
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
+  initScrollDismiss(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
