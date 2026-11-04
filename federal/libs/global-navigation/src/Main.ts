@@ -2,6 +2,7 @@ import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Rende
 import { Component, component } from "./Components/Component";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
+import { link } from "./Components/Link/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
@@ -10,8 +11,10 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { initCompactOverflow } from "./PostRendering/CompactOverflow";
+import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
 
 import { loadUnav, preloadAupSdk, reserveUnavWidth } from "./PostRendering/Unav/Unav";
+import { isUnavEnabled } from "./PostRendering/Unav/Unav.config";
 import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
@@ -178,7 +181,6 @@ export const main = async (
 
   const {
     mountpoint,
-    unavEnabled,
     miloConfig,
     personalization
   } = input;
@@ -189,6 +191,9 @@ export const main = async (
     lanaLog(`Failed to initialize MiloConfig: ${error}`);
     throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
   }
+
+  input = { ...input, unavEnabled: isUnavEnabled(input.unavEnabled) };
+  const { unavEnabled } = input;
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
@@ -357,6 +362,7 @@ export const renderGnavString = ({
   components,
   breadcrumbs,
   productCTA,
+  telephone,
   unavEnabled,
   profileEnabled,
   placeholders,
@@ -398,14 +404,24 @@ export const renderGnavString = ({
       ? component(withLocalnavOverviewLabel(c, placeholders), index)
       : component(c, index)
   );
-  // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
-  // stays visible beside the hamburger, not only inside the drawer.
+  // Clone the trailing CTA into a toolbar slot so it stays by the hamburger.
+  // The telephone has its own pinned slot, so exclude it from the trailing CTA.
   const ctaComponents = components.filter(
-    (c) => c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA'
+    (c) => (c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA') && c !== telephone
   );
   const [trailingCta] = ctaComponents.slice(-1);
   const pinnedCtaHTML = trailingCta !== undefined
     ? `<div class="feds-pinned-cta">${component(trailingCta)}</div>`
+    : '';
+  // Pin the telephone beside the hamburger as a plain link (no CTA pill).
+  const pinnedTelHTML = telephone !== null
+    ? `<div class="feds-pinned-tel">${link({
+        type: 'Link',
+        text: telephone.text,
+        href: telephone.href,
+        daaLl: telephone.daaLl,
+        ariaLabel: telephone.ariaLabel,
+      })}</div>`
     : '';
 
   return `
@@ -475,6 +491,7 @@ export const renderGnavString = ({
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${pinnedCtaHTML}
+  ${pinnedTelHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${profileEnabled
@@ -492,9 +509,7 @@ export const postRenderingTasks = async (
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
 
-  const activeLink = findActiveLink(input.mountpoint);
-  const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
-  activeDropDown?.classList.add('active-element');
+  initActiveLink(input.mountpoint, input.gnavSource);
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initPromoBarHeight(input.mountpoint);
@@ -762,27 +777,6 @@ const initHeaderAnalytics = (
   const header = mountpoint.closest("header");
   if (header === null) return;
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
-};
-
-const isCurrentPageHref = (href: string): boolean => {
-  const url = `${window.location.origin}${window.location.pathname}`;
-  return href === url
-      || href.startsWith(`${url}?`)
-      || href.startsWith(`${url}#`);
-};
-
-const findActiveLink = (
-  mountpoint: HTMLElement
-): HTMLAnchorElement | null => {
-  // In localnav the first top-level <li> (before the divider) is the mega
-  // menu whose title also labels the localnav bar — it represents the
-  // section itself rather than a sibling destination, so it's excluded here
-  // and only links after the divider are eligible to be marked active.
-  const isLocalnav = mountpoint.querySelector('nav.localnav') !== null;
-  return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
-    .filter(a => !a.closest('.feds-breadcrumbs'))
-    .filter(a => !isLocalnav || a.closest('ul.feds-gnav-items > li:first-child') === null)
-    .find(a => isCurrentPageHref(a.href)) ?? null;
 };
 
 /**

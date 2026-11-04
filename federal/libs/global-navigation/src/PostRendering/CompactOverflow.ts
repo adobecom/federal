@@ -36,6 +36,7 @@ export const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const bcWrapper = mountpoint.querySelector<HTMLElement>('.feds-bc-wrapper, .feds-profile-new');
   const pinnedCta = mountpoint.querySelector<HTMLElement>('.feds-pinned-cta');
   const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
+  const pinnedTel = mountpoint.querySelector<HTMLElement>('.feds-pinned-tel');
 
   const check = (): void => {
     // Stripping compact state while a menu is open drops its scroll lock,
@@ -67,10 +68,11 @@ export const initCompactOverflow = (mountpoint: HTMLElement): void => {
 
     // Hide colliding toolbar CTAs; originals stay reachable in the drawer.
     const collapsed = mobile || header.classList.contains('is-compact');
-    if (!collapsed || (!pinnedCta && !productCta)) return;
+    if (!collapsed || (!pinnedCta && !productCta && !pinnedTel)) return;
     const needed = (brandWrapper?.offsetWidth ?? 0)
       + (bcWrapper?.offsetWidth ?? 0)
       + (pinnedCta?.offsetWidth ?? 0)
+      + (pinnedTel?.offsetWidth ?? 0)
       + (productCta?.offsetWidth ?? 0)
       + (utilities?.offsetWidth ?? 0) + CTA_OVERFLOW_GAP;
     const available = nav?.clientWidth ?? header.clientWidth;
