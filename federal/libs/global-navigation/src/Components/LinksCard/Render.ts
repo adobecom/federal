@@ -1,7 +1,13 @@
 import { primaryCTA, secondaryCTA } from "../CTA/Render";
 import { link } from "../Link/Render";
 import { LinksCard, LinksCardItem } from "./Parse";
-import { getAnalyticsAttrs, sanitize, icons, localizeHref } from "../../Utils/Utils";
+import {
+  getAnalyticsAttrs,
+  getTargetAttrs,
+  sanitize,
+  icons,
+  localizeHref,
+} from "../../Utils/Utils";
 
 export const linkscard = ({
   card
@@ -20,15 +26,17 @@ const renderCard = ({
         <span class="links-card-chevron" aria-hidden="true">${icons.chevronDown}</span>
       </div>
       <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
-        ${links.map(item => item.description !== undefined && item.description !== ''
+        ${links.map(item => {
+          const { href, target } = getTargetAttrs(item.href);
+          return item.description !== undefined && item.description !== ''
           ? `<li class="links-card-links__item--has-description">
-               <a class="feds-link links-card-links__item-link ${item.highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(item.href)}" daa-ll="${item.text}">
+               <a class="feds-link links-card-links__item-link ${item.highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(href)}"${target !== '' ? ` target="${target}"` : ''} daa-ll="${item.text}">
                  <span class="links-card-links__item-title">${item.text}</span>
                  <span class="links-card-links__item-description">${item.description}</span>
                </a>
              </li>`
-          : `<li>${link(item)}</li>`
-        ).join("")}
+          : `<li>${link(item)}</li>`;
+        }).join("")}
       </ul>
     </div>
     ${footerCTA === null
