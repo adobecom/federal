@@ -188,7 +188,7 @@ nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
 
   .global-navigation.feds-header-scrolled nav.localnav .feds-localnav-bar,
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
-    border-top-color: rgba(0, 0, 0, 0.12);
+    border-top: 0;
     color: var(--s2a-color-content-default);
   }
 
@@ -430,7 +430,7 @@ header.global-navigation.is-compact.dark-font nav.localnav .feds-localnav-bar {
 
 header.global-navigation.is-compact.feds-header-scrolled nav.localnav .feds-localnav-bar,
 header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
-  border-top-color: rgba(0, 0, 0, 0.12);
+  border-top: 0;
   color: var(--s2a-color-content-default);
 }
 
