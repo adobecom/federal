@@ -289,6 +289,15 @@ header.feds-header-scrolled:not(:has(.localnav)):not(:has(.feds-popup.is-open:no
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (width >= 768px) {
+  .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
 }
 
 /* Scrolled OR any popup/drawer open → backdrop is light/gray, so
@@ -958,6 +967,12 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   header.global-navigation:not(.is-compact) .feds-gnav-items > li > .mega-menu.feds-link[aria-expanded="true"] .chevron-down {
     transform: rotate(180deg);
+  }
+
+  [dir="rtl"] header.global-navigation:not(.is-compact):not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items > li > .feds-link:focus-visible {
+    padding: var(--s2a-spacing-2xs);
+    margin: calc(-1 * var(--s2a-spacing-2xs));
+    outline-offset: calc(var(--s2a-spacing-sm) - var(--s2a-spacing-2xs));
   }
 
   header.global-navigation:not(.is-compact) .feds-popup .feds-popup-header {
