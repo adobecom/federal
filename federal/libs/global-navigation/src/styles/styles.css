@@ -960,7 +960,8 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     transform: rotate(180deg);
   }
 
-  header.global-navigation:not(.is-compact):not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items > li > .feds-link:focus-visible {
+  header.global-navigation:not(.is-compact):not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items > li > .feds-link:focus-visible,
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li > .feds-link:focus-visible {
     padding: var(--s2a-spacing-2xs);
     margin: calc(-1 * var(--s2a-spacing-2xs));
     outline-offset: calc(var(--s2a-spacing-sm) - var(--s2a-spacing-2xs));
