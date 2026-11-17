@@ -67,7 +67,7 @@ nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
     background-color: #3b63fb;
     color: var(--s2a-color-button-content-primary-solid-default);
     border: none;
-    margin-top: var(--s2a-spacing-lg);
+    margin-top: var(--s2a-spacing-sm);
     &:hover {
       background-color: #3b63fb;
       color: var(--s2a-color-button-content-primary-solid-default);
