@@ -31,6 +31,10 @@ jobs:
         with:
           # styles.css imports the design tokens from the consonant submodule.
           submodules: true
+          # Persisting credentials recurses into consonant's nested submodules,
+          # one of which (apps/figma-console-mcp) has no .gitmodules entry and
+          # fails the checkout. This job never needs git credentials again.
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
