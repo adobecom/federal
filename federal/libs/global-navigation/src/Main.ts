@@ -848,22 +848,30 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
+// Maximized promo variants are revealed this long after the page becomes
+// visible; the minimized variant is revealed immediately.
+const PROMO_REVEAL_DELAY_MS = 1000;
+
 // Polls (rather than listening for a `transitionend`) since the host page
 // may set body opacity via a CSS transition, an instant class toggle, or an
 // inline style — a poll catches all three without coupling to whichever
 // mechanism the host happens to use.
-const waitUntilVisible = (callback: () => void): void => {
+const waitUntilVisible = (callback: () => void, delayMs: number): void => {
   const isBodyVisible = (): boolean =>
     window.getComputedStyle(document.body).opacity === '1';
 
   const check = (): void => {
-    if (isBodyVisible()) {
-      // Inline arrow so the timer can only ever receive a function, never a
-      // string that would be evaluated as code.
-      setTimeout(() => callback(), 1000);
-    } else {
+    if (!isBodyVisible()) {
       requestAnimationFrame(check);
+      return;
     }
+    if (delayMs === 0) {
+      callback();
+      return;
+    }
+    // Inline arrow so the timer can only ever receive a function, never a
+    // string that would be evaluated as code.
+    setTimeout(() => callback(), delayMs);
   };
   check();
 };
@@ -937,11 +945,6 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   );
   if (promoWrapper === null) return;
 
-  waitUntilVisible(() => {
-    promoWrapper.style.display = '';
-    promoWrapper.classList.add('feds-promo-bar--reveal');
-  });
-
   // header.global-navigation is `position: sticky`, so it renders below the
   // promo bar and scrolls with the page natively — no JS or CSS animation
   // needed for that part. --feds-promo-bar-height only feeds the extra
@@ -949,19 +952,29 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   // showing (see styles.css); re-measured on resize in case the promo
   // reflows.
   //
-  // Measure the wrapper, not the inner .feds-promo-bar: the wrapper is
-  // what the reveal animation clips via max-height, so its offsetHeight
-  // ramps up in step with the visible box. The inner bar is never
-  // height-constrained, so it reports its full natural height the instant
-  // display flips from `none` — which would snap --feds-promo-bar-height
-  // (and the body padding-top it drives) to its final value a full
-  // animation ahead of what's actually visible on screen.
+  // Measure the wrapper, not the inner .feds-promo-bar: for animated
+  // variants the wrapper is what the reveal animation clips via max-height,
+  // so its offsetHeight ramps up in step with the visible box. The inner bar
+  // is never height-constrained, so it reports its full natural height the
+  // instant display flips from `none` — which would snap
+  // --feds-promo-bar-height (and the body padding-top it drives) to its final
+  // value a full animation ahead of what's actually visible on screen.
   const updateHeight = (): void => {
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
       `${promoWrapper.offsetHeight}px`,
     );
   };
+
+  // Maximized and maximized release variants keep a delayed, animated reveal. The minimized bar is
+  // shown as soon as the page is visible, without a delay or animation.
+  const isMinimized = promoBar.classList.contains('feds-promo-bar--minimized');
+  waitUntilVisible(() => {
+    promoWrapper.style.display = '';
+    promoWrapper.classList.add('feds-promo-bar--reveal');
+    updateHeight();
+  }, isMinimized ? 0 : PROMO_REVEAL_DELAY_MS);
+
   new ResizeObserver(updateHeight).observe(promoWrapper);
   updateHeight();
 
