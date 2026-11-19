@@ -28,6 +28,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # styles.css imports the design tokens from the consonant submodule.
+          submodules: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
