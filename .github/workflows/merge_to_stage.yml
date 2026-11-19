@@ -28,13 +28,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          # styles.css imports the design tokens from the consonant submodule.
-          submodules: true
-          # Persisting credentials recurses into consonant's nested submodules,
-          # one of which (apps/figma-console-mcp) has no .gitmodules entry and
-          # fails the checkout. This job never needs git credentials again.
-          persist-credentials: false
+
+      # styles.css imports the design tokens from the consonant submodule.
+      # Fetched here instead of via checkout's `submodules` input: checkout
+      # recurses into consonant's nested submodules when it configures or
+      # removes credentials, and consonant's apps/figma-console-mcp gitlink has
+      # no .gitmodules entry, which fails the step. This fetch is not recursive.
+      - name: Fetch design tokens submodule
+        working-directory: ${{ github.workspace }}
+        run: git submodule update --init federal/libs/global-navigation/consonant
 
       - name: Setup Node
         uses: actions/setup-node@v4
