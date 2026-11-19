@@ -55,6 +55,12 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   animation: feds-promo-bar-reveal 500ms cubic-bezier(0.42, 0, 0, 1) forwards;
 }
 
+/* Keeps the minimized promo invisible, with its space reserved, until its
+   commerce content is ready (see initPromoBarHeight in Main.ts). */
+.feds-promo-aside-wrapper[data-feds-merch-pending] {
+  visibility: hidden;
+}
+
 /* The minimized bar appears in place, with no delay (see
    initPromoBarHeight in Main.ts) and no reveal animation. */
 .feds-promo-aside-wrapper.feds-promo-bar--reveal:has(> .feds-promo-bar--minimized) {

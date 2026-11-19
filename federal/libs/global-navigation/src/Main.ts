@@ -9,7 +9,7 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss, IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
-import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { holdUntilMerchLinksSettle, initMerchLinks } from "./PostRendering/MerchLinks";
 import { initModalLinks, ModalLinkDecorator } from "./PostRendering/ModalLinks";
 import { initCompactOverflow } from "./PostRendering/CompactOverflow";
 import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
@@ -855,6 +855,10 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
 // visible; the minimized variant is revealed immediately.
 const PROMO_REVEAL_DELAY_MS = 1000;
 
+// Longest the minimized promo waits for its commerce content; matches Milo's
+// M@S field timeout.
+const PROMO_COMMERCE_TIMEOUT_MS = 5000;
+
 // Polls (rather than listening for a `transitionend`) since the host page
 // may set body opacity via a CSS transition, an instant class toggle, or an
 // inline style — a poll catches all three without coupling to whichever
@@ -971,10 +975,26 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
 
   // Maximized and maximized release variants keep a delayed, animated reveal. 
   const isMinimized = promoBar.classList.contains('feds-promo-bar--minimized');
-  waitUntilVisible(() => {
+  const reveal = (): void => {
     promoWrapper.style.display = '';
     promoWrapper.classList.add('feds-promo-bar--reveal');
     updateHeight();
+  };
+  waitUntilVisible(() => {
+    if (!isMinimized) {
+      reveal();
+      return;
+    }
+    // Like C1, the minimized bar is shown only once its commerce content is
+    // ready, so raw M@S/OST links never flash. It keeps its space meanwhile,
+    // invisibly, so the page shifts no more than before.
+    const commerceReady = holdUntilMerchLinksSettle(
+      promoWrapper,
+      PROMO_COMMERCE_TIMEOUT_MS,
+    );
+    promoWrapper.style.display = '';
+    updateHeight();
+    void commerceReady.then(reveal, reveal);
   }, isMinimized ? 0 : PROMO_REVEAL_DELAY_MS);
 
   new ResizeObserver(updateHeight).observe(promoWrapper);
