@@ -38,8 +38,8 @@ The expanded localnav bar also closes on page scroll. It does not lock page
 scrolling unless a submenu is open; full navigation drawers and submenus
 retain their scroll lock.
 
-Like C1, the minimized promo bar is shown only once its commerce (M@S/OST)
-content has resolved, so raw authored links never flash. It keeps its space,
-invisibly, while it waits. After 5 seconds it is shown anyway, and any
-commerce links still unresolved are removed. Maximized variants keep their
-1-second delayed reveal.
+Like C1, the minimized promo bar's content is shown only once its commerce
+(M@S/OST) content has resolved, so raw authored links never flash. The bar
+itself, with its background, appears as before. After 5 seconds the content is
+shown anyway, and any commerce links still unresolved are removed. Maximized
+variants keep their 1-second delayed reveal.

@@ -275,10 +275,10 @@ const removeUnresolvedLink = (
 };
 
 /**
- * Marks `container` pending (hidden by CSS) until the commerce links
- * initMerchLinks started in it have settled, or `timeoutMs` has passed. Links
- * still unresolved then are removed. Resolves immediately when the container
- * has no commerce links.
+ * Marks `container` pending (its content is hidden by CSS) until the commerce
+ * links initMerchLinks started in it have settled, or `timeoutMs` has passed.
+ * Links still unresolved then are removed. Resolves immediately when the
+ * container has no commerce links.
  */
 export const holdUntilMerchLinksSettle = async (
   container: HTMLElement,

@@ -975,26 +975,16 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
 
   // Maximized and maximized release variants keep a delayed, animated reveal. 
   const isMinimized = promoBar.classList.contains('feds-promo-bar--minimized');
-  const reveal = (): void => {
+  waitUntilVisible(() => {
+    // Like C1, the minimized bar's content is shown only once its commerce
+    // content is ready, so raw M@S/OST links never flash. The bar itself, with
+    // its background, appears as before.
+    if (isMinimized) {
+      void holdUntilMerchLinksSettle(promoWrapper, PROMO_COMMERCE_TIMEOUT_MS);
+    }
     promoWrapper.style.display = '';
     promoWrapper.classList.add('feds-promo-bar--reveal');
     updateHeight();
-  };
-  waitUntilVisible(() => {
-    if (!isMinimized) {
-      reveal();
-      return;
-    }
-    // Like C1, the minimized bar is shown only once its commerce content is
-    // ready, so raw M@S/OST links never flash. It keeps its space meanwhile,
-    // invisibly, so the page shifts no more than before.
-    const commerceReady = holdUntilMerchLinksSettle(
-      promoWrapper,
-      PROMO_COMMERCE_TIMEOUT_MS,
-    );
-    promoWrapper.style.display = '';
-    updateHeight();
-    void commerceReady.then(reveal, reveal);
   }, isMinimized ? 0 : PROMO_REVEAL_DELAY_MS);
 
   new ResizeObserver(updateHeight).observe(promoWrapper);
