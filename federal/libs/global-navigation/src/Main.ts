@@ -966,8 +966,7 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
     );
   };
 
-  // Maximized and maximized release variants keep a delayed, animated reveal. The minimized bar is
-  // shown as soon as the page is visible, without a delay or animation.
+  // Maximized and maximized release variants keep a delayed, animated reveal. 
   const isMinimized = promoBar.classList.contains('feds-promo-bar--minimized');
   waitUntilVisible(() => {
     promoWrapper.style.display = '';
