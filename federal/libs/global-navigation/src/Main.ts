@@ -319,6 +319,11 @@ mountpoint: HTMLElement
       const barBgColor = promoBarEl?.style.backgroundColor ?? '';
       if (barBgColor !== '') promoWrapper.style.backgroundColor = barBgColor;
       await initMerchLinks(promoWrapper);
+      // Finish and reveal the promo as soon as its own content is ready,
+      // instead of after the mega menus, Brand Concierge and the other
+      // post-rendering tasks have loaded.
+      initPromoCountdownInPromoBar();
+      initPromoBarHeight(mountpoint);
     }
   }
   if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');
@@ -517,7 +522,6 @@ export const postRenderingTasks = async (
   initActiveLink(input.mountpoint, input.gnavSource);
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
-  initPromoBarHeight(input.mountpoint);
   initLanguageBannerOffset(input.mountpoint);
   initBranchBannerOffset(input.mountpoint);
   initClickListeners(input.mountpoint);
@@ -529,7 +533,6 @@ export const postRenderingTasks = async (
   initScrollDismiss(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-  initPromoCountdownInPromoBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
