@@ -275,30 +275,25 @@ const removeUnresolvedLink = (
 };
 
 /**
- * Marks `container` pending (its content is hidden by CSS) until the commerce
- * links initMerchLinks started in it have settled, or `timeoutMs` has passed.
- * Links still unresolved then are removed. Resolves immediately when the
- * container has no commerce links.
+ * Resolves once the commerce links initMerchLinks started in `container` have
+ * settled, or `timeoutMs` has passed. Links still unresolved then are removed,
+ * so raw authored labels never show. Resolves immediately when the container
+ * has no commerce links.
  */
-export const holdUntilMerchLinksSettle = async (
+export const whenMerchLinksSettle = async (
   container: HTMLElement,
   timeoutMs: number,
 ): Promise<void> => {
   const tasks = merchLinkTasks.get(container);
   if (tasks === undefined) return;
-  container.setAttribute(PENDING_MERCH_ATTR, '');
-  try {
-    await Promise.race([
-      tasks.settled,
-      new Promise((resolve) => { setTimeout(resolve, timeoutMs); }),
-    ]);
-    // A resolved link has been replaced, so any still here never resolved.
-    tasks.links
-      .filter((link) => container.contains(link))
-      .forEach((link) => removeUnresolvedLink(link, container));
-  } finally {
-    container.removeAttribute(PENDING_MERCH_ATTR);
-  }
+  await Promise.race([
+    tasks.settled,
+    new Promise((resolve) => { setTimeout(resolve, timeoutMs); }),
+  ]);
+  // A resolved link has been replaced, so any still here never resolved.
+  tasks.links
+    .filter((link) => container.contains(link))
+    .forEach((link) => removeUnresolvedLink(link, container));
 };
 
 /**

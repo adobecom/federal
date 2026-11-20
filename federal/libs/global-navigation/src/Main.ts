@@ -9,7 +9,7 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss, IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
-import { holdUntilMerchLinksSettle, initMerchLinks } from "./PostRendering/MerchLinks";
+import { initMerchLinks, whenMerchLinksSettle } from "./PostRendering/MerchLinks";
 import { initModalLinks, ModalLinkDecorator } from "./PostRendering/ModalLinks";
 import { initCompactOverflow } from "./PostRendering/CompactOverflow";
 import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
@@ -852,7 +852,7 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
 };
 
 // Maximized promo variants are revealed this long after the page becomes
-// visible; the minimized variant is revealed immediately.
+// visible; the minimized variant as soon as its commerce content is ready.
 const PROMO_REVEAL_DELAY_MS = 1000;
 
 // Longest the minimized promo waits for its commerce content; matches Milo's
@@ -975,16 +975,22 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
 
   // Maximized and maximized release variants keep a delayed, animated reveal. 
   const isMinimized = promoBar.classList.contains('feds-promo-bar--minimized');
-  waitUntilVisible(() => {
-    // Like C1, the minimized bar's content is shown only once its commerce
-    // content is ready, so raw M@S/OST links never flash. The bar itself, with
-    // its background, appears as before.
-    if (isMinimized) {
-      void holdUntilMerchLinksSettle(promoWrapper, PROMO_COMMERCE_TIMEOUT_MS);
-    }
+  const reveal = (): void => {
     promoWrapper.style.display = '';
     promoWrapper.classList.add('feds-promo-bar--reveal');
     updateHeight();
+  };
+  waitUntilVisible(() => {
+    if (!isMinimized) {
+      reveal();
+      return;
+    }
+    // Like C1, the minimized bar is shown only once its commerce content is
+    // ready, so raw M@S/OST links never flash and it appears at its final
+    // height. Showing it earlier lets unresolved labels make it taller first,
+    // shifting the page twice.
+    void whenMerchLinksSettle(promoWrapper, PROMO_COMMERCE_TIMEOUT_MS)
+      .then(reveal, reveal);
   }, isMinimized ? 0 : PROMO_REVEAL_DELAY_MS);
 
   new ResizeObserver(updateHeight).observe(promoWrapper);

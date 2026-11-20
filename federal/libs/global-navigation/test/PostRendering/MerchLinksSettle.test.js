@@ -1,14 +1,13 @@
 import { expect } from '@esm-bundle/chai';
-import { holdUntilMerchLinksSettle, initMerchLinks } from '../../src/PostRendering/MerchLinks';
+import { initMerchLinks, whenMerchLinksSettle } from '../../src/PostRendering/MerchLinks';
 import { setMerchDecorators, setMiloConfig } from '../../src/Utils/Utils';
 
 const MAS_FIELD = 'https://mas.adobe.com/studio.html#content-type=merch-card&path=acom-cc&field=promoText';
 const OST_PRICE = 'https://www.adobe.com/tools/ost?osi=abc&type=price';
-const PENDING = 'data-feds-merch-pending';
 
 const settle = () => new Promise((resolve) => { setTimeout(resolve, 0); });
 
-describe('holdUntilMerchLinksSettle', () => {
+describe('whenMerchLinksSettle', () => {
   let container;
 
   before(() => {
@@ -29,17 +28,18 @@ describe('holdUntilMerchLinksSettle', () => {
     container.remove();
   });
 
-  it('does not hold a container without commerce links', async () => {
+  it('resolves at once for a container without commerce links', async () => {
     container.innerHTML = '<p>Save 20% <a href="/plans">today</a></p>';
     await initMerchLinks(container);
 
-    const held = holdUntilMerchLinksSettle(container, 5000);
-    expect(container.hasAttribute(PENDING)).to.equal(false);
-    await held;
+    let resolved = false;
+    void whenMerchLinksSettle(container, 5000).then(() => { resolved = true; });
+    await settle();
+    expect(resolved).to.equal(true);
     expect(container.querySelector('a')).to.not.equal(null);
   });
 
-  it('holds the container until its commerce links have resolved', async () => {
+  it('resolves only once its commerce links have resolved', async () => {
     container.innerHTML = `<p><a href="${MAS_FIELD}">Mas-field: promo text</a></p>`;
     let finish;
     setMerchDecorators({
@@ -54,16 +54,15 @@ describe('holdUntilMerchLinksSettle', () => {
     });
     await initMerchLinks(container);
 
-    let released = false;
-    const held = holdUntilMerchLinksSettle(container, 5000)
-      .then(() => { released = true; });
+    let resolved = false;
+    const settled = whenMerchLinksSettle(container, 5000)
+      .then(() => { resolved = true; });
     await settle();
-    expect(container.hasAttribute(PENDING)).to.equal(true);
-    expect(released).to.equal(false);
+    expect(resolved).to.equal(false);
 
     finish();
-    await held;
-    expect(container.hasAttribute(PENDING)).to.equal(false);
+    await settled;
+    expect(resolved).to.equal(true);
     expect(container.textContent.trim()).to.equal('Save 20% on Photoshop');
   });
 
@@ -80,13 +79,12 @@ describe('holdUntilMerchLinksSettle', () => {
         : null),
     });
     await initMerchLinks(container);
-    await holdUntilMerchLinksSettle(container, 5000);
+    await whenMerchLinksSettle(container, 5000);
 
     expect(container.querySelector('a')).to.equal(null);
     expect(container.querySelector('.headline')).to.equal(null);
     expect(container.querySelector('.body').textContent.trim()).to.equal('From');
     expect(container.querySelector('.inner img')).to.not.equal(null);
-    expect(container.hasAttribute(PENDING)).to.equal(false);
   });
 
   it('stops waiting after the timeout and removes links still unresolved', async () => {
@@ -96,11 +94,10 @@ describe('holdUntilMerchLinksSettle', () => {
     setMerchDecorators({ merch: () => new Promise(() => {}) });
     await initMerchLinks(container);
 
-    await holdUntilMerchLinksSettle(container, 20);
+    await whenMerchLinksSettle(container, 20);
 
     const links = container.querySelectorAll('a');
     expect(links.length).to.equal(1);
     expect(links[0].textContent).to.equal('Learn more');
-    expect(container.hasAttribute(PENDING)).to.equal(false);
   });
 });
