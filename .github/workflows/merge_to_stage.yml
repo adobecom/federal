@@ -29,6 +29,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # styles.css imports the design tokens from the consonant submodule.
+      # Fetched here instead of via checkout's `submodules` input: checkout
+      # recurses into consonant's nested submodules when it configures or
+      # removes credentials, and consonant's apps/figma-console-mcp gitlink has
+      # no .gitmodules entry, which fails the step. This fetch is not recursive.
+      - name: Fetch design tokens submodule
+        working-directory: ${{ github.workspace }}
+        run: git submodule update --init federal/libs/global-navigation/consonant
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
