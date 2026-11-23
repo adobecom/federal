@@ -418,7 +418,8 @@ export const renderGnavString = ({
       ? component(withLocalnavOverviewLabel(c, placeholders), index)
       : component(c, index)
   );
-  // Keep the CTAs in one measured toolbar group; the telephone has its own slot.
+  // Keep the CTAs in one measured toolbar group;
+  // the telephone has its own slot.
   const ctaComponents = components.filter(
     (c): c is PrimaryCTA | SecondaryCTA =>
       (c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA') && c !== telephone
@@ -571,8 +572,8 @@ export const postRenderingTasks = async (
     initPopoverCloseOnUnavInteraction(input.mountpoint);
   }
 
-  const localnavMarginTop = 8;
-  const breadcrumbs = input.mountpoint.querySelector('nav > ul.feds-breadcrumbs');
+  const navMargin = 8;
+  const breadcrumbs = input.mountpoint.querySelector('nav > .feds-breadcrumbs');
   const mobileLocalnav = input.mountpoint.querySelector('li.feds-menu-wrapper');
   type NavType = "Default" | "DefaultCompact" | "Localnav" | "LocalnavCompact";
   const getGnavHeight = (): number => {
@@ -592,14 +593,18 @@ export const postRenderingTasks = async (
     const mobileLocalnavHeight = mobileLocalnav
       ? (mobileLocalnav as HTMLElement).offsetHeight
       : 0;
-    switch (navType) {
-      case "Default":
-      case "DefaultCompact":
-      case "Localnav": return navHeight + breadcrumbsHeight + localnavMarginTop;
-      case "LocalnavCompact": return navHeight + mobileLocalnavHeight + localnavMarginTop;
-      default: navType satisfies never;
-    }
-    return 0;
+    const secondaryRowHeight = ((): number => {
+      switch (navType) {
+        case "Default":
+        case "DefaultCompact":
+        case "Localnav": return breadcrumbsHeight;
+        case "LocalnavCompact": return mobileLocalnavHeight;
+        default: return navType satisfies never;
+      }
+    })();
+    return secondaryRowHeight > 0
+      ? navMargin + navHeight + secondaryRowHeight
+      : navMargin + navHeight + navMargin;
   };
 
   const fedsWindow = window as unknown as {
