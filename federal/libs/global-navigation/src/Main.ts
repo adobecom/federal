@@ -418,7 +418,8 @@ export const renderGnavString = ({
       ? component(withLocalnavOverviewLabel(c, placeholders), index)
       : component(c, index)
   );
-  // Keep the CTAs in one measured toolbar group; the telephone has its own slot.
+  // Keep the CTAs in one measured toolbar group;
+  // the telephone has its own slot.
   const ctaComponents = components.filter(
     (c): c is PrimaryCTA | SecondaryCTA =>
       (c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA') && c !== telephone
