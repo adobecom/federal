@@ -99,7 +99,7 @@ export const initAnimations = (gnav: HTMLElement): void => {
       if (entries.length < 1) return;
       if (isNavDesktop()) return;
       popupHeightObserverCallback(
-        `.feds-menu-wrapper.${IS_OPEN_CLASS} .feds-gnav-items`,
+        `.feds-popup.${IS_OPEN_CLASS}`,
         POPOVER_BG_HEIGHT_OFFSET_PX + TOP_OFFSET
       );
     });
