@@ -1,4 +1,5 @@
 import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
 import { initScrollDismiss } from '../../src/PostRendering/ScrollDismiss.ts';
 import { wirePopups, isPopupOpen } from '../../src/PostRendering/PopupWiring.ts';
 
@@ -10,6 +11,9 @@ describe('navigation scroll dismissal', () => {
   let drawerTrigger;
   let popupTrigger;
   let stylesheet;
+  let scrollX;
+  let scrollY;
+  let originalLenis;
 
   before(async () => {
     stylesheet = document.createElement('link');
@@ -25,6 +29,12 @@ describe('navigation scroll dismissal', () => {
   after(() => stylesheet.remove());
 
   beforeEach(() => {
+    scrollX = 0;
+    scrollY = 350;
+    sinon.stub(window, 'scrollX').get(() => scrollX);
+    sinon.stub(window, 'scrollY').get(() => scrollY);
+    originalLenis = window.lenis;
+    window.lenis = undefined;
     mountpoint = document.createElement('header');
     mountpoint.className = 'global-navigation is-compact';
     mountpoint.innerHTML = `
@@ -47,11 +57,14 @@ describe('navigation scroll dismissal', () => {
   afterEach(() => {
     cleanup();
     mountpoint.remove();
+    sinon.restore();
+    window.lenis = originalLenis;
   });
 
   it('closes a desktop popup and reflects its collapsed state', () => {
     popupTrigger.click();
     expect(isPopupOpen(popup)).to.equal(true);
+    scrollY += 10;
     window.dispatchEvent(new Event('scroll'));
     expect(isPopupOpen(popup)).to.equal(false);
     expect(popupTrigger.getAttribute('aria-expanded')).to.equal('false');
@@ -61,6 +74,7 @@ describe('navigation scroll dismissal', () => {
   it('closes the drawer and its nested popup on document scroll', () => {
     drawerTrigger.click();
     popupTrigger.click();
+    scrollY += 10;
     document.dispatchEvent(new Event('scroll', { bubbles: true }));
     expect(isPopupOpen(drawer)).to.equal(false);
     expect(isPopupOpen(popup)).to.equal(false);
@@ -72,9 +86,53 @@ describe('navigation scroll dismissal', () => {
     for (let i = 0; i < 2; i += 1) {
       drawerTrigger.click();
       expect(isPopupOpen(drawer)).to.equal(true);
+      scrollY += 10;
       window.dispatchEvent(new Event('scroll'));
       expect(isPopupOpen(drawer)).to.equal(false);
     }
+  });
+
+  it('ignores queued page scroll events at the position where the popup opened', () => {
+    scrollY = 300;
+    popupTrigger.click();
+    [window, document].forEach(target => {
+      target.dispatchEvent(new Event('scroll', { bubbles: true }));
+      expect(isPopupOpen(popup)).to.equal(true);
+      expect(popupTrigger.getAttribute('aria-expanded')).to.equal('true');
+    });
+
+    scrollY -= 1;
+    document.dispatchEvent(new Event('scroll', { bubbles: true }));
+    expect(isPopupOpen(popup)).to.equal(false);
+  });
+
+  it('cancels existing smooth-scroll momentum when a popup or drawer opens', () => {
+    const scrollTo = sinon.spy();
+    window.lenis = { start: sinon.spy(), stop: sinon.spy(), scrollTo };
+    [drawerTrigger, popupTrigger].forEach(trigger => {
+      trigger.click();
+      expect(scrollTo.lastCall.args).to.deep.equal([
+        scrollY, { immediate: true, force: true },
+      ]);
+      window.dispatchEvent(new Event('scroll'));
+    });
+    expect(scrollTo.callCount).to.equal(2);
+    expect(isPopupOpen(drawer)).to.equal(true);
+    expect(isPopupOpen(popup)).to.equal(true);
+    expect(window.lenis.stop.called).to.equal(false);
+
+    scrollY += 10;
+    window.dispatchEvent(new Event('scroll'));
+    expect(isPopupOpen(drawer)).to.equal(false);
+    expect(isPopupOpen(popup)).to.equal(false);
+    expect(scrollTo.callCount).to.equal(2);
+  });
+
+  it('dismisses menus on horizontal page scrolling', () => {
+    popupTrigger.click();
+    scrollX += 1;
+    window.dispatchEvent(new Event('scroll'));
+    expect(isPopupOpen(popup)).to.equal(false);
   });
 
   it('does not dismiss menus when their contents scroll', () => {
@@ -90,6 +148,7 @@ describe('navigation scroll dismissal', () => {
   it('does not emit redundant toggle events when already closed', () => {
     let toggles = 0;
     popup.addEventListener('toggle', () => { toggles += 1; });
+    scrollY += 10;
     window.dispatchEvent(new Event('scroll'));
     expect(toggles).to.equal(0);
   });
@@ -97,8 +156,18 @@ describe('navigation scroll dismissal', () => {
   it('can remove the scroll listener', () => {
     popupTrigger.click();
     cleanup();
+    scrollY += 10;
     window.dispatchEvent(new Event('scroll'));
     expect(isPopupOpen(popup)).to.equal(true);
+  });
+
+  it('removes the momentum-cancellation listeners on cleanup', () => {
+    const scrollTo = sinon.spy();
+    window.lenis = { start: sinon.spy(), stop: sinon.spy(), scrollTo };
+    cleanup();
+    drawerTrigger.click();
+    popupTrigger.click();
+    expect(scrollTo.called).to.equal(false);
   });
 
   it('lets the page scroll with the localnav bar expanded and closes it fully', () => {
@@ -108,6 +177,7 @@ describe('navigation scroll dismissal', () => {
     expect(isPopupOpen(drawer)).to.equal(true);
     expect(getComputedStyle(document.body).overflowY).not.to.equal('hidden');
 
+    scrollY += 10;
     document.dispatchEvent(new Event('scroll', { bubbles: true }));
     expect(isPopupOpen(drawer)).to.equal(false);
     expect(drawer.classList.contains('feds-menu-active')).to.equal(false);

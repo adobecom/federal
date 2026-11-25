@@ -76,10 +76,14 @@ declare global {
       updateConfig: (config: Record<string, unknown>) => Promise<void>;
     };
 
-    /** Smooth-scroll controller used by manage-people modal flow */
+    /** Smooth-scroll controller used by navigation and manage-people modals */
     lenis?: {
       start: () => void;
       stop: () => void;
+      scrollTo?: (
+        target: number,
+        options?: { immediate?: boolean; force?: boolean },
+      ) => void;
     };
 
     /** Adobe Launch: Properties set for all outgoing analytics events. */

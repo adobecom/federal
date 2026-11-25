@@ -40,6 +40,9 @@ are hidden and their original menu entries remain available.
 Open C2 navigation menus close when the page scrolls, including when already
 past the header's scroll threshold. Scrolling inside a dropdown or compact
 navigation drawer does not dismiss it.
+Opening a menu cancels any existing Lenis smooth-scroll momentum at the current
+page position, so the first click stays open. A queued scroll event at that same
+position is ignored; subsequent page movement still dismisses the menu.
 The expanded localnav bar also closes on page scroll. It does not lock page
 scrolling unless a submenu is open; full navigation drawers and submenus
 retain their scroll lock.
