@@ -24,6 +24,7 @@ const FEDERAL_LINK_CLASSES = new Set([
   'feds-link',
   'feds-link--highlight',
   'feds-primary-cta',
+  'feds-primary-cta--blue',
   'feds-secondary-cta',
 ]);
 
