@@ -385,6 +385,17 @@ export const getRegistrationGateAttrs = (
   return { href, hideWhenRegistered: false };
 };
 
+// Primary CTA links ending in `#_button-blue` get the Adobe blue fill.
+export const BLUE_FILL_SUFFIX = '#_button-blue';
+
+export const getCtaFillAttrs = (
+  href: string,
+): { href: string; blue: boolean } => {
+  if (href.includes(BLUE_FILL_SUFFIX))
+    return { href: href.replace(BLUE_FILL_SUFFIX, ''), blue: true };
+  return { href, blue: false };
+};
+
 // A `tel:` link, pinned beside the hamburger on compact (not just the drawer).
 export const isTelephoneLink = (href: string): boolean =>
   typeof href === 'string' && href.trim().toLowerCase().startsWith('tel:');

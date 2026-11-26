@@ -37,6 +37,15 @@ matches the authored navigation. The CTA group (including its internal gaps)
 is measured as a whole; when the toolbar no longer fits, the pinned controls
 are hidden and their original menu entries remain available.
 
+Top-level primary CTAs (bold links) use a theme-dependent white or black fill
+by default. Append `#_button-blue` to the CTA's URL in the gnav document to
+use the standard Adobe blue fill instead, for example
+`https://www.adobe.com/buy#_button-blue`. The blue fill stays the same in
+every theme and state, including dark and light fonts, scrolled, compact,
+open menus, the mobile drawer and localnav, and it applies to the pinned
+toolbar copy. The suffix is set per navigation source; there is no page-level
+metadata override.
+
 Open C2 navigation menus close when the page scrolls, including when already
 past the header's scroll threshold. Scrolling inside a dropdown or compact
 navigation drawer does not dismiss it.

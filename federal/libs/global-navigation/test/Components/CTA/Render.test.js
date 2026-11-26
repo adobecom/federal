@@ -107,6 +107,47 @@ describe('CTA Render', () => {
       const anchor = container.querySelector('a.feds-primary-cta');
       expect(anchor.hasAttribute('data-feds-merch-pending')).to.equal(true);
     });
+
+    it('renders the default (theme-dependent) fill without the blue modifier', () => {
+      const container = document.createElement('div');
+      container.innerHTML = primaryCTA({ type: 'PrimaryCTA', text: 'Buy now', href: '/buy' });
+      const anchor = container.querySelector('a.feds-primary-cta');
+      expect(anchor.classList.contains('feds-primary-cta--blue')).to.be.false;
+    });
+
+    it('strips #_button-blue from the href and adds the blue modifier', () => {
+      const container = document.createElement('div');
+      container.innerHTML = primaryCTA({
+        type: 'PrimaryCTA',
+        text: 'Buy now',
+        href: 'https://www.adobe.com/buy#_button-blue',
+      });
+      const anchor = container.querySelector('a.feds-primary-cta');
+      expect(anchor.getAttribute('href')).to.equal('https://www.adobe.com/buy');
+      expect(anchor.classList.contains('feds-primary-cta--blue')).to.be.true;
+    });
+
+    it('composes #_button-blue with #_hide-when-registered and #_blank', () => {
+      const container = document.createElement('div');
+      container.innerHTML = primaryCTA({
+        type: 'PrimaryCTA',
+        text: 'Register',
+        href: 'https://max.adobe.com/register#_button-blue#_hide-when-registered#_blank',
+      });
+      const anchor = container.querySelector('a.feds-primary-cta');
+      expect(anchor.getAttribute('href')).to.equal('https://max.adobe.com/register');
+      expect(anchor.getAttribute('target')).to.equal('_blank');
+      expect(anchor.hasAttribute('data-feds-hide-when-registered')).to.be.true;
+      expect(anchor.classList.contains('feds-primary-cta--blue')).to.be.true;
+    });
+
+    it('keeps the blue modifier on pinned toolbar copies', () => {
+      const container = document.createElement('div');
+      container.innerHTML = pinnedCTAs([
+        { type: 'PrimaryCTA', text: 'Buy now', href: '/buy#_button-blue' },
+      ]);
+      expect(container.querySelector('.feds-pinned-cta > a.feds-primary-cta--blue')).to.not.equal(null);
+    });
   });
 
   describe('secondaryCTA', () => {
