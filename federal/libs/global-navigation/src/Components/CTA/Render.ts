@@ -1,6 +1,7 @@
 import {
   getAnalyticsAttrs,
   getAriaAttrs,
+  getCtaFillAttrs,
   getTargetAttrs,
   getRegistrationGateAttrs,
   isMasFieldLink,
@@ -15,7 +16,8 @@ export const primaryCTA = ({
   ariaLabel,
   ariaAttrs,
 }: PrimaryCTA): HTML => {
-  const { href: unblankedHref, target } = getTargetAttrs(href);
+  const { href: unfilledHref, blue } = getCtaFillAttrs(href);
+  const { href: unblankedHref, target } = getTargetAttrs(unfilledHref);
   const { href: strippedHref, hideWhenRegistered } =
     getRegistrationGateAttrs(unblankedHref);
   const pendingMerchAttr = isMasFieldLink(strippedHref)
@@ -23,7 +25,7 @@ export const primaryCTA = ({
     : '';
   return `
 <a href="${localizeHref(strippedHref)}"
-  class="feds-primary-cta"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
+  class="feds-primary-cta${blue ? ' feds-primary-cta--blue' : ''}"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}

@@ -350,6 +350,31 @@
     border-color: var(--s2a-color-gray-1000);
   }
 
+  /* Blue primary CTA (`#_button-blue`): theme-independent. `:is(#_, *)` raises
+     specificity to beat every state-specific primary rule, incl. localnav.css. */
+  & .feds-primary-cta.feds-primary-cta--blue:is(#_, *) {
+    background-color: var(--s2a-color-button-background-accent-solid-on-light-default, #3b63fb);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-button-background-accent-solid-on-light-default, #3b63fb);
+
+    &:hover {
+      background-color: var(--s2a-color-button-background-accent-solid-on-light-hover, #274dea);
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-button-background-accent-solid-on-light-hover, #274dea);
+    }
+
+    &:active {
+      background-color: var(--s2a-color-button-background-accent-solid-on-light-active, #1e3bb8);
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-button-background-accent-solid-on-light-active, #1e3bb8);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--s2a-color-focus-ring-default, #3b63fb);
+      outline-offset: 2px;
+    }
+  }
+
   /* Full-width only on small screens; stays a natural-width pill from 769px up. */
   @media (max-width: 768px) {
     &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > :is(.feds-primary-cta, .feds-secondary-cta) {

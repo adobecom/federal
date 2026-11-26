@@ -279,6 +279,38 @@ describe('initMerchLinks — commerce link routing', () => {
     }
   });
 
+  it('keeps the blue fill class on a resolved MAS primary CTA', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <ul class="feds-gnav-items">
+        <li><a class="feds-primary-cta feds-primary-cta--blue" href="${MAS_CTA}">Mas-field: Buy now</a></li>
+      </ul>
+    `;
+    document.body.appendChild(mountpoint);
+    let masField;
+    setMerchDecorators({
+      merch: async (link) => {
+        masField = document.createElement('mas-field');
+        link.replaceWith(masField);
+        return masField;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+      masField.innerHTML = '<a class="con-button blue button-l">Buy now</a>';
+      masField.dispatchEvent(new CustomEvent('mas:ready', { bubbles: true }));
+
+      const resolved = mountpoint.querySelector('a');
+      expect(resolved.textContent).to.equal('Buy now');
+      expect(resolved.classList.contains('feds-primary-cta')).to.equal(true);
+      expect(resolved.classList.contains('feds-primary-cta--blue')).to.equal(true);
+      expect(resolved.classList.contains('con-button')).to.equal(false);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
   it('waits for Milo to hoist a late plain link before finalizing it', async () => {
     const mountpoint = document.createElement('div');
     mountpoint.innerHTML = `
